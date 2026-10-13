@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GamerRadar - Comparador Inteligente de Notebooks BR & EUA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header / Topbar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="logo-icon">⚡</div>
+        <div>
+          <h1 class="logo-title">GamerRadar <span>BR vs EUA</span></h1>
+          <p class="logo-subtitle">Comparador Inteligente, Equivalência de Hardware & Vigia de Preços</p>
+        </div>
+      </div>
+
+      <!-- Quick Currency / Exchange Indicator -->
+      <div class="currency-bar">
+        <div class="currency-item">
+          <span class="currency-label">Cotação Dólar (Turismo/Wise):</span>
+          <div class="currency-input-wrap">
+            <span>R$</span>
+            <input type="number" id="usdRateInput" value="5.65" step="0.05" min="4.00" max="8.00">
+          </div>
+        </div>
+        <div class="currency-item">
+          <span class="currency-label">Forma de Pagamento (EUA):</span>
+          <select id="importModeSelect">
+            <option value="wise">✈️ Irmão traz (Conta Global Wise/Nomad - 1.1% IOF)</option>
+            <option value="direct">💵 Irmão traz (Dólar em Espécie / Câmbio Direto)</option>
+          </select>
+        </div>
+        <button class="btn btn-secondary" id="btnOpenSyncModal" title="Conectar ao Google Sheets / Apps Script">
+          ☁️ Conectar Google Sheets
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <!-- Budget / Target Banner -->
+    <section class="budget-spotlight">
+      <div class="spotlight-card">
+        <div class="spotlight-info">
+          <span class="badge badge-accent">🎯 Sua Faixa Selecionada</span>
+          <h2>Orçamento Foco: <strong>R$ 8.000 a R$ 8.900</strong></h2>
+          <p>
+            Na faixa de R$ 8k - 8.9k, o objetivo é garantir <strong>RTX 4060 com TGP máximo (140W) e tela QHD 100% sRGB</strong> no Brasil,
+            ou buscar nos EUA um modelo com <strong>RTX 4070</strong> no mesmo preço final!
+          </p>
+        </div>
+        <div class="spotlight-stats">
+          <div class="stat-box">
+            <span class="stat-label">Equivalente em US$ (Viagem)</span>
+            <span class="stat-value" id="spotlightUsdEquiv">~ $1.415 a $1.575 USD</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">GPU Recomendada</span>
+            <span class="stat-value text-glow">RTX 4060 (140W) ou RTX 4070</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Modelos Monitorados</span>
+            <span class="stat-value" id="spotlightCount">8 modelos ativos</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation & Filters -->
+    <section class="controls-section">
+      <div class="search-filter-bar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Buscar por modelo (ex: Legion, Predator, G16, RTX 4070)...">
+        </div>
+
+        <div class="filter-chips" id="filterChips">
+          <button class="chip active" data-filter="all">Todos</button>
+          <button class="chip" data-filter="budget">Na Faixa (R$ 8k - 8.9k)</button>
+          <button class="chip" data-filter="gpu_upgrade">🚀 Upgrade Grátis de GPU nos EUA</button>
+          <button class="chip" data-filter="rtx4070">Com RTX 4070</button>
+          <button class="chip" data-filter="rtx4060">Com RTX 4060</button>
+          <button class="chip" data-filter="watchlist">⭐ Meus Monitorados</button>
+        </div>
+      </div>
+
+      <div class="sort-bar">
+        <span>Ordenar por:</span>
+        <select id="sortSelect">
+          <option value="value_score">Melhor Custo-Benefício (Score)</option>
+          <option value="price_br_asc">Menor Preço no Brasil (R$)</option>
+          <option value="price_us_asc">Menor Preço nos EUA (US$)</option>
+          <option value="diff_desc">Maior Economia trazendo dos EUA</option>
+          <option value="gpu_power">Potência da GPU (TGP / Tier)</option>
+        </select>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-primary" id="btnOpenDuel">🥊 Duelo: Qual Vale Mais a Pena?</button>
+          <button class="btn btn-secondary" id="btnOpenAddModal">➕ Novo Modelo</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Comparison Grid -->
+    <section class="catalog-section">
+      <div class="section-header">
+        <h2 class="section-title">Radar de Preços Brasil vs EUA</h2>
+        <span class="catalog-summary" id="catalogSummary">Exibindo 8 notebooks</span>
+      </div>
+
+      <div class="notebook-grid" id="notebookGrid">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Side-by-Side Similar Models Comparator Drawer/Modal -->
+    <div class="modal-backdrop" id="comparatorModal" style="display: none;">
+      <div class="modal-dialog modal-large">
+        <div class="modal-header">
+          <div>
+            <span class="badge badge-purple">Motor de Similaridade</span>
+            <h3 class="modal-title" id="comparatorTitle">Notebooks Parecidos & Concorrentes Diretos</h3>
+          </div>
+          <button class="btn-close" id="btnCloseComparator">✕</button>
+        </div>
+        <div class="modal-body" id="comparatorBody">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Custom Watcher Modal -->
+    <div class="modal-backdrop" id="addModal" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3 class="modal-title">Cadastrar Notebook no Rastreador</h3>
+          <button class="btn-close" id="btnCloseAddModal">✕</button>
+        </div>
+        <div class="modal-body">
+          <form id="addLaptopForm" class="form-grid">
+            <div class="form-group full-width">
+              <label for="lapName">Nome do Modelo</label>
+              <input type="text" id="lapName" required placeholder="Ex: Acer Predator Helios Neo 16 PHN16-72">
+            </div>
+            <div class="form-group">
+              <label for="lapGpu">Placa de Vídeo (GPU)</label>
+              <select id="lapGpu" required>
+                <option value="RTX 4070">NVIDIA GeForce RTX 4070 (140W)</option>
+                <option value="RTX 4060">NVIDIA GeForce RTX 4060 (140W)</option>
+                <option value="RTX 4080">NVIDIA GeForce RTX 4080 (175W)</option>
+                <option value="RTX 4050">NVIDIA GeForce RTX 4050 (95W)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="lapCpu">Processador (CPU)</label>
+              <input type="text" id="lapCpu" required placeholder="Ex: Intel i7-14700HX ou Ryzen 7 8845HS">
+            </div>
+            <div class="form-group">
+              <label for="lapRam">Memória RAM</label>
+              <input type="text" id="lapRam" required placeholder="Ex: 16GB DDR5 5600MHz">
+            </div>
+            <div class="form-group">
+              <label for="lapScreen">Tela</label>
+              <input type="text" id="lapScreen" required placeholder="Ex: 16 QHD 165Hz 100% sRGB">
+            </div>
+            <div class="form-group">
+              <label for="lapPriceBr">Preço Médio Brasil (R$)</label>
+              <input type="number" id="lapPriceBr" required placeholder="Ex: 8499" min="1000" step="50">
+            </div>
+            <div class="form-group">
+              <label for="lapPriceUs">Preço Médio EUA (US$)</label>
+              <input type="number" id="lapPriceUs" required placeholder="Ex: 1299" min="200" step="10">
+            </div>
+            <div class="form-group full-width">
+              <label for="lapStoreBr">Loja / Link Brasil</label>
+              <input type="text" id="lapStoreBr" placeholder="Ex: Kabum / Pichau / Mercado Livre / Dell BR">
+            </div>
+            <div class="form-group full-width">
+              <label for="lapStoreUs">Loja / Link EUA</label>
+              <input type="text" id="lapStoreUs" placeholder="Ex: Best Buy / Amazon US / B&H Photo">
+            </div>
+            <div class="form-actions full-width">
+              <button type="button" class="btn btn-secondary" id="btnCancelAdd">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Salvar no Radar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert / Price History Simulator Modal -->
+    <div class="modal-backdrop" id="historyModal" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div>
+            <span class="badge badge-cyan">Histórico & Alerta de Preço</span>
+            <h3 class="modal-title" id="historyTitle">Monitoramento do Modelo</h3>
+          </div>
+          <button class="btn-close" id="btnCloseHistory">✕</button>
+        </div>
+        <div class="modal-body" id="historyBody">
+          <!-- Dynamic history points & alert setup -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Google Sheets / Apps Script Sync Modal -->
+    <div class="modal-backdrop" id="syncModal" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div>
+            <span class="badge badge-accent">Nuvem 100% Gratuita</span>
+            <h3 class="modal-title">Sincronizar com Google Sheets / Apps Script</h3>
+          </div>
+          <button class="btn-close" id="btnCloseSyncModal">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Integre seu site no <strong>GitHub Pages</strong> diretamente com uma <strong>Planilha Google</strong> através do <strong>Google Apps Script</strong>.
+            Assim, o Google vigia os preços na nuvem mesmo com o seu computador desligado!
+          </p>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="gasApiUrl">URL do Web App do Google Apps Script:</label>
+            <input type="text" id="gasApiUrl" placeholder="https://script.google.com/macros/s/.../exec">
+            <small style="color: var(--text-dim); font-size: 0.75rem;">Cole a URL gerada ao clicar em 'Implantar como App da Web' no Google Apps Script.</small>
+          </div>
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button class="btn btn-secondary" id="btnTestFetchGAS">Testar & Carregar Dados</button>
+            <button class="btn btn-primary" id="btnSaveGAS">Salvar Conexão</button>
+          </div>
+          <div id="gasStatusMessage" style="margin-top: 0.75rem; font-size: 0.82rem; display: none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Duel / "Qual Vale Mais a Pena?" Confrontation Modal -->
+    <div class="modal-backdrop" id="duelModal" style="display: none;">
+      <div class="modal-dialog modal-large">
+        <div class="modal-header">
+          <div>
+            <span class="badge badge-purple">Inteligência de Decisão</span>
+            <h3 class="modal-title">🥊 Duelo Direto: Brasil vs EUA (Mesmo Preço, Quem Leva?)</h3>
+          </div>
+          <button class="btn-close" id="btnCloseDuelModal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="duel-selector-bar">
+            <div class="duel-select-group">
+              <label for="duelSelectBr">🇧🇷 Escolha o Modelo de Referência do Brasil:</label>
+              <select id="duelSelectBr"></select>
+            </div>
+            <div class="duel-vs-circle">VS</div>
+            <div class="duel-select-group">
+              <label for="duelSelectUs">🇺🇸 Escolha o Modelo que seu Irmão Traz dos EUA:</label>
+              <select id="duelSelectUs"></select>
+            </div>
+          </div>
+
+          <div id="duelResultArea">
+            <!-- Dynamic comparison & verdict rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>⚡ <strong>GamerRadar</strong> - Calculadora de paridade de compra, paridade técnica e rastreador de preços.</p>
+      <p class="footer-tip">Dica técnica: Sempre confira o <strong>TGP (Watts)</strong> da GPU. Uma RTX 4060 de 140W supera uma RTX 4070 limitada a 75W/100W!</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

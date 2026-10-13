@@ -1,0 +1,1118 @@
+// GamerRadar - Inteligência de Hardware, Comparador BR x EUA e Vigia de Preços
+
+const STORAGE_KEY = 'gamer_radar_laptops';
+const WATCHLIST_KEY = 'gamer_radar_watchlist';
+const GAS_URL_KEY = 'gamer_radar_gas_url';
+
+// Catálogo base de modelos com dados de mercado reais focados na faixa de R$ 8.000 - R$ 8.900
+const DEFAULT_LAPTOPS = [
+  {
+    id: 'predator-helios-neo-16',
+    name: 'Acer Predator Helios Neo 16',
+    modelCode: 'PHN16-72-74T0',
+    gpu: 'NVIDIA RTX 4060',
+    gpuTgp: '140W (Potência Máxima)',
+    gpuTier: 'mid-high',
+    cpu: 'Intel Core i7-14700HX (20 Cores, 28 Threads)',
+    ram: '16GB DDR5 5600MHz (Expansível até 64GB)',
+    storage: '1TB SSD NVMe M.2 Gen4',
+    screen: '16" WQXGA (2560x1600) 165Hz, 100% sRGB, 400 nits, G-Sync',
+    cooling: 'Liquid Metal + Dual 5th Gen AeroBlade 3D Fans',
+    priceBr: 8299,
+    priceUs: 1199,
+    storeBr: 'Acer Store / Kabum',
+    storeUs: 'Best Buy / Amazon US',
+    urlBr: 'https://www.kabum.com.br',
+    urlUs: 'https://www.bestbuy.com',
+    score: 93,
+    bestFor: 'Melhor refrigeração e tela 1600p impecável no BR',
+    history: [
+      { date: 'Nov 2025 (Black Friday)', br: 7899, us: 1099 },
+      { date: 'Jan 2026', br: 8599, us: 1249 },
+      { date: 'Hoje', br: 8299, us: 1199 }
+    ]
+  },
+  {
+    id: 'dell-g16-7630',
+    name: 'Dell G16 7630',
+    modelCode: 'G16-7630-U30P',
+    gpu: 'NVIDIA RTX 4070',
+    gpuTgp: '140W (Potência Máxima)',
+    gpuTier: 'high',
+    cpu: 'Intel Core i7-13650HX (14 Cores)',
+    ram: '16GB DDR5 4800MHz',
+    storage: '1TB SSD NVMe M.2 Gen4',
+    screen: '16" QHD+ (2560x1600) 240Hz, 100% DCI-P3, 300 nits',
+    cooling: 'Vapor Chamber inspirada na Alienware + 4 saídas de ar',
+    priceBr: 8799,
+    priceUs: 1299,
+    storeBr: 'Dell Brasil Oficial / Amazon BR',
+    storeUs: 'Dell US / Best Buy',
+    urlBr: 'https://www.dell.com/pt-br',
+    urlUs: 'https://www.dell.com/en-us',
+    score: 95,
+    bestFor: 'Uma das poucas opções com RTX 4070 abaixo de R$ 8.900 no Brasil',
+    history: [
+      { date: 'Nov 2025 (Black Friday)', br: 8299, us: 1199 },
+      { date: 'Fev 2026', br: 9199, us: 1349 },
+      { date: 'Hoje', br: 8799, us: 1299 }
+    ]
+  },
+  {
+    id: 'lenovo-legion-slim-5',
+    name: 'Lenovo Legion Slim 5 (Gen 8/9)',
+    modelCode: '16APH8 / 16AHP9',
+    gpu: 'NVIDIA RTX 4060',
+    gpuTgp: '140W',
+    gpuTier: 'mid-high',
+    cpu: 'AMD Ryzen 7 7840HS / 8845HS (Eficiência térmica e bateria top)',
+    ram: '16GB DDR5 5600MHz (Slots livres)',
+    storage: '1TB SSD NVMe M.2',
+    screen: '16" WQXGA (2560x1600) 165Hz, 100% sRGB, 350 nits',
+    cooling: 'Legion ColdFront 5.0 (Silencioso e robusto)',
+    priceBr: 8499,
+    priceUs: 1249,
+    storeBr: 'Lenovo Oficial / Mercado Livre',
+    storeUs: 'Lenovo US / B&H Photo',
+    urlBr: 'https://www.lenovo.com/br',
+    urlUs: 'https://www.bhphotovideo.com',
+    score: 94,
+    bestFor: 'Chassi em alumínio fino, teclado superior e bateria longa',
+    history: [
+      { date: 'Dez 2025', br: 8299, us: 1180 },
+      { date: 'Jan 2026', br: 8899, us: 1299 },
+      { date: 'Hoje', br: 8499, us: 1249 }
+    ]
+  },
+  {
+    id: 'asus-tuf-gaming-a15',
+    name: 'ASUS TUF Gaming A15',
+    modelCode: 'FA507UI-HQ017W',
+    gpu: 'NVIDIA RTX 4070',
+    gpuTgp: '140W com Dynamic Boost',
+    gpuTier: 'high',
+    cpu: 'AMD Ryzen 9 8945HS (Com NPU AI dedicada)',
+    ram: '16GB DDR5 5600MHz',
+    storage: '1TB SSD NVMe',
+    screen: '15.6" WQHD (2560x1440) 165Hz, 100% DCI-P3, G-Sync',
+    cooling: 'Dual Arc Flow Fans + 5 Heatpipes',
+    priceBr: 8699,
+    priceUs: 1149,
+    storeBr: 'Kabum / Loja ASUS',
+    storeUs: 'Best Buy / Micro Center',
+    urlBr: 'https://www.kabum.com.br',
+    urlUs: 'https://www.bestbuy.com',
+    score: 92,
+    bestFor: 'Super resistente (certificação militar MIL-STD-810H) + RTX 4070',
+    history: [
+      { date: 'Nov 2025', br: 8199, us: 1049 },
+      { date: 'Fev 2026', br: 8999, us: 1199 },
+      { date: 'Hoje', br: 8699, us: 1149 }
+    ]
+  },
+  {
+    id: 'lenovo-legion-pro-5i',
+    name: 'Lenovo Legion Pro 5i (EUA Sweetspot)',
+    modelCode: '16IRX9',
+    gpu: 'NVIDIA RTX 4070',
+    gpuTgp: '140W',
+    gpuTier: 'high',
+    cpu: 'Intel Core i7-14700HX',
+    ram: '32GB DDR5 5600MHz (Já vem com 32GB)',
+    storage: '1TB SSD NVMe Gen4',
+    screen: '16" 240Hz WQXGA, 500 nits, DisplayHDR 400, 100% sRGB',
+    cooling: 'Coldfront com câmara de vapor e IA Lenovo Vantage',
+    priceBr: 11499,
+    priceUs: 1449,
+    storeBr: 'Lojas Especializadas / Importação BR',
+    storeUs: 'Micro Center / B&H Photo / Lenovo US',
+    urlBr: 'https://www.google.com.br/shopping',
+    urlUs: 'https://www.microcenter.com',
+    score: 98,
+    bestFor: '🌟 SE TROUXER DOS EUA: Custa R$ 8.400 convertido e destrói qualquer modelo de R$ 8.900 do BR!',
+    history: [
+      { date: 'Nov 2025 (BF)', br: 10999, us: 1349 },
+      { date: 'Jan 2026', br: 11999, us: 1499 },
+      { date: 'Hoje', br: 11499, us: 1449 }
+    ]
+  },
+  {
+    id: 'acer-nitro-16',
+    name: 'Acer Nitro 16',
+    modelCode: 'AN16-41-R746',
+    gpu: 'NVIDIA RTX 4060',
+    gpuTgp: '140W',
+    gpuTier: 'mid-high',
+    cpu: 'AMD Ryzen 7 7735HS (8 Cores)',
+    ram: '16GB DDR5 4800MHz',
+    storage: '512GB / 1TB SSD NVMe',
+    screen: '16" WUXGA (1920x1200) 165Hz, 100% sRGB, 400 nits',
+    cooling: 'Liquid Metal na CPU + 4 saídas de exaustão',
+    priceBr: 7299,
+    priceUs: 999,
+    storeBr: 'Kabum / Magazine Luiza',
+    storeUs: 'Amazon US / Best Buy',
+    urlBr: 'https://www.kabum.com.br',
+    urlUs: 'https://www.amazon.com',
+    score: 89,
+    bestFor: 'Fica abaixo do seu teto (R$ 7.299), sobrando grana para upgrade de SSD e periféricos',
+    history: [
+      { date: 'Nov 2025', br: 6899, us: 899 },
+      { date: 'Jan 2026', br: 7599, us: 1049 },
+      { date: 'Hoje', br: 7299, us: 999 }
+    ]
+  },
+  {
+    id: 'asus-rog-zephyrus-g16',
+    name: 'ASUS ROG Zephyrus G16 (2024)',
+    modelCode: 'GU605MI',
+    gpu: 'NVIDIA RTX 4070',
+    gpuTgp: '105W (Perfil Fino / Ultrabook Gamer)',
+    gpuTier: 'high',
+    cpu: 'Intel Core Ultra 7 155H (Meteor Lake AI)',
+    ram: '16GB LPDDR5X 7467MHz',
+    storage: '1TB NVMe PCIe 4.0',
+    screen: '16" OLED 2.5K (240Hz, 0.2ms, 100% DCI-P3, HDR True Black 500)',
+    cooling: 'Tri-Fan Technology com metal líquido e câmara',
+    priceBr: 14899,
+    priceUs: 1599,
+    storeBr: 'ASUS Store Brasil (Muito sobrepreço)',
+    storeUs: 'Best Buy (Promoção frequente)',
+    urlBr: 'https://www.lojaasus.com.br',
+    urlUs: 'https://www.bestbuy.com',
+    score: 96,
+    bestFor: 'A melhor tela do planeta (OLED 240Hz) e corpo ultrafino estilo MacBook',
+    history: [
+      { date: 'Dez 2025', br: 15499, us: 1499 },
+      { date: 'Jan 2026', br: 14999, us: 1699 },
+      { date: 'Hoje', br: 14899, us: 1599 }
+    ]
+  },
+  {
+    id: 'dell-g15-5530',
+    name: 'Dell G15 5530 (Versão i7/4060)',
+    modelCode: 'G15-5530-U25P',
+    gpu: 'NVIDIA RTX 4060',
+    gpuTgp: '140W',
+    gpuTier: 'mid-high',
+    cpu: 'Intel Core i7-13650HX',
+    ram: '16GB DDR5 4800MHz',
+    storage: '512GB SSD NVMe',
+    screen: '15.6" FHD (1920x1080) 165Hz, 100% sRGB, 300 nits',
+    cooling: 'Design Alienware dual-fan',
+    priceBr: 6999,
+    priceUs: 949,
+    storeBr: 'Dell Brasil / Magazine Luiza',
+    storeUs: 'Dell US Outlet / Best Buy',
+    urlBr: 'https://www.dell.com/pt-br',
+    urlUs: 'https://www.dell.com/en-us',
+    score: 87,
+    bestFor: 'Opção de entrada para RTX 4060 140W com bom suporte pós-venda',
+    history: [
+      { date: 'Nov 2025', br: 6499, us: 899 },
+      { date: 'Jan 2026', br: 7299, us: 999 },
+      { date: 'Hoje', br: 6999, us: 949 }
+    ]
+  }
+];
+
+// Estado da Aplicação
+let laptops = [];
+let watchlist = [];
+let currentFilter = 'all';
+let currentSort = 'value_score';
+let usdRate = 5.65;
+let importMode = 'wise'; // 'wise' (1.1% IOF) ou 'direct' (sem IOF)
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  bindEvents();
+  render();
+});
+
+function loadData() {
+  const savedLaptops = localStorage.getItem(STORAGE_KEY);
+  laptops = savedLaptops ? JSON.parse(savedLaptops) : DEFAULT_LAPTOPS;
+
+  const savedWatch = localStorage.getItem(WATCHLIST_KEY);
+  watchlist = savedWatch ? JSON.parse(savedWatch) : ['predator-helios-neo-16', 'dell-g16-7630', 'lenovo-legion-pro-5i'];
+
+  const rateInput = document.getElementById('usdRateInput');
+  if (rateInput) usdRate = parseFloat(rateInput.value) || 5.65;
+
+  const savedGasUrl = localStorage.getItem(GAS_URL_KEY);
+  const gasInput = document.getElementById('gasApiUrl');
+  if (gasInput && savedGasUrl) {
+    gasInput.value = savedGasUrl;
+    // Tenta sincronizar silenciosamente com o Google Sheets na inicialização
+    fetchFromGAS(savedGasUrl, true);
+  }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(laptops));
+  localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
+}
+
+// Cálculo exato: Seu irmão compra nos EUA e traz para você!
+function calculateConvertedUsPrice(priceUs) {
+  // Se você mandar o dinheiro via conta global (Wise / Nomad), incide 1.1% de IOF
+  // Se for dólar em espécie direto, é câmbio puro
+  const iof = importMode === 'wise' ? 0.011 : 0.00;
+  return priceUs * usdRate * (1 + iof);
+}
+
+function bindEvents() {
+  // Cotação e Modo de importação
+  document.getElementById('usdRateInput').addEventListener('input', (e) => {
+    usdRate = parseFloat(e.target.value) || 5.65;
+    render();
+  });
+
+  document.getElementById('importModeSelect').addEventListener('change', (e) => {
+    importMode = e.target.value;
+    render();
+  });
+
+  // Busca e Filtros
+  document.getElementById('searchInput').addEventListener('input', () => {
+    render();
+  });
+
+  document.getElementById('filterChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentFilter = chip.dataset.filter;
+    render();
+  });
+
+  document.getElementById('sortSelect').addEventListener('change', (e) => {
+    currentSort = e.target.value;
+    render();
+  });
+
+  // Modal Cadastrar Novo
+  document.getElementById('btnOpenAddModal').addEventListener('click', () => {
+    document.getElementById('addModal').style.display = 'flex';
+  });
+
+  document.getElementById('btnCloseAddModal').addEventListener('click', () => {
+    document.getElementById('addModal').style.display = 'none';
+  });
+
+  document.getElementById('btnCancelAdd').addEventListener('click', () => {
+    document.getElementById('addModal').style.display = 'none';
+  });
+
+  document.getElementById('addLaptopForm').addEventListener('submit', handleAddLaptop);
+
+  // Modais de Comparador e Histórico
+  document.getElementById('btnCloseComparator').addEventListener('click', () => {
+    document.getElementById('comparatorModal').style.display = 'none';
+  });
+
+  document.getElementById('btnCloseHistory').addEventListener('click', () => {
+    document.getElementById('historyModal').style.display = 'none';
+  });
+
+  // Modal de Sincronização Google Sheets / Apps Script
+  const btnOpenSync = document.getElementById('btnOpenSyncModal');
+  if (btnOpenSync) {
+    btnOpenSync.addEventListener('click', () => {
+      document.getElementById('syncModal').style.display = 'flex';
+    });
+  }
+
+  const btnCloseSync = document.getElementById('btnCloseSyncModal');
+  if (btnCloseSync) {
+    btnCloseSync.addEventListener('click', () => {
+      document.getElementById('syncModal').style.display = 'none';
+    });
+  }
+
+  const btnSaveGAS = document.getElementById('btnSaveGAS');
+  if (btnSaveGAS) {
+    btnSaveGAS.addEventListener('click', () => {
+      const url = document.getElementById('gasApiUrl').value.trim();
+      localStorage.setItem(GAS_URL_KEY, url);
+      showGasMessage('Configuração salva com sucesso!', 'success');
+      if (url) fetchFromGAS(url);
+    });
+  }
+
+  const btnTestFetch = document.getElementById('btnTestFetchGAS');
+  if (btnTestFetch) {
+    btnTestFetch.addEventListener('click', () => {
+      const url = document.getElementById('gasApiUrl').value.trim();
+      if (!url) {
+        showGasMessage('Por favor, insira a URL do Google Apps Script.', 'error');
+        return;
+      }
+      fetchFromGAS(url);
+    });
+  }
+
+  // Modal de Duelo / Qual Vale Mais a Pena
+  const btnOpenDuel = document.getElementById('btnOpenDuel');
+  if (btnOpenDuel) {
+    btnOpenDuel.addEventListener('click', () => {
+      openDuelModal();
+    });
+  }
+
+  const btnCloseDuel = document.getElementById('btnCloseDuelModal');
+  if (btnCloseDuel) {
+    btnCloseDuel.addEventListener('click', () => {
+      document.getElementById('duelModal').style.display = 'none';
+    });
+  }
+
+  const duelSelectBr = document.getElementById('duelSelectBr');
+  const duelSelectUs = document.getElementById('duelSelectUs');
+  if (duelSelectBr && duelSelectUs) {
+    duelSelectBr.addEventListener('change', renderDuel);
+    duelSelectUs.addEventListener('change', renderDuel);
+  }
+
+  // Fechar ao clicar fora
+  window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-backdrop')) {
+      e.target.style.display = 'none';
+    }
+  });
+}
+
+function showGasMessage(msg, type) {
+  const el = document.getElementById('gasStatusMessage');
+  if (!el) return;
+  el.innerText = msg;
+  el.style.display = 'block';
+  el.style.color = type === 'error' ? 'var(--danger)' : 'var(--accent)';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+// Sincronização direta com a API do Google Apps Script
+async function fetchFromGAS(url, silent = false) {
+  try {
+    if (!silent) showGasMessage('Conectando ao Google Sheets...', 'info');
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Status HTTP: ' + response.status);
+    const data = await response.json();
+    
+    if (Array.isArray(data) && data.length > 0) {
+      // Normalizar campos vindos da planilha
+      laptops = data.map(item => ({
+        id: item.id || ('gas-' + Math.random().toString(36).substr(2, 9)),
+        name: item.name || 'Notebook Gamer',
+        modelCode: item.modelCode || 'Google Sheets',
+        gpu: item.gpu || 'RTX 4060',
+        gpuTgp: item.gpuTgp || '140W',
+        gpuTier: (item.gpu && item.gpu.includes('4070')) ? 'high' : 'mid-high',
+        cpu: item.cpu || 'Processador Gamer',
+        ram: item.ram || '16GB DDR5',
+        storage: item.storage || '1TB SSD NVMe',
+        screen: item.screen || '16" 165Hz',
+        cooling: 'Refrigeração de Alta Eficiência',
+        priceBr: Number(item.priceBr) || 0,
+        priceUs: Number(item.priceUs) || 0,
+        storeBr: item.storeBr || 'Brasil',
+        storeUs: item.storeUs || 'EUA',
+        urlBr: item.urlBr || '#',
+        urlUs: item.urlUs || '#',
+        score: item.score || (item.gpu && item.gpu.includes('4070') ? 94 : 91),
+        bestFor: item.bestFor || 'Sincronizado da Nuvem Google',
+        history: item.history || [
+          { date: 'Atual', br: Number(item.priceBr) || 0, us: Number(item.priceUs) || 0 }
+        ]
+      }));
+
+      saveData();
+      render();
+      if (!silent) showGasMessage(`✓ ${laptops.length} notebooks carregados da Planilha Google!`, 'success');
+    }
+  } catch (err) {
+    console.warn('Erro ao conectar com Google Apps Script:', err);
+    if (!silent) showGasMessage('Erro ao conectar. Verifique se o Web App está com acesso "Qualquer pessoa" (Anyone).', 'error');
+  }
+}
+
+function handleAddLaptop(e) {
+  e.preventDefault();
+  const name = document.getElementById('lapName').value.trim();
+  const gpu = document.getElementById('lapGpu').value;
+  const cpu = document.getElementById('lapCpu').value.trim();
+  const ram = document.getElementById('lapRam').value.trim();
+  const screen = document.getElementById('lapScreen').value.trim();
+  const priceBr = parseFloat(document.getElementById('lapPriceBr').value) || 0;
+  const priceUs = parseFloat(document.getElementById('lapPriceUs').value) || 0;
+  const storeBr = document.getElementById('lapStoreBr').value.trim() || 'Lojas Nacionais';
+  const storeUs = document.getElementById('lapStoreUs').value.trim() || 'Lojas EUA';
+
+  const newLaptop = {
+    id: 'user-' + Date.now(),
+    name,
+    modelCode: 'Custom Watch',
+    gpu,
+    gpuTgp: '140W',
+    gpuTier: gpu.includes('4070') ? 'high' : (gpu.includes('4080') ? 'ultra' : 'mid-high'),
+    cpu,
+    ram,
+    storage: '1TB SSD NVMe',
+    screen,
+    cooling: 'Dual Fan Gamer',
+    priceBr,
+    priceUs,
+    storeBr,
+    storeUs,
+    urlBr: '#',
+    urlUs: '#',
+    score: 90,
+    bestFor: 'Adicionado pelo usuário',
+    history: [
+      { date: 'Hoje (Cadastro)', br: priceBr, us: priceUs }
+    ]
+  };
+
+  laptops.unshift(newLaptop);
+  watchlist.push(newLaptop.id);
+  saveData();
+
+  document.getElementById('addLaptopForm').reset();
+  document.getElementById('addModal').style.display = 'none';
+  render();
+}
+
+function toggleWatch(id) {
+  if (watchlist.includes(id)) {
+    watchlist = watchlist.filter(item => item !== id);
+  } else {
+    watchlist.push(id);
+  }
+  saveData();
+  render();
+}
+
+// Motor de Similaridade de Notebooks
+function findSimilarLaptops(targetLaptop) {
+  return laptops
+    .filter(item => item.id !== targetLaptop.id)
+    .map(other => {
+      let similarityScore = 0;
+
+      // 1. GPU (peso 40)
+      if (other.gpu === targetLaptop.gpu) {
+        similarityScore += 40;
+      } else if (
+        (other.gpu.includes('4060') && targetLaptop.gpu.includes('4070')) ||
+        (other.gpu.includes('4070') && targetLaptop.gpu.includes('4060'))
+      ) {
+        similarityScore += 28; // Concorrentes diretos de patamar próximo
+      } else {
+        similarityScore += 10;
+      }
+
+      // 2. Tela & Taxa de Hz (peso 25)
+      const targetScreenQhd = targetLaptop.screen.includes('QHD') || targetLaptop.screen.includes('WQXGA') || targetLaptop.screen.includes('2560');
+      const otherScreenQhd = other.screen.includes('QHD') || other.screen.includes('WQXGA') || other.screen.includes('2560');
+      if (targetScreenQhd === otherScreenQhd) {
+        similarityScore += 25;
+      } else {
+        similarityScore += 15;
+      }
+
+      // 3. Processador (peso 20)
+      const targetCpuHX = targetLaptop.cpu.includes('HX');
+      const otherCpuHX = other.cpu.includes('HX');
+      if (targetCpuHX === otherCpuHX) {
+        similarityScore += 20;
+      } else {
+        similarityScore += 12;
+      }
+
+      // 4. Faixa de Preço Brasil (peso 15)
+      const priceDelta = Math.abs(other.priceBr - targetLaptop.priceBr);
+      if (priceDelta <= 800) {
+        similarityScore += 15;
+      } else if (priceDelta <= 1500) {
+        similarityScore += 10;
+      } else {
+        similarityScore += 4;
+      }
+
+      return {
+        laptop: other,
+        similarity: Math.min(99, Math.round(similarityScore))
+      };
+    })
+    .sort((a, b) => b.similarity - a.similarity);
+}
+
+// Modal do Comparador de Similares
+function openSimilarModal(laptopId) {
+  const target = laptops.find(l => l.id === laptopId);
+  if (!target) return;
+
+  const similars = findSimilarLaptops(target).slice(0, 3);
+  const convertedTargetUs = calculateConvertedUsPrice(target.priceUs);
+
+  document.getElementById('comparatorTitle').innerHTML = `Rivais e Modelos Parecidos com: <strong>${target.name}</strong>`;
+
+  let html = `
+    <div class="similars-hero">
+      <div class="similars-hero-title">Modelo Selecionado como Referência:</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h3 style="color:var(--primary); font-size:1.2rem;">${target.name}</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted);">${target.gpu} (${target.gpuTgp}) • ${target.cpu} • ${target.screen}</p>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:1.15rem; font-weight:800; font-family:var(--font-mono);">R$ ${target.priceBr.toLocaleString('pt-BR')} no Brasil</div>
+          <div style="font-size:0.85rem; color:var(--accent); font-family:var(--font-mono);">✈️ Irmão traz por: $ ${target.priceUs.toLocaleString('en-US')} (~ R$ ${Math.round(convertedTargetUs).toLocaleString('pt-BR')})</div>
+        </div>
+      </div>
+    </div>
+
+    <h4 style="margin-bottom:1rem; font-size:1rem; color:var(--text-main);">Top 3 Concorrentes Diretos no Mercado:</h4>
+    <div class="similars-grid">
+  `;
+
+  similars.forEach(({ laptop: item, similarity }, index) => {
+    const itemConvertedUs = calculateConvertedUsPrice(item.priceUs);
+    const diffBr = item.priceBr - target.priceBr;
+    const isBestDeal = item.priceBr <= target.priceBr && (item.score >= target.score || item.gpu.includes('4070'));
+
+    html += `
+      <div class="similar-card ${isBestDeal ? 'best-alternative' : ''}">
+        <span class="match-badge">🎯 ${similarity}% de Similaridade Técnica</span>
+        <h4 style="font-size:0.95rem; font-weight:700;">${item.name}</h4>
+        
+        <div style="font-size:0.8rem; color:var(--text-muted);">
+          <div>⚡ <strong>GPU:</strong> <span style="color:#38bdf8;">${item.gpu}</span></div>
+          <div>🧠 <strong>CPU:</strong> ${item.cpu.split('(')[0]}</div>
+          <div>🖥️ <strong>Tela:</strong> ${item.screen.split(',')[0]}</div>
+        </div>
+
+        <div style="background:var(--bg-surface); padding:0.6rem; border-radius:6px; margin-top:0.4rem;">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+            <span>Preço Brasil:</span>
+            <strong style="font-family:var(--font-mono);">R$ ${item.priceBr.toLocaleString('pt-BR')}</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--accent);">
+            <span>Irmão traz por:</span>
+            <strong style="font-family:var(--font-mono);">$ ${item.priceUs.toLocaleString('en-US')} (~ R$ ${Math.round(itemConvertedUs).toLocaleString('pt-BR')})</strong>
+          </div>
+          <div style="font-size:0.75rem; margin-top:0.3rem; color:${diffBr < 0 ? 'var(--accent)' : 'var(--text-dim)'};">
+            ${diffBr < 0 ? `💰 R$ ${Math.abs(diffBr).toLocaleString('pt-BR')} mais barato no BR` : (diffBr === 0 ? 'Mesmo preço no BR' : `R$ ${diffBr.toLocaleString('pt-BR')} mais caro no BR`)}
+          </div>
+        </div>
+
+        <p style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">"${item.bestFor}"</p>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  document.getElementById('comparatorBody').innerHTML = html;
+  document.getElementById('comparatorModal').style.display = 'flex';
+}
+
+// Modal de Histórico e Alerta de Preço
+function openHistoryModal(laptopId) {
+  const target = laptops.find(l => l.id === laptopId);
+  if (!target) return;
+
+  document.getElementById('historyTitle').innerText = target.name;
+
+  let timelineHtml = target.history.map(entry => `
+    <div class="history-entry">
+      <span class="history-date">📅 ${entry.date}</span>
+      <div class="history-prices">
+        <span>🇧🇷 R$ ${entry.br.toLocaleString('pt-BR')}</span>
+        <span style="color:var(--text-dim); margin:0 4px;">|</span>
+        <span style="color:var(--accent);">🇺🇸 $ ${entry.us.toLocaleString('en-US')}</span>
+      </div>
+    </div>
+  `).join('');
+
+  const targetConverted = calculateConvertedUsPrice(target.priceUs);
+  const lowestBr = Math.min(...target.history.map(h => h.br));
+
+  let html = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <div>
+        <span class="spec-label">Menor Preço Registrado (BR):</span>
+        <div style="font-size:1.1rem; font-weight:700; color:var(--accent); font-family:var(--font-mono);">
+          R$ ${lowestBr.toLocaleString('pt-BR')}
+        </div>
+      </div>
+      <div>
+        <span class="spec-label">Preço Atual EUA Convertido:</span>
+        <div style="font-size:1.1rem; font-weight:700; color:var(--primary); font-family:var(--font-mono);">
+          R$ ${Math.round(targetConverted).toLocaleString('pt-BR')}
+        </div>
+      </div>
+    </div>
+
+    <h4 style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.5rem;">Histórico de Oscilação de Preços:</h4>
+    <div class="history-timeline">
+      ${timelineHtml}
+    </div>
+
+    <div class="alert-setup-box">
+      <h4>🔔 Vigia Ativo: Configurar Alerta de Preço</h4>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem;">
+        Defina o valor máximo que você aceita pagar. O robô emite alerta sonoro/visual assim que o modelo cair para este preço:
+      </p>
+      <div style="display:flex; gap:0.5rem;">
+        <input type="number" id="alertTargetPrice" value="${target.priceBr - 500}" style="background:var(--bg-card); border:1px solid var(--border-subtle); padding:6px 10px; border-radius:6px; color:#fff; width:140px; font-family:var(--font-mono);">
+        <button class="btn btn-primary" onclick="savePriceAlert('${target.id}')">Ativar Alerta</button>
+      </div>
+      <div id="alertFeedback" style="font-size:0.78rem; color:var(--accent); margin-top:0.4rem; display:none;">
+        ✓ Alerta gravado com sucesso!
+      </div>
+    </div>
+  `;
+
+  document.getElementById('historyBody').innerHTML = html;
+  document.getElementById('historyModal').style.display = 'flex';
+}
+
+window.savePriceAlert = function(laptopId) {
+  const targetVal = document.getElementById('alertTargetPrice').value;
+  localStorage.setItem(`alert_${laptopId}`, targetVal);
+  const fb = document.getElementById('alertFeedback');
+  if (fb) {
+    fb.style.display = 'block';
+    setTimeout(() => { fb.style.display = 'none'; }, 2500);
+  }
+};
+
+// Renderização Principal do Grid
+function render() {
+  const grid = document.getElementById('notebookGrid');
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  // Filtragem
+  let filtered = laptops.filter(laptop => {
+    // Busca por texto
+    const matchQuery = 
+      laptop.name.toLowerCase().includes(query) ||
+      laptop.gpu.toLowerCase().includes(query) ||
+      laptop.cpu.toLowerCase().includes(query) ||
+      laptop.storeBr.toLowerCase().includes(query) ||
+      laptop.storeUs.toLowerCase().includes(query);
+
+    if (!matchQuery) return false;
+
+    // Filtros por chip
+    if (currentFilter === 'budget') {
+      return laptop.priceBr >= 7900 && laptop.priceBr <= 9100;
+    }
+    if (currentFilter === 'gpu_upgrade') {
+      const convertedUs = calculateConvertedUsPrice(laptop.priceUs);
+      // Modelo nos EUA tem GPU superior (4070 ou 4080) e o preço convertido cabe no orçamento de ~8k a 9k
+      return (laptop.gpu.includes('4070') || laptop.gpu.includes('4080')) && convertedUs <= 9400;
+    }
+    if (currentFilter === 'rtx4070') {
+      return laptop.gpu.includes('4070');
+    }
+    if (currentFilter === 'rtx4060') {
+      return laptop.gpu.includes('4060');
+    }
+    if (currentFilter === 'watchlist') {
+      return watchlist.includes(laptop.id);
+    }
+
+    return true;
+  });
+
+  // Ordenação
+  filtered.sort((a, b) => {
+    const convertedA = calculateConvertedUsPrice(a.priceUs);
+    const convertedB = calculateConvertedUsPrice(b.priceUs);
+    const diffA = a.priceBr - convertedA;
+    const diffB = b.priceBr - convertedB;
+
+    switch (currentSort) {
+      case 'value_score':
+        return b.score - a.score;
+      case 'price_br_asc':
+        return a.priceBr - b.priceBr;
+      case 'price_us_asc':
+        return a.priceUs - b.priceUs;
+      case 'diff_desc':
+        return diffB - diffA;
+      case 'gpu_power':
+        return (b.gpu.includes('4070') ? 2 : 1) - (a.gpu.includes('4070') ? 2 : 1);
+      default:
+        return 0;
+    }
+  });
+
+  // Atualizar contadores
+  document.getElementById('catalogSummary').innerText = `Exibindo ${filtered.length} de ${laptops.length} modelos`;
+  document.getElementById('spotlightCount').innerText = `${laptops.length} modelos ativos`;
+
+  // Atualiza equivalente em US$ do banner de R$ 8.000 a R$ 8.900
+  const usdMin = Math.round(8000 / usdRate);
+  const usdMax = Math.round(8900 / usdRate);
+  document.getElementById('spotlightUsdEquiv').innerText = `~ $${usdMin} a $${usdMax} USD`;
+
+  // Renderizar Cards
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align:center; padding:3rem; background:var(--bg-card); border-radius:var(--radius-lg); border:1px dashed var(--border-subtle);">
+        <p style="font-size:1.1rem; color:var(--text-muted); margin-bottom:0.5rem;">Nenhum notebook encontrado para esse filtro.</p>
+        <button class="btn btn-secondary" onclick="document.getElementById('searchInput').value=''; document.querySelector('.chip[data-filter=all]').click();">Limpar Filtros</button>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(laptop => {
+    const isWatched = watchlist.includes(laptop.id);
+    const inBudget = laptop.priceBr >= 8000 && laptop.priceBr <= 8900;
+    const convertedUs = calculateConvertedUsPrice(laptop.priceUs);
+    const diff = laptop.priceBr - convertedUs;
+    const isUsCheaper = diff > 0;
+
+    // Decisão Inteligente: Vale a pena lá ou aqui?
+    let decisionBadge = '';
+    const hasSuperiorGpuInUsa = (laptop.gpu.includes('4070') || laptop.gpu.includes('4080')) && convertedUs <= 9400;
+    const hasGreatDealInBr = laptop.gpu.includes('4060') && laptop.priceBr <= 8600 && Math.abs(diff) < 900;
+
+    if (hasSuperiorGpuInUsa) {
+      decisionBadge = `
+        <div class="badge badge-recommend-usa" style="width:100%; text-align:center; padding:5px 8px; font-size:0.75rem;">
+          🚀 VALE MUITO NOS EUA: Leva ${laptop.gpu} pelo preço de 4060 no Brasil!
+        </div>
+      `;
+    } else if (hasGreatDealInBr) {
+      decisionBadge = `
+        <div class="badge badge-recommend-br" style="width:100%; text-align:center; padding:5px 8px; font-size:0.75rem;">
+          🛡️ VALE A PENA NO BRASIL: Mesma placa + Garantia nacional de 1 ano e Teclado ABNT2
+        </div>
+      `;
+    }
+
+    return `
+      <div class="laptop-card ${inBudget ? 'in-budget' : ''}">
+        <div class="card-top">
+          <div class="card-title-wrap">
+            <h3 class="card-title">${laptop.name}</h3>
+            <span class="card-series">${laptop.modelCode} • ${laptop.bestFor}</span>
+          </div>
+          <div class="card-score">
+            <div class="card-score-val">${laptop.score}</div>
+            <div class="card-score-lbl">Score</div>
+          </div>
+        </div>
+
+        ${decisionBadge}
+
+        <!-- Bloco de Especificações Técnicas -->
+        <div class="specs-block">
+          <div class="spec-item">
+            <span class="spec-label">Placa de Vídeo (GPU)</span>
+            <span class="spec-value spec-gpu-tgp">${laptop.gpu} <small>(${laptop.gpuTgp})</small></span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Processador (CPU)</span>
+            <span class="spec-value">${laptop.cpu.split('(')[0]}</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Memória RAM</span>
+            <span class="spec-value">${laptop.ram.split('(')[0]}</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Armazenamento</span>
+            <span class="spec-value">${laptop.storage}</span>
+          </div>
+          <div class="screen-highlight">
+            🖥️ <strong>Tela:</strong> ${laptop.screen}
+          </div>
+        </div>
+
+        <!-- Caixa de Comparação de Preços Brasil vs EUA -->
+        <div class="price-comparison-box">
+          <div class="price-row">
+            <div class="price-country">
+              <span>🇧🇷 Loja no Brasil</span>
+              <small style="color:var(--text-dim); font-size:0.75rem;">(${laptop.storeBr})</small>
+            </div>
+            <div class="price-val br">
+              R$ ${laptop.priceBr.toLocaleString('pt-BR')}
+            </div>
+          </div>
+
+          <div class="price-row">
+            <div class="price-country">
+              <span>🇺🇸 Seu Irmão compra nos EUA</span>
+              <small style="color:var(--text-dim); font-size:0.75rem;">(${laptop.storeUs})</small>
+            </div>
+            <div>
+              <div class="price-val us">$ ${laptop.priceUs.toLocaleString('en-US')}</div>
+              <div class="price-converted-sub">Total: ~ R$ ${Math.round(convertedUs).toLocaleString('pt-BR')}</div>
+            </div>
+          </div>
+
+          <div class="price-delta-bar">
+            <span class="delta-label">Resultado:</span>
+            ${isUsCheaper ? `
+              <span class="delta-value save-usa">
+                ⚡ Economia de R$ ${Math.round(diff).toLocaleString('pt-BR')} trazendo com ele!
+              </span>
+            ` : `
+              <span class="delta-value save-br">
+                🇧🇷 Melhor comprar no Brasil (R$ ${Math.round(Math.abs(diff)).toLocaleString('pt-BR')} menor)
+              </span>
+            `}
+          </div>
+        </div>
+
+        <!-- Ações do Card -->
+        <div class="card-actions">
+          <button class="btn btn-primary" onclick="openDuelModal('${laptop.id}')" title="Colocar em duelo direto contra outro modelo">
+            🥊 Duelo
+          </button>
+          <button class="btn btn-similars" onclick="openSimilarModal('${laptop.id}')" title="Ver notebooks equivalentes em desempenho">
+            🔀 Parecidos
+          </button>
+          <button class="btn btn-secondary" onclick="openHistoryModal('${laptop.id}')" title="Ver histórico e configurar alerta">
+            📊 Histórico
+          </button>
+          <button class="btn btn-watch ${isWatched ? 'watching' : ''}" onclick="toggleWatch('${laptop.id}')" title="Adicionar aos favoritos vigiados">
+            ${isWatched ? '⭐ Vigiando' : '☆ Vigiar'}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==========================================
+// MOTOR DE DUELO: QUAL VALE MAIS A PENA?
+// ==========================================
+
+function openDuelModal(presetId = null) {
+  const selectBr = document.getElementById('duelSelectBr');
+  const selectUs = document.getElementById('duelSelectUs');
+  if (!selectBr || !selectUs) return;
+
+  // Preenche opções de Brasil
+  selectBr.innerHTML = laptops.map(l => `
+    <option value="${l.id}">🇧🇷 ${l.name} - R$ ${l.priceBr.toLocaleString('pt-BR')} [${l.gpu}]</option>
+  `).join('');
+
+  // Preenche opções de EUA
+  selectUs.innerHTML = laptops.map(l => {
+    const converted = calculateConvertedUsPrice(l.priceUs);
+    return `
+      <option value="${l.id}">🇺🇸 ${l.name} - $ ${l.priceUs} (~ R$ ${Math.round(converted).toLocaleString('pt-BR')}) [${l.gpu}]</option>
+    `;
+  }).join('');
+
+  // Se presetId foi passado, seleciona como referência
+  if (presetId) {
+    selectBr.value = presetId;
+    // Tenta encontrar um rival dos EUA com RTX 4070 ou Legion Pro
+    const rivalUs = laptops.find(l => l.id !== presetId && (l.gpu.includes('4070') || l.id === 'lenovo-legion-pro-5i'));
+    if (rivalUs) selectUs.value = rivalUs.id;
+  } else {
+    // Defaults padrão de impacto para o orçamento de R$ 8.000 a 8.900
+    selectBr.value = 'predator-helios-neo-16'; // RTX 4060 por R$ 8.299 no BR
+    selectUs.value = 'lenovo-legion-pro-5i';     // RTX 4070 por $ 1.449 (~ R$ 8.270) nos EUA
+  }
+
+  renderDuel();
+  document.getElementById('duelModal').style.display = 'flex';
+}
+
+function getGpuBenchmark(gpuString) {
+  if (gpuString.includes('4080')) return { power: 175, name: 'RTX 4080', fps1440p: 110, tier: 4 };
+  if (gpuString.includes('4070')) return { power: 125, name: 'RTX 4070', fps1440p: 82, tier: 3 };
+  if (gpuString.includes('4060')) return { power: 100, name: 'RTX 4060', fps1440p: 65, tier: 2 };
+  if (gpuString.includes('4050')) return { power: 75, name: 'RTX 4050', fps1440p: 48, tier: 1 };
+  return { power: 90, name: 'GPU Dedicada', fps1440p: 55, tier: 1 };
+}
+
+function renderDuel() {
+  const idBr = document.getElementById('duelSelectBr').value;
+  const idUs = document.getElementById('duelSelectUs').value;
+
+  const lapBr = laptops.find(l => l.id === idBr) || laptops[0];
+  const lapUs = laptops.find(l => l.id === idUs) || laptops[1];
+
+  const priceBr = lapBr.priceBr;
+  const priceUsConverted = calculateConvertedUsPrice(lapUs.priceUs);
+  const diffPrice = priceBr - priceUsConverted;
+
+  const benchBr = getGpuBenchmark(lapBr.gpu);
+  const benchUs = getGpuBenchmark(lapUs.gpu);
+
+  // Análise de Veredito
+  let winner = 'usa'; // 'usa' ou 'br'
+  let verdictTitle = '';
+  let verdictDesc = '';
+
+  const isUsGpuSuperior = benchUs.tier > benchBr.tier;
+  const isPricesClose = Math.abs(diffPrice) <= 800; // Preços muito parelhos
+
+  if (isUsGpuSuperior && (diffPrice >= -400)) {
+    winner = 'usa';
+    const fpsGainPercent = Math.round(((benchUs.fps1440p - benchBr.fps1440p) / benchBr.fps1440p) * 100);
+    verdictTitle = `🏆 Veredito: VALE MUITO MAIS A PENA TRAZER DOS EUA!`;
+    verdictDesc = `
+      Pelo mesmo orçamento (em torno de R$ ${Math.round(priceUsConverted).toLocaleString('pt-BR')}), 
+      seu irmão traz um notebook com <strong>${benchUs.name}</strong> contra a <strong>${benchBr.name}</strong> daqui.
+      Você ganha <strong>+${fpsGainPercent}% de FPS em todos os jogos (Cyberpunk, Warzone, GTA, etc.)</strong>, 
+      além de geralmente pegar tela superior e mais memória RAM sem pagar nada a mais!
+    `;
+  } else if (!isUsGpuSuperior && diffPrice < 500) {
+    winner = 'br';
+    verdictTitle = `🏆 Veredito: VALE MAIS A PENA COMPRAR NO BRASIL!`;
+    verdictDesc = `
+      Os dois modelos possuem a mesma placa de vídeo (<strong>${benchBr.name}</strong>) e o preço no Brasil 
+      está praticamente empatado com o preço dos EUA. Comprando aqui, você tem a enorme vantagem de 
+      <strong>1 ano de garantia nacional com reparo local</strong> e <strong>teclado oficial ABNT2 com 'Ç'</strong>.
+    `;
+  } else if (diffPrice > 1200) {
+    winner = 'usa';
+    verdictTitle = `🏆 Veredito: ECONOMIA BRUTAL TRAZENDO DOS EUA!`;
+    verdictDesc = `
+      Você economiza impressionantes <strong>R$ ${Math.round(diffPrice).toLocaleString('pt-BR')}</strong> 
+      trazendo com seu irmão dos EUA pelo mesmo nível de desempenho técnico!
+    `;
+  } else {
+    winner = 'br';
+    verdictTitle = `🏆 Veredito: BRASIL MAIS RECOMENDADO!`;
+    verdictDesc = `
+      A diferença de preço é pequena demais para justificar abrir mão da garantia brasileira de 12 meses.
+    `;
+  }
+
+  const resultArea = document.getElementById('duelResultArea');
+  if (!resultArea) return;
+
+  resultArea.innerHTML = `
+    <!-- Cartão do Veredito -->
+    <div class="duel-verdict-card ${winner === 'usa' ? 'winner-usa' : 'winner-br'}">
+      <div class="duel-verdict-title">${verdictTitle}</div>
+      <div class="duel-verdict-desc">${verdictDesc}</div>
+    </div>
+
+    <!-- Comparativo Lado a Lado -->
+    <div class="duel-cards-grid">
+      <!-- Card Brasil -->
+      <div class="duel-card ${winner === 'br' ? 'winner' : ''}">
+        <div class="duel-header-row">
+          <div>
+            <span class="badge badge-cyan">Opção Nacional</span>
+            <div class="duel-model-name">${lapBr.name}</div>
+            <small style="color:var(--text-muted);">${lapBr.storeBr}</small>
+          </div>
+          <div class="duel-price-badge" style="color:#f1f5f9;">
+            R$ ${priceBr.toLocaleString('pt-BR')}
+          </div>
+        </div>
+
+        <div class="benchmarks-box">
+          <div class="meter-row">
+            <div class="meter-header">
+              <span>Potência Gráfica: <strong>${lapBr.gpu}</strong></span>
+              <span>${benchBr.power} pts</span>
+            </div>
+            <div class="meter-track">
+              <div class="meter-fill gpu" style="width: ${Math.min(100, Math.round((benchBr.power / 175) * 100))}%;"></div>
+            </div>
+          </div>
+
+          <div class="meter-row">
+            <div class="meter-header">
+              <span>FPS Médio (1440p Alto / Jogos AAA)</span>
+              <span>~${benchBr.fps1440p} FPS</span>
+            </div>
+            <div class="meter-track">
+              <div class="meter-fill gpu" style="width: ${Math.min(100, Math.round((benchBr.fps1440p / 120) * 100))}%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:0.82rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px;">
+          <div>🧠 <strong>Processador:</strong> ${lapBr.cpu.split('(')[0]}</div>
+          <div>🖥️ <strong>Tela:</strong> ${lapBr.screen}</div>
+          <div>💾 <strong>RAM & Armazenamento:</strong> ${lapBr.ram.split('(')[0]} | ${lapBr.storage}</div>
+        </div>
+
+        <ul class="pros-cons-list" style="margin-top:auto;">
+          <li>✓ Garantia direta no Brasil (12 meses)</li>
+          <li>✓ Teclado com tecla "Ç" (ABNT2)</li>
+          <li>✓ Sem depender de viagem do irmão</li>
+        </ul>
+      </div>
+
+      <!-- Card EUA -->
+      <div class="duel-card ${winner === 'usa' ? 'winner' : ''}">
+        <div class="duel-header-row">
+          <div>
+            <span class="badge badge-accent">Irmão Traz dos EUA ✈️</span>
+            <div class="duel-model-name">${lapUs.name}</div>
+            <small style="color:var(--text-muted);">${lapUs.storeUs}</small>
+          </div>
+          <div style="text-align:right;">
+            <div class="duel-price-badge" style="color:var(--accent);">
+              $ ${lapUs.priceUs}
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono);">
+              ~ R$ ${Math.round(priceUsConverted).toLocaleString('pt-BR')}
+            </div>
+          </div>
+        </div>
+
+        <div class="benchmarks-box">
+          <div class="meter-row">
+            <div class="meter-header">
+              <span>Potência Gráfica: <strong>${lapUs.gpu}</strong></span>
+              <span style="color:${isUsGpuSuperior ? 'var(--accent)' : 'inherit'}; font-weight:700;">
+                ${benchUs.power} pts ${isUsGpuSuperior ? '🔥 (+GPU Superior)' : ''}
+              </span>
+            </div>
+            <div class="meter-track">
+              <div class="meter-fill ${isUsGpuSuperior ? 'gpu-high' : 'gpu'}" style="width: ${Math.min(100, Math.round((benchUs.power / 175) * 100))}%;"></div>
+            </div>
+          </div>
+
+          <div class="meter-row">
+            <div class="meter-header">
+              <span>FPS Médio (1440p Alto / Jogos AAA)</span>
+              <span style="color:${isUsGpuSuperior ? 'var(--accent)' : 'inherit'}; font-weight:700;">
+                ~${benchUs.fps1440p} FPS
+              </span>
+            </div>
+            <div class="meter-track">
+              <div class="meter-fill ${isUsGpuSuperior ? 'gpu-high' : 'gpu'}" style="width: ${Math.min(100, Math.round((benchUs.fps1440p / 120) * 100))}%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:0.82rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px;">
+          <div>🧠 <strong>Processador:</strong> ${lapUs.cpu.split('(')[0]}</div>
+          <div>🖥️ <strong>Tela:</strong> ${lapUs.screen}</div>
+          <div>💾 <strong>RAM & Armazenamento:</strong> ${lapUs.ram.split('(')[0]} | ${lapUs.storage}</div>
+        </div>
+
+        <ul class="pros-cons-list" style="margin-top:auto;">
+          <li>${isUsGpuSuperior ? '⚡ <strong>Placa de vídeo muito mais potente</strong>' : '⚡ Desempenho equilibrado'}</li>
+          <li>✓ Telas mais nítidas (240Hz / 500 nits) e construções premium</li>
+          <li>⚠️ Teclado padrão americano (US Internacional, sem tecla física Ç)</li>
+          <li>⚠️ Garantia internacional depende da fabricante (Dell e Asus oferecem global)</li>
+        </ul>
+      </div>
+    </div>
+  `;
+}
