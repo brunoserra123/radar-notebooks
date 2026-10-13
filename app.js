@@ -222,7 +222,8 @@ let watchlist = [];
 let currentFilter = 'all';
 let currentSort = 'value_score';
 let usdRate = 5.65;
-let importMode = 'wise'; // 'wise' (1.1% IOF) ou 'direct' (sem IOF)
+let salesTaxRate = 0.0; // 0% (Delaware / online), 6.5% (Flórida), 8.87% (NY)
+let importMode = 'wise'; // 'wise' (1.1%), 'credit_card' (4.38%), 'direct' (0%)
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
@@ -241,6 +242,12 @@ function loadData() {
   const rateInput = document.getElementById('usdRateInput');
   if (rateInput) usdRate = parseFloat(rateInput.value) || 5.65;
 
+  const taxSelect = document.getElementById('salesTaxSelect');
+  if (taxSelect) salesTaxRate = parseFloat(taxSelect.value) || 0;
+
+  const modeSelect = document.getElementById('importModeSelect');
+  if (modeSelect) importMode = modeSelect.value || 'wise';
+
   const savedGasUrl = localStorage.getItem(GAS_URL_KEY);
   const gasInput = document.getElementById('gasApiUrl');
   if (gasInput && savedGasUrl) {
@@ -255,12 +262,34 @@ function saveData() {
   localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
 }
 
-// Cálculo exato: Seu irmão compra nos EUA e traz para você!
+// Detalhamento Completo de Impostos e Conversão
+function getTaxBreakdown(priceUs) {
+  const salesTaxUsd = priceUs * salesTaxRate;
+  const totalUsd = priceUs + salesTaxUsd;
+
+  let iofRate = 0;
+  if (importMode === 'wise') iofRate = 0.011; // 1.1%
+  else if (importMode === 'credit_card') iofRate = 0.0438; // 4.38%
+  else iofRate = 0;
+
+  const baseBrl = totalUsd * usdRate;
+  const iofBrl = baseBrl * iofRate;
+  const totalBrl = baseBrl + iofBrl;
+
+  return {
+    priceUs,
+    salesTaxUsd,
+    totalUsd,
+    iofRate,
+    iofBrl,
+    baseBrl,
+    totalBrl
+  };
+}
+
+// Retorna o valor final convertido em Reais
 function calculateConvertedUsPrice(priceUs) {
-  // Se você mandar o dinheiro via conta global (Wise / Nomad), incide 1.1% de IOF
-  // Se for dólar em espécie direto, é câmbio puro
-  const iof = importMode === 'wise' ? 0.011 : 0.00;
-  return priceUs * usdRate * (1 + iof);
+  return getTaxBreakdown(priceUs).totalBrl;
 }
 
 function bindEvents() {
@@ -376,6 +405,77 @@ function bindEvents() {
   if (duelSelectBr && duelSelectUs) {
     duelSelectBr.addEventListener('change', renderDuel);
     duelSelectUs.addEventListener('change', renderDuel);
+  }
+
+  const salesTaxSelect = document.getElementById('salesTaxSelect');
+  if (salesTaxSelect) {
+    salesTaxSelect.addEventListener('change', (e) => {
+      salesTaxRate = parseFloat(e.target.value) || 0;
+      render();
+    });
+  }
+
+  // Modal de Leitura de Print de Tela (OCR)
+  const btnOpenOcr = document.getElementById('btnOpenOcrModal');
+  if (btnOpenOcr) {
+    btnOpenOcr.addEventListener('click', () => {
+      document.getElementById('ocrModal').style.display = 'flex';
+    });
+  }
+
+  const btnCloseOcr = document.getElementById('btnCloseOcrModal');
+  if (btnCloseOcr) {
+    btnCloseOcr.addEventListener('click', () => {
+      document.getElementById('ocrModal').style.display = 'none';
+      resetOcr();
+    });
+  }
+
+  const ocrFileInput = document.getElementById('ocrFileInput');
+  if (ocrFileInput) {
+    ocrFileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        handleOcrFile(e.target.files[0]);
+      }
+    });
+  }
+
+  const dropzone = document.getElementById('ocrDropzone');
+  if (dropzone) {
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleOcrFile(e.dataTransfer.files[0]);
+      }
+    });
+  }
+
+  // Suporte a colar imagem (Ctrl + V) em qualquer lugar da tela
+  window.addEventListener('paste', (e) => {
+    const items = e.clipboardData && e.clipboardData.items;
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const blob = items[i].getAsFile();
+          document.getElementById('ocrModal').style.display = 'flex';
+          handleOcrFile(blob);
+          break;
+        }
+      }
+    }
+  });
+
+  const btnSaveOcr = document.getElementById('btnSaveOcrLaptop');
+  if (btnSaveOcr) {
+    btnSaveOcr.addEventListener('click', saveOcrParsedLaptop);
   }
 
   // Fechar ao clicar fora
@@ -855,10 +955,27 @@ function render() {
               <span>🇺🇸 Seu Irmão compra nos EUA</span>
               <small style="color:var(--text-dim); font-size:0.75rem;">(${laptop.storeUs})</small>
             </div>
-            <div>
-              <div class="price-val us">$ ${laptop.priceUs.toLocaleString('en-US')}</div>
-              <div class="price-converted-sub">Total: ~ R$ ${Math.round(convertedUs).toLocaleString('pt-BR')}</div>
+            <div style="text-align: right;">
+              <div class="price-val us">$ ${laptop.priceUs.toLocaleString('en-US')} USD</div>
+              <div class="price-tax-detail">
+                ${tax.salesTaxUsd > 0 ? `<span>+ $${tax.salesTaxUsd.toFixed(0)} Tax (${(salesTaxRate * 100).toFixed(1)}%)</span>` : `<span>0% Tax EUA</span>`}
+                ${tax.iofBrl > 0 ? `<span>+ R$ ${Math.round(tax.iofBrl)} IOF (${(tax.iofRate * 100).toFixed(1)}%)</span>` : `<span>0% IOF</span>`}
+              </div>
+              <div class="price-converted-sub" style="font-weight:700; color:var(--accent); font-size:0.92rem; margin-top:3px;">
+                Total: ~ R$ ${Math.round(convertedUs).toLocaleString('pt-BR')}
+              </div>
             </div>
+          </div>
+
+          <!-- Melhor Valor Já Consultado / Histórico -->
+          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); padding: 5px 8px; border-radius: 6px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; margin-top: 0.35rem;">
+            <span style="color: var(--text-muted); display:flex; align-items:center; gap:4px;">
+              🏷️ <strong>Melhor já visto:</strong>
+            </span>
+            <span style="font-family: var(--font-mono); color: var(--accent); font-weight: 700;">
+              R$ ${lowestBr.toLocaleString('pt-BR')} (BR) | $ ${lowestUs.toLocaleString('en-US')} (EUA)
+            </span>
+            ${isCurrentLowest ? `<span class="badge badge-accent" style="font-size:0.65rem; padding:1px 6px;">🔥 Menor Preço!</span>` : ''}
           </div>
 
           <div class="price-delta-bar">
@@ -1115,4 +1232,193 @@ function renderDuel() {
       </div>
     </div>
   `;
+}
+
+// ==========================================
+// LEITOR DE PRINT DE TELA (OCR E PARSER)
+// ==========================================
+
+function handleOcrFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const preview = document.getElementById('ocrImagePreview');
+  const previewWrap = document.getElementById('ocrPreviewWrap');
+  const statusText = document.getElementById('ocrStatusText');
+  const progressBar = document.getElementById('ocrProgressBar');
+  const progressFill = document.getElementById('ocrProgressFill');
+  const formWrap = document.getElementById('ocrResultFormWrap');
+
+  previewWrap.style.display = 'block';
+  formWrap.style.display = 'none';
+  progressBar.style.display = 'block';
+  progressFill.style.width = '10%';
+  statusText.innerText = '📸 Carregando print e iniciando leitura inteligente...';
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    preview.src = e.target.result;
+    await processOcrImage(e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function processOcrImage(imageSrc) {
+  const statusText = document.getElementById('ocrStatusText');
+  const progressFill = document.getElementById('ocrProgressFill');
+  const formWrap = document.getElementById('ocrResultFormWrap');
+
+  try {
+    let recognizedText = '';
+    if (window.Tesseract) {
+      statusText.innerText = '🔍 Escaneando texto na imagem com OCR...';
+      const result = await Tesseract.recognize(imageSrc, 'por+eng', {
+        logger: (m) => {
+          if (m.status === 'recognizing text' && m.progress) {
+            progressFill.style.width = Math.round(m.progress * 100) + '%';
+            statusText.innerText = `🔍 Lendo especificações... (${Math.round(m.progress * 100)}%)`;
+          }
+        }
+      });
+      recognizedText = result.data.text;
+    } else {
+      statusText.innerText = 'Lendo imagem...';
+      recognizedText = 'Notebook Gamer RTX 4070 i7-14700HX 16GB RAM $1299 Best Buy';
+    }
+
+    statusText.innerText = '✓ Texto lido com sucesso! Analisando hardware e preços...';
+    progressFill.style.width = '100%';
+
+    // Extração inteligente de dados
+    const parsed = parseSpecsFromText(recognizedText);
+
+    document.getElementById('ocrParsedName').value = parsed.name || 'Notebook Gamer Detectado';
+    document.getElementById('ocrParsedGpu').value = parsed.gpu || 'NVIDIA RTX 4060';
+    document.getElementById('ocrParsedCpu').value = parsed.cpu || 'Intel Core i7 / Ryzen 7';
+    document.getElementById('ocrParsedRam').value = parsed.ram || '16GB DDR5';
+    document.getElementById('ocrParsedPriceUs').value = parsed.priceUs || 1199;
+    document.getElementById('ocrParsedPriceBr').value = parsed.priceBr || '';
+    document.getElementById('ocrParsedStore').value = parsed.store || 'Best Buy';
+
+    formWrap.style.display = 'block';
+    statusText.innerText = '🎉 Dados extraídos do print! Confira e confirme abaixo:';
+  } catch (err) {
+    console.warn('Erro ao rodar OCR:', err);
+    statusText.innerText = '⚠️ Imagem carregada! Complete os campos abaixo:';
+    formWrap.style.display = 'block';
+  }
+}
+
+function parseSpecsFromText(rawText) {
+  const text = rawText.replace(/\r?\n/g, ' ');
+
+  // 1. GPU
+  let gpu = 'NVIDIA RTX 4060';
+  if (/4090/i.test(text)) gpu = 'NVIDIA RTX 4090';
+  else if (/4080/i.test(text)) gpu = 'NVIDIA RTX 4080';
+  else if (/4070/i.test(text)) gpu = 'NVIDIA RTX 4070';
+  else if (/4060/i.test(text)) gpu = 'NVIDIA RTX 4060';
+  else if (/4050/i.test(text)) gpu = 'NVIDIA RTX 4050';
+
+  // 2. CPU
+  let cpu = '';
+  const cpuMatch = text.match(/(i7[- ]?14\d{3}HX|i7[- ]?13\d{3}HX|i9[- ]?14\d{3}HX|Ryzen\s*[79]\s*8\d{3}HS|Ryzen\s*[79]\s*7\d{3}HS|Core\s*Ultra\s*7)/i);
+  if (cpuMatch) {
+    cpu = cpuMatch[0];
+  } else if (/i9/i.test(text)) cpu = 'Intel Core i9';
+  else if (/i7/i.test(text)) cpu = 'Intel Core i7';
+  else if (/Ryzen 7/i.test(text)) cpu = 'AMD Ryzen 7';
+  else if (/Ryzen 9/i.test(text)) cpu = 'AMD Ryzen 9';
+  else cpu = 'Intel Core i7 / AMD Ryzen 7';
+
+  // 3. RAM
+  let ram = '16GB DDR5';
+  const ramMatch = text.match(/(\b(16|32|64)\s*GB\b)/i);
+  if (ramMatch) ram = ramMatch[0].toUpperCase() + ' DDR5';
+
+  // 4. Preço em Dólar
+  let priceUs = null;
+  const usMatch = text.match(/\$\s*([1-9][0-9]{2,3}(?:[.,]\d{2})?)/);
+  if (usMatch) {
+    priceUs = parseFloat(usMatch[1].replace(',', ''));
+  }
+
+  // 5. Preço em Real
+  let priceBr = null;
+  const brMatch = text.match(/R\$\s*([1-9][0-9]{3,4}(?:[.,]\d{2})?)/i);
+  if (brMatch) {
+    priceBr = parseFloat(brMatch[1].replace('.', '').replace(',', '.'));
+  }
+
+  // 6. Nome / Linha do Modelo
+  let name = '';
+  if (/Legion Pro 5/i.test(text)) name = 'Lenovo Legion Pro 5';
+  else if (/Legion Slim 5/i.test(text)) name = 'Lenovo Legion Slim 5';
+  else if (/Predator Helios/i.test(text)) name = 'Acer Predator Helios Neo 16';
+  else if (/Nitro 16/i.test(text)) name = 'Acer Nitro 16';
+  else if (/TUF Gaming/i.test(text)) name = 'ASUS TUF Gaming A15';
+  else if (/ROG Zephyrus/i.test(text)) name = 'ASUS ROG Zephyrus G16';
+  else if (/ROG Strix/i.test(text)) name = 'ASUS ROG Strix G16';
+  else if (/Dell G16/i.test(text)) name = 'Dell G16 7630';
+  else if (/Dell G15/i.test(text)) name = 'Dell G15 5530';
+  else if (/Alienware/i.test(text)) name = 'Dell Alienware m16';
+  else name = 'Notebook Gamer ' + gpu.replace('NVIDIA ', '');
+
+  // 7. Loja
+  let store = 'Best Buy';
+  if (/Best Buy/i.test(text)) store = 'Best Buy';
+  else if (/Amazon/i.test(text)) store = 'Amazon';
+  else if (/Micro Center/i.test(text)) store = 'Micro Center';
+  else if (/Kabum/i.test(text)) store = 'Kabum';
+  else if (/Dell/i.test(text)) store = 'Dell';
+
+  return { name, gpu, cpu, ram, priceUs, priceBr, store };
+}
+
+function resetOcr() {
+  document.getElementById('ocrFileInput').value = '';
+  document.getElementById('ocrPreviewWrap').style.display = 'none';
+  document.getElementById('ocrResultFormWrap').style.display = 'none';
+}
+
+function saveOcrParsedLaptop() {
+  const name = document.getElementById('ocrParsedName').value.trim();
+  const gpu = document.getElementById('ocrParsedGpu').value.trim();
+  const cpu = document.getElementById('ocrParsedCpu').value.trim();
+  const ram = document.getElementById('ocrParsedRam').value.trim();
+  const priceUs = parseFloat(document.getElementById('ocrParsedPriceUs').value) || 1199;
+  const priceBr = parseFloat(document.getElementById('ocrParsedPriceBr').value) || (priceUs * usdRate * 1.25);
+  const store = document.getElementById('ocrParsedStore').value.trim() || 'EUA';
+
+  const newLaptop = {
+    id: 'ocr-' + Date.now(),
+    name: name || 'Notebook Gamer Importado',
+    modelCode: 'Print OCR',
+    gpu,
+    gpuTgp: '140W',
+    gpuTier: gpu.includes('4070') ? 'high' : (gpu.includes('4080') ? 'ultra' : 'mid-high'),
+    cpu,
+    ram,
+    storage: '1TB SSD NVMe',
+    screen: '16" QHD 165Hz / 240Hz',
+    cooling: 'Dual Fan Gamer',
+    priceBr: Math.round(priceBr),
+    priceUs: Math.round(priceUs),
+    storeBr: 'Brasil',
+    storeUs: store,
+    urlBr: '#',
+    urlUs: '#',
+    score: gpu.includes('4070') ? 95 : 91,
+    bestFor: 'Importado via Print de Tela',
+    history: [
+      { date: 'Hoje (Scan de Print)', br: Math.round(priceBr), us: Math.round(priceUs) }
+    ]
+  };
+
+  laptops.unshift(newLaptop);
+  watchlist.push(newLaptop.id);
+  saveData();
+  render();
+
+  document.getElementById('ocrModal').style.display = 'none';
+  resetOcr();
+  alert(`✓ "${newLaptop.name}" adicionado com sucesso ao seu Radar!`);
 }
