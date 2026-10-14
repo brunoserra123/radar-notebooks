@@ -367,6 +367,10 @@ document.addEventListener('DOMContentLoaded', () => {
   loadData();
   bindEvents();
   render();
+  // Busca cotação do dólar ao vivo imediatamente
+  fetchLiveDollarRate(false);
+  // Confere automaticamente a cada 5 minutos em segundo plano
+  setInterval(() => fetchLiveDollarRate(false), 5 * 60 * 1000);
 });
 
 // Motor Inteligente Anti-Duplicação: impede cadastrar o mesmo notebook duas vezes
@@ -430,6 +434,69 @@ function findDuplicateLaptop(target, list = laptops) {
     }
   }
   return null;
+}
+
+// Cotação do Dólar Comercial ao Vivo com Atualização Automática
+async function fetchLiveDollarRate(isManual = false) {
+  const badge = document.getElementById('liveDollarBadge');
+  const rateInput = document.getElementById('usdRateInput');
+
+  if (isManual && badge) {
+    badge.innerHTML = '⏳ Buscando...';
+  }
+
+  try {
+    // 1. AwesomeAPI (Cotação oficial ao vivo para BRL)
+    const res = await fetch('https://economia.awesomeapi.com.br/last/USD-BRL');
+    if (!res.ok) throw new Error('Falha AwesomeAPI');
+    const data = await res.json();
+    if (data && data.USDBRL && data.USDBRL.bid) {
+      const liveRate = parseFloat(parseFloat(data.USDBRL.bid).toFixed(2));
+      if (!isNaN(liveRate) && liveRate > 3 && liveRate < 10) {
+        usdRate = liveRate;
+        if (rateInput) rateInput.value = liveRate.toFixed(2);
+        if (badge) {
+          const nowStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          badge.innerHTML = `🟢 Ao Vivo: R$ ${liveRate.toFixed(2)}`;
+          badge.title = `Última verificação às ${nowStr} • Confere sozinho a cada 5 minutos`;
+        }
+        render();
+        if (isManual) {
+          showToastNotification(`💵 Dólar atualizado ao vivo: R$ ${liveRate.toFixed(2)} (Banco Central / Mercado)`);
+        }
+        return;
+      }
+    }
+  } catch (err) {
+    console.warn('Tentando fallback de cotação do dólar...', err);
+  }
+
+  // 2. Fallback Secundário (ExchangeRate API)
+  try {
+    const res2 = await fetch('https://open.er-api.com/v6/latest/USD');
+    if (res2.ok) {
+      const data2 = await res2.json();
+      if (data2 && data2.rates && data2.rates.BRL) {
+        const liveRate2 = parseFloat(data2.rates.BRL.toFixed(2));
+        usdRate = liveRate2;
+        if (rateInput) rateInput.value = liveRate2.toFixed(2);
+        if (badge) {
+          badge.innerHTML = `🟢 Ao Vivo: R$ ${liveRate2.toFixed(2)}`;
+        }
+        render();
+        if (isManual) {
+          showToastNotification(`💵 Dólar atualizado ao vivo: R$ ${liveRate2.toFixed(2)}`);
+        }
+        return;
+      }
+    }
+  } catch (err2) {
+    console.warn('Falha no fallback de cotação:', err2);
+  }
+
+  if (badge) {
+    badge.innerHTML = `🟢 R$ ${usdRate.toFixed(2)}`;
+  }
 }
 
 function loadData() {
@@ -564,6 +631,11 @@ function bindEvents() {
   // Cotação e Modo de importação
   document.getElementById('usdRateInput').addEventListener('input', (e) => {
     usdRate = parseFloat(e.target.value) || 5.65;
+    const badge = document.getElementById('liveDollarBadge');
+    if (badge) {
+      badge.innerHTML = `✍️ Manual: R$ ${usdRate.toFixed(2)}`;
+      badge.title = 'Valor digitado manualmente. Clique no botão ↻ ao lado para voltar à cotação ao vivo!';
+    }
     render();
   });
 
