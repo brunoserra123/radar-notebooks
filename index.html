@@ -54,6 +54,21 @@
             <option value="direct">0% (Dólar em Espécie Direto)</option>
           </select>
         </div>
+        <!-- Conversor Rápido de Peso: Libras (EUA) ⇄ Quilos (BR) -->
+        <div class="currency-item weight-converter-item" title="Conversor Rápido: 1 libra (lb) = 0.4536 kg">
+          <span class="currency-label">⚖️ Peso EUA ⇄ BR:</span>
+          <div class="weight-converter-box">
+            <div class="weight-field-group">
+              <input type="number" id="quickWeightLbs" value="5.2" step="0.1" min="0" placeholder="lbs" title="Digite o peso em Libras (lbs)">
+              <span class="weight-unit-tag">lbs</span>
+            </div>
+            <span class="weight-arrow-sep">⇄</span>
+            <div class="weight-field-group">
+              <input type="number" id="quickWeightKg" value="2.36" step="0.05" min="0" placeholder="kg" title="Digite o peso em Quilos (kg)">
+              <span class="weight-unit-tag">kg</span>
+            </div>
+          </div>
+        </div>
         <button class="btn btn-secondary" id="btnOpenSyncModal" title="Conectar ao Google Sheets / Apps Script">
           ☁️ Google Sheets
         </button>
@@ -526,6 +541,7 @@
           <!-- Abas de Navegação -->
           <div class="guide-tabs" id="guideTabsNav">
             <button class="guide-tab-btn active" data-tab="interactive">⚔️ Comparador Interativo de Placas</button>
+            <button class="guide-tab-btn" data-tab="integrated">🎮 Dedicada vs Integrada (iGPU)</button>
             <button class="guide-tab-btn" data-tab="battery">🔋 Autonomia Real da Bateria</button>
             <button class="guide-tab-btn" data-tab="ramstorage">💾 RAM (DDR5/Troca) & SSD/SATA</button>
             <button class="guide-tab-btn" data-tab="usbc">🔌 Carregador Type-C vs Pino Tradicional</button>
@@ -562,7 +578,89 @@
             </div>
           </div>
 
-          <!-- Aba 2: Autonomia Real da Bateria -->
+          <!-- Aba 2: Placa Dedicada vs Placa Integrada (iGPU) -->
+          <div class="guide-tab-pane" id="paneIntegrated" style="display: none;">
+            <div class="integrated-gpu-guide">
+              <div class="guide-alert-box alert-success" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+                <h4 style="color: #34d399; font-size: 1.1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">
+                  <span>💡 Como chama a "outra placa de vídeo" sem ser a dedicada?</span>
+                </h4>
+                <p style="font-size: 0.92rem; color: var(--text-main); line-height: 1.6;">
+                  Chama-se <strong>PLACA DE VÍDEO INTEGRADA (ou iGPU / Vídeo Integrado)</strong>!<br>
+                  Ela não é uma placa separada: vem <strong>embutida dentro do próprio processador (CPU)</strong>. Exemplos: <em>Intel Iris Xe Graphics</em>, <em>Intel Arc Graphics</em> e <em>AMD Radeon 780M / 680M</em>.
+                </p>
+              </div>
+
+              <!-- Comparativo Lado a Lado: Dedicada vs Integrada -->
+              <div class="dgpu-vs-igpu-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+                <!-- Card Placa Dedicada -->
+                <div class="dgpu-card" style="background: var(--bg-card); border: 2px solid rgba(56, 189, 248, 0.45); border-radius: var(--radius-md); padding: 1.25rem;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem;">
+                    <span class="badge badge-accent" style="font-size:0.75rem; padding: 4px 10px;">⚡ DEDICADA (dGPU)</span>
+                    <strong style="color: #38bdf8; font-size: 1.05rem;">NVIDIA GeForce RTX</strong>
+                  </div>
+                  <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom: 0.75rem;">
+                    Ex: <strong>RTX 4060, RTX 4070, RTX 4080 (140W)</strong>
+                  </div>
+                  <ul class="pros-cons-list" style="font-size: 0.85rem; line-height: 1.55;">
+                    <li>✓ <strong>Chip Físico Separado:</strong> Silício próprio soldado na placa-mãe exclusivamente para gráficos.</li>
+                    <li>✓ <strong>Memória Própria (VRAM GDDR6):</strong> Tem 8GB ou 12GB ultrarrápidos que pertencem só a ela.</li>
+                    <li>✓ <strong>Força Bruta para Jogos:</strong> Consome de 100W a 140W (TGP) para rodar Cyberpunk 2077, GTA VI e Warzone no Ultra a 100+ FPS com Ray Tracing e DLSS 3.</li>
+                    <li>⚠️ <strong>Uso:</strong> Ativa quando o notebook está na tomada para entregar potência máxima.</li>
+                  </ul>
+                </div>
+
+                <!-- Card Placa Integrada -->
+                <div class="igpu-card" style="background: var(--bg-card); border: 2px solid rgba(167, 139, 250, 0.45); border-radius: var(--radius-md); padding: 1.25rem;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem;">
+                    <span class="badge badge-purple" style="font-size:0.75rem; padding: 4px 10px;">🔋 INTEGRADA (iGPU)</span>
+                    <strong style="color: #c084fc; font-size: 1.05rem;">Intel Iris Xe / Arc / Radeon</strong>
+                  </div>
+                  <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom: 0.75rem;">
+                    Ex: <strong>Intel Iris Xe, Intel Arc, AMD Radeon 780M / 680M</strong>
+                  </div>
+                  <ul class="pros-cons-list" style="font-size: 0.85rem; line-height: 1.55;">
+                    <li>✓ <strong>Dentro do Processador:</strong> Não tem chip separado; divide o calor e espaço com a CPU.</li>
+                    <li>✓ <strong>Economia Brutal de Bateria:</strong> Gasta míseros 15W a 28W, permitindo que o notebook dure de 6h a 9h fora da tomada.</li>
+                    <li>✓ <strong>Excelente para Multimídia:</strong> Dá tela, roda YouTube em 4K, filmes, Word, Excel e navegação suavemente.</li>
+                    <li>🚫 <strong>Não tem memória própria:</strong> Pega "emprestado" da memória RAM do computador.</li>
+                    <li>❌ <strong>NÃO serve para jogos pesados:</strong> Em lançamentos AAA, roda a 15-25 FPS engasgando.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Por que notebooks gamer têm as duas? MUX Switch / Advanced Optimus -->
+              <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+                <h4 style="color: #38bdf8; font-size: 1rem; margin-bottom: 0.5rem;">🤝 Por que os notebooks gamer têm AS DUAS placas ao mesmo tempo?</h4>
+                <p style="font-size: 0.88rem; color: var(--text-main); line-height: 1.55; margin-bottom: 0.75rem;">
+                  Todo notebook gamer moderno tem um componente chamado <strong>MUX Switch / NVIDIA Advanced Optimus</strong> que alterna entre as duas:
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem;">
+                  <div style="background: rgba(0,0,0,0.3); padding: 0.85rem; border-radius: 6px; font-size: 0.84rem; border-left: 3px solid #38bdf8;">
+                    <strong style="color: #38bdf8;">🔌 Jogando na Tomada:</strong><br>
+                    O sistema liga a <strong>RTX 4060/4070 (Dedicada)</strong> para entregar 140W de potência e centenas de frames por segundo.
+                  </div>
+                  <div style="background: rgba(0,0,0,0.3); padding: 0.85rem; border-radius: 6px; font-size: 0.84rem; border-left: 3px solid #34d399;">
+                    <strong style="color: #34d399;">🔋 Na Mochila / Bateria:</strong><br>
+                    O sistema desliga a placa NVIDIA e usa apenas a <strong>Placa Integrada (Intel / Radeon)</strong> para a bateria durar horas.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Alerta Anti-Golpe / Pegadinha -->
+              <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: var(--radius-md); padding: 1.25rem;">
+                <h4 style="color: #f87171; font-size: 1rem; margin-bottom: 0.4rem; display:flex; align-items:center; gap:6px;">
+                  <span>⚠️ CUIDADO COM ANÚNCIOS ENGANOSOS NA INTERNET!</span>
+                </h4>
+                <p style="font-size: 0.86rem; color: var(--text-main); line-height: 1.55;">
+                  Muitas lojas anunciam: <em>"Notebook Gamer Core i7 16GB SSD 512GB com Gráficos Intel Iris Xe de Alta Performance"</em> por R$ 3.800.<br>
+                  <strong>ISSO NÃO É NOTEBOOK GAMER!</strong> Não possui placa de vídeo dedicada (NVIDIA RTX). Sem placa dedicada, você <strong>não conseguirá rodar jogos modernos</strong>. O nosso GamerRadar avisa imediatamente quando um print ou link não tem placa dedicada!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aba 3: Autonomia Real da Bateria -->
           <div class="guide-tab-pane" id="paneBattery" style="display: none;">
             <div class="battery-guide-box">
               <div class="battery-truth-alert">
@@ -882,6 +980,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=20261014_v20"></script>
+  <script src="app.js?v=20261014_v22"></script>
 </body>
 </html>

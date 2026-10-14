@@ -859,6 +859,7 @@ function bindEvents() {
 
   // Inicializar o Guia de Placas de Vídeo & Bateria
   initGpuGuideModal();
+  initWeightConverter();
 
   // Fechar ao clicar fora
   window.addEventListener('click', (e) => {
@@ -2201,6 +2202,105 @@ function getCpuEquivalence(cpu) {
   return 'Equivalente de Alta Performance Gamer';
 }
 
+// Retorna a Placa de Vídeo Integrada (iGPU) que todo processador gamer possui para economizar bateria
+function getIntegratedGpu(laptop) {
+  if (laptop && laptop.integratedGpu) return laptop.integratedGpu;
+  const cpu = ((laptop && laptop.cpu) ? laptop.cpu : '').toLowerCase();
+  const name = ((laptop && laptop.name) ? laptop.name : '').toLowerCase();
+
+  // 1. AMD Ryzen 9 / Ryzen 7 8000/7040
+  if (cpu.includes('8945') || cpu.includes('8845') || cpu.includes('7940') || cpu.includes('ryzen 9') || name.includes('tuf a15')) {
+    return 'AMD Radeon 780M (RDNA 3 - Na bateria)';
+  }
+  // 2. AMD Ryzen 7 7735HS
+  if (cpu.includes('7735') || name.includes('nitro 16')) {
+    return 'AMD Radeon 680M (RDNA 2 - Na bateria)';
+  }
+  // 3. Intel Core Ultra 7 155H / Ultra 9 (Meteor Lake c/ Arc)
+  if (cpu.includes('ultra') || cpu.includes('155h') || name.includes('zephyrus')) {
+    return 'Intel Arc Graphics (8 Xe-Cores c/ IA)';
+  }
+  // 4. Intel Core i7-13650HX / 14700HX / i9 (Linha HX)
+  if (cpu.includes('hx') || cpu.includes('14700') || cpu.includes('13650') || name.includes('legion') || name.includes('helios') || name.includes('dell g16')) {
+    return 'Intel UHD Graphics 770 (Econômica na bateria)';
+  }
+  // 5. Intel Core i7 / i5 comum
+  if (cpu.includes('intel') || cpu.includes('i7')) {
+    return 'Intel Iris Xe Graphics';
+  }
+  return 'Gráficos Integrados do Processador (iGPU)';
+}
+
+// Conversor Bidirecional de Peso: Libras (EUA) ⇄ Quilos (Brasil)
+function initWeightConverter() {
+  const lbsInput = document.getElementById('quickWeightLbs');
+  const kgInput = document.getElementById('quickWeightKg');
+  if (!lbsInput || !kgInput) return;
+
+  const LBS_TO_KG = 0.45359237;
+
+  lbsInput.addEventListener('input', () => {
+    const lbs = parseFloat(lbsInput.value);
+    if (!isNaN(lbs) && lbs >= 0) {
+      kgInput.value = (lbs * LBS_TO_KG).toFixed(2);
+    } else {
+      kgInput.value = '';
+    }
+  });
+
+  kgInput.addEventListener('input', () => {
+    const kg = parseFloat(kgInput.value);
+    if (!isNaN(kg) && kg >= 0) {
+      lbsInput.value = (kg / LBS_TO_KG).toFixed(2);
+    } else {
+      lbsInput.value = '';
+    }
+  });
+}
+
+// Retorna o peso oficial/estimado do notebook em Quilos (kg) e Libras (lbs)
+function getLaptopWeight(laptop) {
+  if (laptop && laptop.weightKg && laptop.weightLbs) {
+    return { kg: Number(laptop.weightKg).toFixed(2), lbs: Number(laptop.weightLbs).toFixed(2) };
+  }
+  const name = ((laptop && laptop.name) ? laptop.name : '').toLowerCase();
+  const model = ((laptop && laptop.modelCode) ? laptop.modelCode : '').toLowerCase();
+
+  // 1. Ultraleves / Portáteis premium (~1.95 kg / 4.30 lbs)
+  if (name.includes('zephyrus') || model.includes('gu605')) {
+    return { kg: '1.95', lbs: '4.30' };
+  }
+  // 2. Chassi gamer equilibrado (~2.20 kg / 4.85 lbs)
+  if (name.includes('tuf') || name.includes('a15')) {
+    return { kg: '2.20', lbs: '4.85' };
+  }
+  // 3. Legion Slim 5 (~2.30 kg / 5.07 lbs)
+  if (name.includes('slim 5') || name.includes('16aph8')) {
+    return { kg: '2.30', lbs: '5.07' };
+  }
+  // 4. HP Omen 16 (~2.37 kg / 5.22 lbs)
+  if (name.includes('omen') || name.includes('victus')) {
+    return { kg: '2.37', lbs: '5.22' };
+  }
+  // 5. Legion Pro 5i (~2.50 kg / 5.51 lbs)
+  if (name.includes('pro 5i') || name.includes('legion pro')) {
+    return { kg: '2.50', lbs: '5.51' };
+  }
+  // 6. Acer Predator Helios Neo 16 (~2.60 kg / 5.73 lbs)
+  if (name.includes('helios') || name.includes('neo 16') || name.includes('predator')) {
+    return { kg: '2.60', lbs: '5.73' };
+  }
+  // 7. Dell G15 (~2.65 kg / 5.84 lbs)
+  if (name.includes('dell g15') || model.includes('5530')) {
+    return { kg: '2.65', lbs: '5.84' };
+  }
+  // 8. Dell G16 (~2.70 kg / 5.95 lbs)
+  if (name.includes('dell g16') || model.includes('7630')) {
+    return { kg: '2.70', lbs: '5.95' };
+  }
+  return { kg: '2.40', lbs: '5.29' };
+}
+
 // Renderização Principal do Grid
 function render() {
   const grid = document.getElementById('notebookGrid');
@@ -2422,8 +2522,16 @@ function render() {
         <div class="specs-block">
           <div class="specs-hardware-grid">
             <div class="spec-item">
-              <span class="spec-label">🎮 Placa de Vídeo (GPU)</span>
-              <span class="spec-value spec-gpu-tgp">${laptop.gpu} <small style="color:var(--text-muted); font-weight:700;">(${laptop.gpuTgp})</small></span>
+              <span class="spec-label">🎮 Placa de Vídeo (Dedicada vs Integrada)</span>
+              <span class="spec-value spec-gpu-tgp">
+                <div>
+                  <span class="badge badge-accent" style="font-size:0.68rem; padding:1px 6px;">⚡ DEDICADA (dGPU)</span>
+                  <strong>${laptop.gpu}</strong> <small style="color:var(--text-muted); font-weight:700;">(${laptop.gpuTgp || '140W'})</small>
+                </div>
+                <div style="margin-top: 4px; font-size: 0.73rem; color: var(--text-muted); line-height: 1.35;">
+                  <span style="color:#a78bfa; font-weight:700;">🔋 Integrada (iGPU):</span> ${getIntegratedGpu(laptop)}
+                </div>
+              </span>
             </div>
             <div class="spec-item">
               <span class="spec-label">⚡ Processador (CPU)</span>
@@ -2469,8 +2577,11 @@ function render() {
           </div>
 
           <div class="card-extra-row">
-            <div class="extra-row-item" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <div class="extra-row-item" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
               ${renderPortsBadge(laptop)}
+              <span class="badge" style="background:rgba(56, 189, 248, 0.12); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.35); font-size:0.73rem; padding: 3px 8px; font-weight:700;" title="Peso oficial aproximado para viagem (Mala/Mochila)">
+                ⚖️ ${getLaptopWeight(laptop).kg} kg (${getLaptopWeight(laptop).lbs} lbs)
+              </span>
               <button type="button" class="btn-robot-verify" onclick="openSpecsAuditModal('${laptop.id}')" title="Conferir especificações com Robô IA">
                 🤖 Conferir Specs
               </button>
@@ -2650,6 +2761,7 @@ function renderTable(filteredLaptops) {
                   <div>
                     <div class="table-model-title">${laptop.name}</div>
                     <div style="font-size:0.75rem; color:var(--text-dim);">${laptop.modelCode} • Score: <strong>${laptop.score}</strong></div>
+                    <div style="font-size:0.72rem; color:#38bdf8; font-weight:700; margin-top:2px;">⚖️ ${getLaptopWeight(laptop).kg} kg (${getLaptopWeight(laptop).lbs} lbs)</div>
                   </div>
                 </div>
               </td>
@@ -3033,7 +3145,12 @@ async function processOcrImage(imageSrc) {
     }
 
     formWrap.style.display = 'block';
-    statusText.innerText = '🎉 Dados extraídos do print com Preço Brasil preenchido! Confira abaixo:';
+    if (parsed.isIntegratedOnly) {
+      statusText.innerHTML = `⚠️ <strong style="color:#ef4444;">ALERTA DE HARDWARE:</strong> Este modelo possui apenas <strong>Placa Integrada (${parsed.integratedGpuName})</strong>! Ele NÃO possui placa de vídeo dedicada NVIDIA/AMD. Não recomendado para jogos pesados modernos!`;
+      statusText.style.color = '#f87171';
+    } else {
+      statusText.innerText = '🎉 Dados extraídos do print com Preço Brasil preenchido! Confira abaixo:';
+    }
   } catch (err) {
     console.warn('Erro ao rodar OCR:', err);
     statusText.innerText = '⚠️ Imagem carregada! Complete os campos abaixo:';
@@ -3192,13 +3309,35 @@ function recalcOcrBrPrice(force = true) {
 function parseSpecsFromText(rawText) {
   const text = rawText.replace(/\r?\n/g, ' ');
 
-  // 1. GPU
-  let gpu = 'NVIDIA RTX 4060';
-  if (/4090/i.test(text)) gpu = 'NVIDIA RTX 4090';
-  else if (/4080/i.test(text)) gpu = 'NVIDIA RTX 4080';
-  else if (/4070/i.test(text)) gpu = 'NVIDIA RTX 4070';
-  else if (/4060/i.test(text)) gpu = 'NVIDIA RTX 4060';
-  else if (/4050/i.test(text)) gpu = 'NVIDIA RTX 4050';
+  // 1. GPU (Diferenciação clara de Placa Dedicada vs Placa Integrada)
+  let gpu = 'NVIDIA GeForce RTX 4060 (Dedicada)';
+  let isIntegratedOnly = false;
+  let integratedGpuName = '';
+
+  if (/4090/i.test(text)) gpu = 'NVIDIA GeForce RTX 4090 (175W)';
+  else if (/4080/i.test(text)) gpu = 'NVIDIA GeForce RTX 4080 (175W)';
+  else if (/4070/i.test(text)) gpu = 'NVIDIA GeForce RTX 4070 (140W)';
+  else if (/4060/i.test(text)) gpu = 'NVIDIA GeForce RTX 4060 (140W)';
+  else if (/4050/i.test(text)) gpu = 'NVIDIA GeForce RTX 4050 (105W)';
+  else if (/3050|3060|3070|3080/i.test(text)) gpu = 'NVIDIA GeForce RTX 30-Series (Dedicada)';
+  else if (/radeon rx/i.test(text)) gpu = 'AMD Radeon RX (Dedicada)';
+  else if (/iris\s*xe/i.test(text)) {
+    gpu = 'Intel Iris Xe (Apenas Placa Integrada)';
+    isIntegratedOnly = true;
+    integratedGpuName = 'Intel Iris Xe';
+  } else if (/intel\s*arc/i.test(text) && !/a\d{3}m/i.test(text)) {
+    gpu = 'Intel Arc Graphics (Placa Integrada)';
+    isIntegratedOnly = true;
+    integratedGpuName = 'Intel Arc';
+  } else if (/uhd\s*graphics/i.test(text)) {
+    gpu = 'Intel UHD Graphics (Apenas Placa Integrada)';
+    isIntegratedOnly = true;
+    integratedGpuName = 'Intel UHD';
+  } else if (/radeon\s*(?:780m|680m|graphics)/i.test(text) && !/rx\s*\d{4}/i.test(text)) {
+    gpu = 'AMD Radeon Graphics (Apenas Placa Integrada)';
+    isIntegratedOnly = true;
+    integratedGpuName = 'AMD Radeon Graphics';
+  }
 
   // 2. CPU (Prioriza Intel Core e AMD Ryzen detectados)
   let cpu = '';
@@ -3252,7 +3391,7 @@ function parseSpecsFromText(rawText) {
   else if (/Kabum/i.test(text)) store = 'Kabum';
   else if (/Dell/i.test(text)) store = 'Dell';
 
-  return { name, gpu, cpu, ram, ramStatus, isSolderedRam, priceUs, priceBr, store };
+  return { name, gpu, cpu, ram, ramStatus, isSolderedRam, priceUs, priceBr, store, isIntegratedOnly, integratedGpuName };
 }
 
 function resetOcr() {
@@ -3340,6 +3479,8 @@ function saveOcrParsedLaptop() {
       hasBiometrics: isZephyrus,
       biometrics: isZephyrus ? '📷 Windows Hello Facial' : '❌ Sem Leitor de Digital',
       ports: '2x USB-C + 2x USB-A + HDMI 2.1',
+      weightKg: parseFloat(getLaptopWeight({ name }).kg),
+      weightLbs: parseFloat(getLaptopWeight({ name }).lbs),
       priceBr: Math.round(priceBr),
       priceUs: Math.round(priceUs),
       storeBr: 'Brasil',
@@ -3803,9 +3944,10 @@ function initGpuGuideModal() {
 
       const targetPane = document.getElementById(
         targetTab === 'interactive' ? 'paneInteractive' :
+        (targetTab === 'integrated' ? 'paneIntegrated' :
         (targetTab === 'battery' ? 'paneBattery' :
         (targetTab === 'ramstorage' ? 'paneRamStorage' :
-        (targetTab === 'usbc' ? 'paneUsbc' : 'paneNextGen')))
+        (targetTab === 'usbc' ? 'paneUsbc' : 'paneNextGen'))))
       );
       if (targetPane) {
         targetPane.style.display = 'block';

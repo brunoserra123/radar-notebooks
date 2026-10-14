@@ -147,6 +147,55 @@ body {
   width: 60px;
   padding-left: 4px;
   outline: none;
+}
+
+/* Conversor Rápido de Peso: Libras ⇄ Quilos */
+.weight-converter-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-surface);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.12);
+}
+
+.weight-field-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.weight-field-group input {
+  background: transparent;
+  border: none;
+  color: #38bdf8;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  width: 52px;
+  text-align: right;
+  padding: 2px 3px;
+  outline: none;
+}
+
+.weight-unit-tag {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  user-select: none;
+}
+
+.weight-arrow-sep {
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 0.85rem;
+  user-select: none;
+  padding: 0 2px;
+}
+
 .badge-dollar-live {
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;
