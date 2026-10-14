@@ -2202,6 +2202,41 @@ function openVideoReviewsModal(laptopId) {
       </div>
     </div>
 
+    <!-- Player Embutido Nativo do YouTube com Busca em Tempo Real (Zero Dependência, Roda na Hora!) -->
+    <div class="video-player-section">
+      <div class="video-player-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="video-live-badge">🔴 Player YouTube GamerRadar</span>
+          <span style="font-size:0.78rem; color:var(--text-muted);">Assista aos reviews e benchmarks direto aqui</span>
+        </div>
+        <div class="video-tabs-bar">
+          <button type="button" class="video-tab-btn active" id="tabBtn_br" onclick="switchVideoPlayer('${laptop.id}', 'br')">🇧🇷 Review Brasil</button>
+          <button type="button" class="video-tab-btn" id="tabBtn_us" onclick="switchVideoPlayer('${laptop.id}', 'us')">🇺🇸 Review Mundial</button>
+          <button type="button" class="video-tab-btn" id="tabBtn_fps" onclick="switchVideoPlayer('${laptop.id}', 'fps')">🎮 Testes de FPS (${gpuTerm})</button>
+          <button type="button" class="video-tab-btn" id="tabBtn_teardown" onclick="switchVideoPlayer('${laptop.id}', 'teardown')">🛠️ Como Abrir & Upgrades</button>
+        </div>
+      </div>
+
+      <div class="video-player-wrapper">
+        <iframe id="videoPlayerIframe" 
+          src="https://www.youtube-nocookie.com/embed?listType=search&list=${encodeURIComponent(cleanName + ' review Dan Ferreira Adrenaline')}"
+          title="YouTube Player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <div class="video-player-footer">
+        <div id="videoPlayerActiveLabel" style="font-size:0.82rem; color:#38bdf8; font-weight:700;">
+          ▶️ Carregado: Reviews dos Melhores Canais do Brasil (Dan Ferreira / Adrenaline / Lucas Ishii)
+        </div>
+        <a id="videoPlayerExternalLink" href="${urlBr}" target="_blank" class="video-channel-btn" style="padding:4px 10px; font-size:0.75rem; text-decoration:none;">
+          Abrir no YouTube em Tela Cheia ↗
+        </a>
+      </div>
+    </div>
+
     <!-- Seção de Acesso Rápido em 1 Clique -->
     <div class="video-section-header">
       <h4>⚡ Acesso Rápido em 1 Clique (Buscas Cirúrgicas no YouTube)</h4>
@@ -2470,15 +2505,76 @@ function closeVideoReviewsModal() {
 function executeCustomVideoSearch(laptopId) {
   const input = document.getElementById(`customVideoSearchInput_${laptopId}`);
   const term = input ? input.value.trim() : '';
+  if (!term) return;
   searchVideoWithTerm(laptopId, term);
 }
 
+function switchVideoPlayer(laptopId, mode) {
+  const laptop = laptops.find(l => String(l.id) === String(laptopId)) || DEFAULT_LAPTOPS.find(l => String(l.id) === String(laptopId));
+  const rawName = (laptop && laptop.name) ? String(laptop.name) : 'Notebook Gamer';
+  const cleanName = rawName.replace(/notebook\s*gamer/gi, '').trim() || rawName;
+  const gpuTerm = ((laptop && laptop.gpu) ? String(laptop.gpu) : 'RTX 4060').replace(/NVIDIA\s*/gi, '').trim();
+  
+  const iframe = document.getElementById('videoPlayerIframe');
+  const label = document.getElementById('videoPlayerActiveLabel');
+  const extLink = document.getElementById('videoPlayerExternalLink');
+  
+  document.querySelectorAll('.video-tab-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById(`tabBtn_${mode}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  let query = '';
+  let labelText = '';
+  let externalUrl = '';
+
+  if (mode === 'br') {
+    query = `${cleanName} review (Dan Ferreira OR Adrenaline OR Lucas Ishii)`;
+    labelText = '▶️ Carregado: Reviews dos Melhores Canais do Brasil (Dan Ferreira / Adrenaline / Lucas Ishii)';
+    externalUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+  } else if (mode === 'us') {
+    query = `"${cleanName}" "${gpuTerm}" review (Jarrod's Tech OR Dave2D OR Just Josh)`;
+    labelText = '▶️ Carregado: Testes dos Laboratórios Mundiais de Elite (Jarrod\'s Tech, Dave2D, Just Josh)';
+    externalUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+  } else if (mode === 'fps') {
+    query = `${gpuTerm} laptop gaming fps benchmark gameplay`;
+    labelText = `🎮 Carregado: Testes Reais de FPS em Jogos com ${gpuTerm}`;
+    externalUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+  } else if (mode === 'teardown') {
+    query = `${cleanName} teardown upgrade ram ssd opening inside`;
+    labelText = '🛠️ Carregado: Como Abrir a Tampa, Slots de Memória RAM e Instalação de SSD';
+    externalUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+  }
+
+  if (iframe) {
+    iframe.src = `https://www.youtube-nocookie.com/embed?listType=search&list=${encodeURIComponent(query)}`;
+  }
+  if (label) label.innerText = labelText;
+  if (extLink) extLink.href = externalUrl;
+}
+
 function searchVideoWithTerm(laptopId, customTerm) {
-  const laptop = laptops.find(l => l.id === laptopId) || DEFAULT_LAPTOPS.find(l => l.id === laptopId);
-  const laptopName = laptop ? laptop.name.replace(/notebook\s*gamer/gi, '').trim() : '';
-  const query = `${laptopName} ${customTerm}`.trim();
-  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-  window.open(url, '_blank');
+  const laptop = laptops.find(l => String(l.id) === String(laptopId)) || DEFAULT_LAPTOPS.find(l => String(l.id) === String(laptopId));
+  const rawName = laptop ? String(laptop.name) : 'Notebook Gamer';
+  const cleanName = rawName.replace(/notebook\s*gamer/gi, '').trim() || rawName;
+  const query = `${cleanName} ${customTerm}`.trim();
+  
+  const iframe = document.getElementById('videoPlayerIframe');
+  const label = document.getElementById('videoPlayerActiveLabel');
+  const extLink = document.getElementById('videoPlayerExternalLink');
+  
+  if (iframe) {
+    iframe.src = `https://www.youtube-nocookie.com/embed?listType=search&list=${encodeURIComponent(query)}`;
+    iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, '_blank');
+  }
+  
+  if (label) {
+    label.innerText = `🔍 Busca no Player: "${customTerm}" (${cleanName})`;
+  }
+  if (extLink) {
+    extLink.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+  }
 }
 
 // Modal e Extração Inteligente por Link Direto
@@ -4858,11 +4954,12 @@ window.openVideoReviewsModal = openVideoReviewsModal;
 window.closeVideoReviewsModal = closeVideoReviewsModal;
 window.executeCustomVideoSearch = executeCustomVideoSearch;
 window.searchVideoWithTerm = searchVideoWithTerm;
+window.switchVideoPlayer = switchVideoPlayer;
 
 // ==========================================
 // SISTEMA DE VERIFICAÇÃO DE NOVA VERSÃO VIA API & GITHUB
 // ==========================================
-const CURRENT_APP_VERSION = '20261014_v28';
+const CURRENT_APP_VERSION = '20261014_v29';
 const GITHUB_REPO_API = 'https://api.github.com/repos/brunoserra123/radar-notebooks/commits/main';
 
 let isCheckingUpdate = false;

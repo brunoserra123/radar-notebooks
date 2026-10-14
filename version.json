@@ -1,5 +1,5 @@
 {
-  "version": "20261014_v28",
-  "releaseNotes": "Correção dos botões de Vídeos & Reviews na tabela comparativa TudoCelular + visual gamer de alto contraste + z-index do modal corrigido",
-  "updatedAt": "2026-10-14T16:15:00-03:00"
+  "version": "20261014_v29",
+  "releaseNotes": "Novo Player de Vídeo do YouTube Embutido diretamente no site com abas interativas (Reviews Brasil, Global, Testes de FPS e Upgrades)",
+  "updatedAt": "2026-10-14T16:35:00-03:00"
 }
