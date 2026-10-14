@@ -148,6 +148,9 @@
           <button class="chip" data-filter="gpu_upgrade">🚀 Upgrade Grátis de GPU nos EUA</button>
           <button class="chip" data-filter="rtx4070">Com RTX 4070</button>
           <button class="chip" data-filter="rtx4060">Com RTX 4060</button>
+          <button class="chip" data-filter="usbc_charging">🔌 Carrega por Type-C (USB-C PD)</button>
+          <button class="chip" data-filter="biometrics">🔐 Com Leitor de Digital / Facial</button>
+          <button class="chip" data-filter="rich_ports">⚡ Portas: USB-A + Type-C</button>
           <button class="chip" data-filter="watchlist">⭐ Meus Monitorados</button>
         </div>
       </div>
@@ -162,6 +165,7 @@
           <option value="gpu_power">Potência da GPU (TGP / Tier)</option>
         </select>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border: none; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);">⚡ Comparativo de Placas & Bateria</button>
           <button class="btn btn-screenshot" id="btnOpenOcrModal">📸 Puxar por Print</button>
           <button class="btn btn-primary" id="btnOpenDuel">🥊 Duelo: Qual Vale Mais a Pena?</button>
           <button class="btn btn-secondary" id="btnOpenAddModal">➕ Novo Modelo</button>
@@ -389,15 +393,20 @@
                       <input type="text" id="ocrParsedRam">
                     </div>
                     <div class="form-group">
-                      <label>Preço em Dólar (US$)</label>
+                      <label for="ocrParsedPriceUs">Preço em Dólar (US$) 🇺🇸</label>
                       <input type="number" id="ocrParsedPriceUs" step="10">
+                      <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">Preço original na loja dos EUA</div>
                     </div>
                     <div class="form-group">
-                      <label>Preço no Brasil (R$) [Opcional]</label>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label for="ocrParsedPriceBr">Preço no Brasil (R$) 🇧🇷</label>
+                        <button type="button" id="btnRecalcOcrBr" style="background: none; border: none; color: var(--accent); font-size: 0.72rem; cursor: pointer; text-decoration: underline; padding: 0;">↻ Recalcular Estimativa</button>
+                      </div>
                       <input type="number" id="ocrParsedPriceBr" step="50">
+                      <div id="ocrPriceBrHelp" style="font-size: 0.72rem; color: var(--accent); margin-top: 3px;">⚡ Calculado automaticamente para o mercado brasileiro</div>
                     </div>
                     <div class="form-group">
-                      <label>Loja / Origem</label>
+                      <label for="ocrParsedStore">Loja / Origem</label>
                       <input type="text" id="ocrParsedStore" placeholder="Best Buy / Amazon / Kabum">
                     </div>
                   </div>
@@ -410,6 +419,174 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    <!-- Modal Comparativo de Placas de Vídeo, Bateria & Tipo de Carregador -->
+    <div class="modal-backdrop" id="gpuGuideModal" style="display: none;">
+      <div class="modal-dialog modal-large">
+        <div class="modal-header">
+          <div>
+            <span class="badge badge-warning">Guia Prático do Comprador</span>
+            <h3 class="modal-title">⚡ Comparativo de Placas de Vídeo, Bateria & Tipo de Carregador</h3>
+          </div>
+          <button class="btn-close" id="btnCloseGpuGuideModal">✕</button>
+        </div>
+        <div class="modal-body">
+          <!-- Abas de Navegação -->
+          <div class="guide-tabs" id="guideTabsNav">
+            <button class="guide-tab-btn active" data-tab="interactive">⚔️ Comparador Interativo de Placas</button>
+            <button class="guide-tab-btn" data-tab="battery">🔋 Autonomia Real da Bateria</button>
+            <button class="guide-tab-btn" data-tab="usbc">🔌 Carregador Type-C vs Pino Tradicional</button>
+            <button class="guide-tab-btn" data-tab="nextgen">🔮 Próxima Geração (RTX Série 50)</button>
+          </div>
+
+          <!-- Aba 1: Comparador Interativo -->
+          <div class="guide-tab-pane active" id="paneInteractive">
+            <div class="duel-selector-bar" style="margin-bottom: 1.25rem;">
+              <div class="duel-select-group">
+                <label for="guideGpuA">🎮 Placa Base (Origem):</label>
+                <select id="guideGpuA">
+                  <option value="rtx4050">NVIDIA RTX 4050 (6GB GDDR6)</option>
+                  <option value="rtx4060" selected>NVIDIA RTX 4060 (8GB GDDR6)</option>
+                  <option value="rtx4070">NVIDIA RTX 4070 (8GB GDDR6)</option>
+                  <option value="rtx4080">NVIDIA RTX 4080 (12GB GDDR6X)</option>
+                </select>
+              </div>
+              <div class="duel-vs-circle">VS</div>
+              <div class="duel-select-group">
+                <label for="guideGpuB">🔥 Placa Alvo (Comparar):</label>
+                <select id="guideGpuB">
+                  <option value="rtx4050">NVIDIA RTX 4050 (6GB GDDR6)</option>
+                  <option value="rtx4060">NVIDIA RTX 4060 (8GB GDDR6)</option>
+                  <option value="rtx4070" selected>NVIDIA RTX 4070 (8GB GDDR6)</option>
+                  <option value="rtx4080">NVIDIA RTX 4080 (12GB GDDR6X)</option>
+                  <option value="rtx50series">RTX Série 50 (Blackwell - Nova Geração)</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="guideComparisonResult">
+              <!-- Rendered dynamically by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Aba 2: Autonomia Real da Bateria -->
+          <div class="guide-tab-pane" id="paneBattery" style="display: none;">
+            <div class="battery-guide-box">
+              <div class="battery-truth-alert">
+                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">⚡</div>
+                <div>
+                  <strong>A Realidade Sem Enrolação:</strong> Nenhum notebook gamer do mundo foi projetado para jogar sem tomada!
+                  Ao jogar na bateria, o sistema reduz os watts da placa de 140W para ~35W (para a bateria não estufar), <strong>derrubando o FPS em até 50%</strong>. A bateria dura no máximo <strong>1h a 1h20 jogando</strong>.
+                </div>
+              </div>
+
+              <h4 style="margin: 1.25rem 0 0.75rem 0; font-size: 1rem; color: var(--accent);">
+                💻 Autonomia Real em Uso Comum (Trabalho, Faculdade, YouTube com brilho médio):
+              </h4>
+              <div class="battery-cards-grid">
+                <div class="battery-card">
+                  <div class="battery-card-badge intel">Intel Core HX (i7-14700HX / i7-13650HX)</div>
+                  <div class="battery-card-hours">3h00 a 4h30</div>
+                  <p class="battery-card-desc">Foco 100% em potência bruta. Possui 20 núcleos de alto desempenho que consomem energia contínua mesmo no Windows.</p>
+                  <div class="battery-card-tag">Ex: Acer Predator Neo 16, Dell G16 7630</div>
+                </div>
+
+                <div class="battery-card highlight">
+                  <div class="battery-card-badge ultra">Intel Core Ultra (Meteor Lake Ultra 7 155H)</div>
+                  <div class="battery-card-hours">7h00 a 9h00</div>
+                  <p class="battery-card-desc">Possui ilha de baixo consumo (Low Power Island) e NPU integrada. Desliga os núcleos pesados ao navegar e ver vídeos.</p>
+                  <div class="battery-card-tag">Ex: ASUS ROG Zephyrus G16 (2024)</div>
+                </div>
+
+                <div class="battery-card">
+                  <div class="battery-card-badge amd">AMD Ryzen Série HS (Ryzen 7 7840HS / 8845HS)</div>
+                  <div class="battery-card-hours">7h00 a 8h30</div>
+                  <p class="battery-card-desc">Construído em 4nm TSMC de extrema eficiência térmica. Excelente para quem precisa usar na aula sem levar carregador.</p>
+                  <div class="battery-card-tag">Ex: Lenovo Legion Slim 5, ASUS TUF A15</div>
+                </div>
+              </div>
+
+              <div class="battery-tips-list" style="margin-top: 1.25rem;">
+                <div class="tip-item">
+                  <strong>💡 O Segredo do MUX Switch / Advanced Optimus:</strong>
+                  Quando estiver fora de casa, selecione o modo "Eco" ou "iGPU Only" no software do notebook (Lenovo Vantage, Armoury Crate ou PredatorSense). Isso desliga a placa Nvidia por completo, dobrando a autonomia da bateria!
+                </div>
+                <div class="tip-item">
+                  <strong>✈️ Limite de Bateria em Avião (99.9Wh):</strong>
+                  Pela regulamentação da ANAC (Brasil) e FAA (EUA), baterias acima de 100Wh são proibidas em bagagem de mão de voos. Modelos como Zephyrus G16, TUF A15 e Helios Neo trazem <strong>90Wh</strong>, o maior tamanho permitido para viagem internacional do seu irmão!
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aba 3: Carregador Type-C vs Pino Tradicional -->
+          <div class="guide-tab-pane" id="paneUsbc" style="display: none;">
+            <div class="usbc-guide-box">
+              <div class="usbc-comparison-cards">
+                <div class="usbc-card good">
+                  <div class="usbc-card-header">
+                    <span class="badge badge-accent">⚡ Praticidade Total</span>
+                    <h4>Notebook com Carregamento USB-C PD (Power Delivery)</h4>
+                  </div>
+                  <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                    Modelos como <strong>Lenovo Legion Slim 5 (140W)</strong>, <strong>Legion Pro 5i (140W)</strong>, <strong>ASUS ROG Zephyrus G16 (100W)</strong> e <strong>ASUS TUF A15 (100W)</strong> aceitam recarga diretamente pela porta USB-C!
+                  </p>
+                  <ul class="pros-cons-list">
+                    <li>✓ <strong>Você não precisa levar o tijolo na mochila:</strong> basta colocar um carregador de celular GaN compacto de 65W ou 100W para trabalhar ou estudar fora.</li>
+                    <li>✓ Usa o mesmo cabo do celular Android / Galaxy Fold 6!</li>
+                    <li>✓ Perfeito para cafeterias, reuniões, viagens e aeroportos.</li>
+                    <li>⚠️ Para jogar em potência máxima com TGP 140W, ainda usa a fonte principal em casa.</li>
+                  </ul>
+                </div>
+
+                <div class="usbc-card alert">
+                  <div class="usbc-card-header">
+                    <span class="badge badge-purple">🔌 Apenas Plugue Tradicional</span>
+                    <h4>Notebook Sem Recarga por Type-C (Pino Redondo)</h4>
+                  </div>
+                  <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                    Modelos como a <strong>linha Dell G15 e Dell G16</strong> possuem portas USB-C, porém elas servem apenas para transmissão de dados e saída de vídeo. <strong>NÃO recarregam o notebook!</strong>
+                  </p>
+                  <ul class="pros-cons-list">
+                    <li>⚠️ <strong>Obrigado a carregar a fonte pesada de 240W/330W</strong> (mais de 1 kg na mochila) mesmo se for apenas responder e-mails ou assistir aula.</li>
+                    <li>⚠️ Se esquecer a fonte original em casa, o notebook fica sem bateria e não aceita nenhum carregador de tomada portátil.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aba 4: Próxima Geração (RTX Série 50) -->
+          <div class="guide-tab-pane" id="paneNextGen" style="display: none;">
+            <div class="nextgen-guide-box">
+              <div style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+                <h4 style="color: #c084fc; font-size: 1.1rem; margin-bottom: 0.5rem;">🔮 Vale a Pena Esperar a Próxima Geração (RTX Série 50 Blackwell)?</h4>
+                <p style="font-size: 0.88rem; color: var(--text-main); line-height: 1.5;">
+                  A resposta sincera para o seu orçamento de <strong>R$ 8.000 a R$ 8.900</strong> é: <strong>NÃO VALE A PENA ESPERAR!</strong> Veja por que:
+                </p>
+              </div>
+
+              <div class="nextgen-reasons-grid">
+                <div class="reason-card">
+                  <div class="reason-icon">💸</div>
+                  <h5>1. Ágio de Lançamento Brutal</h5>
+                  <p>Notebooks de nova geração chegam nos EUA custando de $1.600 a $2.200 (bem acima do seu teto de $1.400). Levam de 6 a 9 meses até entrarem nas primeiras promoções.</p>
+                </div>
+                <div class="reason-card">
+                  <div class="reason-icon">🏷️</div>
+                  <h5>2. Sweetspot Histórico da Série 40</h5>
+                  <p>Agora é exatamente o momento onde a Série 40 (RTX 4060 por $999 e RTX 4070 por $1.199-$1.299) atinge seu menor preço histórico nos EUA para queima de estoque.</p>
+                </div>
+                <div class="reason-card">
+                  <div class="reason-icon">🚀</div>
+                  <h5>3. DLSS 3 + Frame Generation</h5>
+                  <p>A arquitetura Ada Lovelace da RTX 40 já possui gerador de quadros por IA (Frame Gen) e suporte a Ray Tracing de 3ª geração. Uma RTX 4070 roda qualquer lançamento no Ultra pelos próximos 4 anos com folga.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

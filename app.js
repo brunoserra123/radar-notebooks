@@ -18,6 +18,12 @@ const DEFAULT_LAPTOPS = [
     storage: '1TB SSD NVMe M.2 Gen4',
     screen: '16" WQXGA (2560x1600) 165Hz, 100% sRGB, 400 nits, G-Sync',
     cooling: 'Liquid Metal + Dual 5th Gen AeroBlade 3D Fans',
+    battery: '90Wh (~5h escritório / 1.1h game)',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Suporta carregamento USB-C Power Delivery 100W + Fonte de mesa 330W',
+    hasBiometrics: false,
+    biometrics: '❌ Sem leitor de digital (PIN / Senha)',
+    ports: '2x USB-C (Thunderbolt 4 / 100W PD) + 3x USB-A 3.2 Gen 2 + HDMI 2.1 + MicroSD + RJ-45',
     priceBr: 8299,
     priceUs: 1199,
     storeBr: 'Acer Store / Kabum',
@@ -44,6 +50,12 @@ const DEFAULT_LAPTOPS = [
     storage: '1TB SSD NVMe M.2 Gen4',
     screen: '16" QHD+ (2560x1600) 240Hz, 100% DCI-P3, 300 nits',
     cooling: 'Vapor Chamber inspirada na Alienware + 4 saídas de ar',
+    battery: '86Wh (~4h escritório / 1h game)',
+    hasUsbCCharging: false,
+    chargingInfo: '🔌 Apenas plugue redondo tradicional Dell (240W/330W). Porta Type-C NÃO carrega o note',
+    hasBiometrics: false,
+    biometrics: '❌ Sem leitor de digital',
+    ports: '1x USB-C (Thunderbolt 4 / DisplayPort) + 3x USB-A 3.2 + HDMI 2.1 + RJ-45',
     priceBr: 8799,
     priceUs: 1299,
     storeBr: 'Dell Brasil Oficial / Amazon BR',
@@ -70,6 +82,12 @@ const DEFAULT_LAPTOPS = [
     storage: '1TB SSD NVMe M.2',
     screen: '16" WQXGA (2560x1600) 165Hz, 100% sRGB, 350 nits',
     cooling: 'Legion ColdFront 5.0 (Silencioso e robusto)',
+    battery: '80Wh (~7.5h escritório c/ Ryzen / 1.2h game)',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Suporta recarga ultrarrápida USB-C 140W PD (levar carregador de celular na mochila) + Fonte Slim 230W',
+    hasBiometrics: true,
+    biometrics: '🔐 Leitor de Impressão Digital no Botão Power (Desbloqueio Instantâneo)',
+    ports: '2x USB-C (1x 140W PD + 1x DP 1.4) + 2x USB-A 3.2 Gen 2 + Leitor SD Full-size + HDMI 2.1',
     priceBr: 8499,
     priceUs: 1249,
     storeBr: 'Lenovo Oficial / Mercado Livre',
@@ -77,7 +95,7 @@ const DEFAULT_LAPTOPS = [
     urlBr: 'https://www.lenovo.com/br',
     urlUs: 'https://www.bhphotovideo.com',
     score: 94,
-    bestFor: 'Chassi em alumínio fino, teclado superior e bateria longa',
+    bestFor: 'Chassi em alumínio fino, teclado superior, leitor de digital e bateria longa',
     history: [
       { date: 'Dez 2025', br: 8299, us: 1180 },
       { date: 'Jan 2026', br: 8899, us: 1299 },
@@ -96,6 +114,12 @@ const DEFAULT_LAPTOPS = [
     storage: '1TB SSD NVMe',
     screen: '15.6" WQHD (2560x1440) 165Hz, 100% DCI-P3, G-Sync',
     cooling: 'Dual Arc Flow Fans + 5 Heatpipes',
+    battery: '90Wh Bateria Enorme (~8h escritório c/ Ryzen 9 / 1.5h game)',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Aceita carregador USB-C Power Delivery 100W + Fonte de mesa 240W',
+    hasBiometrics: false,
+    biometrics: '❌ Sem leitor de digital',
+    ports: '2x USB-C (1x USB4 40Gbps + 1x Type-C c/ 100W PD) + 2x USB-A 3.2 + HDMI 2.1 + RJ-45',
     priceBr: 8699,
     priceUs: 1149,
     storeBr: 'Kabum / Loja ASUS',
@@ -103,7 +127,7 @@ const DEFAULT_LAPTOPS = [
     urlBr: 'https://www.kabum.com.br',
     urlUs: 'https://www.bestbuy.com',
     score: 92,
-    bestFor: 'Super resistente (certificação militar MIL-STD-810H) + RTX 4070',
+    bestFor: 'Super resistente (certificação militar MIL-STD-810H) + RTX 4070 + Bateria 90Wh',
     history: [
       { date: 'Nov 2025', br: 8199, us: 1049 },
       { date: 'Fev 2026', br: 8999, us: 1199 },
@@ -122,6 +146,12 @@ const DEFAULT_LAPTOPS = [
     storage: '1TB SSD NVMe Gen4',
     screen: '16" 240Hz WQXGA, 500 nits, DisplayHDR 400, 100% sRGB',
     cooling: 'Coldfront com câmara de vapor e IA Lenovo Vantage',
+    battery: '80Wh (~4.5h escritório / 1h game)',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Suporta recarga rápida USB-C 140W PD (carrega na faculdade ou trabalho) + Fonte 300W',
+    hasBiometrics: false,
+    biometrics: '❌ Sem digital (Webcam 1080p c/ botão físico E-Shutter de privacidade)',
+    ports: '2x USB-C (1x 140W PD + 1x DP) + 4x USB-A 3.2 (Abundância de portas para periféricos!) + HDMI 2.1 + RJ-45',
     priceBr: 11499,
     priceUs: 1449,
     storeBr: 'Lojas Especializadas / Importação BR',
@@ -148,6 +178,12 @@ const DEFAULT_LAPTOPS = [
     storage: '512GB / 1TB SSD NVMe',
     screen: '16" WUXGA (1920x1200) 165Hz, 100% sRGB, 400 nits',
     cooling: 'Liquid Metal na CPU + 4 saídas de exaustão',
+    battery: '90Wh (~6h escritório / 1.1h game)',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Suporta USB-C 100W PD + Fonte 230W',
+    hasBiometrics: false,
+    biometrics: '❌ Sem leitor de digital',
+    ports: '2x USB-C (USB4 / 100W PD) + 3x USB-A 3.2 + HDMI 2.1 + MicroSD + RJ-45',
     priceBr: 7299,
     priceUs: 999,
     storeBr: 'Kabum / Magazine Luiza',
@@ -174,6 +210,12 @@ const DEFAULT_LAPTOPS = [
     storage: '1TB NVMe PCIe 4.0',
     screen: '16" OLED 2.5K (240Hz, 0.2ms, 100% DCI-P3, HDR True Black 500)',
     cooling: 'Tri-Fan Technology com metal líquido e câmara',
+    battery: '90Wh (~8.5h escritório c/ Intel Ultra / 1.5h game)',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Suporta recarga USB-C 100W Type-C portátil + Conector ASUS Slim 200W/240W',
+    hasBiometrics: true,
+    biometrics: '📷 Reconhecimento Facial Windows Hello (Câmera Infravermelho IR estilo Face ID)',
+    ports: '2x USB-C (1x Thunderbolt 4 / 100W PD + 1x USB-C 3.2 Gen 2) + 2x USB-A 3.2 Gen 2 + Leitor SD UHS-II + HDMI 2.1',
     priceBr: 14899,
     priceUs: 1599,
     storeBr: 'ASUS Store Brasil (Muito sobrepreço)',
@@ -181,7 +223,7 @@ const DEFAULT_LAPTOPS = [
     urlBr: 'https://www.lojaasus.com.br',
     urlUs: 'https://www.bestbuy.com',
     score: 96,
-    bestFor: 'A melhor tela do planeta (OLED 240Hz) e corpo ultrafino estilo MacBook',
+    bestFor: 'A melhor tela do planeta (OLED 240Hz), desbloqueio facial Windows Hello e corpo ultrafino estilo MacBook',
     history: [
       { date: 'Dez 2025', br: 15499, us: 1499 },
       { date: 'Jan 2026', br: 14999, us: 1699 },
@@ -200,6 +242,12 @@ const DEFAULT_LAPTOPS = [
     storage: '512GB SSD NVMe',
     screen: '15.6" FHD (1920x1080) 165Hz, 100% sRGB, 300 nits',
     cooling: 'Design Alienware dual-fan',
+    battery: '56Wh (~3.5h escritório / 50min game)',
+    hasUsbCCharging: false,
+    chargingInfo: '🔌 Apenas plugue convencional redondo Dell (240W). Não carrega por Type-C',
+    hasBiometrics: false,
+    biometrics: '❌ Sem leitor de digital',
+    ports: '1x USB-C (DisplayPort) + 3x USB-A 3.2 + HDMI 2.1 + RJ-45',
     priceBr: 6999,
     priceUs: 949,
     storeBr: 'Dell Brasil / Magazine Luiza',
@@ -234,7 +282,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function loadData() {
   const savedLaptops = localStorage.getItem(STORAGE_KEY);
-  laptops = savedLaptops ? JSON.parse(savedLaptops) : DEFAULT_LAPTOPS;
+  if (savedLaptops) {
+    try {
+      const parsed = JSON.parse(savedLaptops);
+      // Mesclar propriedades novas (battery, ports, biometrics, hasUsbCCharging) caso venham do DEFAULT_LAPTOPS
+      laptops = parsed.map(item => {
+        const def = DEFAULT_LAPTOPS.find(d => d.id === item.id);
+        if (def) {
+          return {
+            ...def,
+            ...item,
+            battery: item.battery || def.battery,
+            hasUsbCCharging: item.hasUsbCCharging !== undefined ? item.hasUsbCCharging : def.hasUsbCCharging,
+            chargingInfo: item.chargingInfo || def.chargingInfo,
+            hasBiometrics: item.hasBiometrics !== undefined ? item.hasBiometrics : def.hasBiometrics,
+            biometrics: item.biometrics || def.biometrics,
+            ports: item.ports || def.ports
+          };
+        }
+        return item;
+      });
+    } catch(e) {
+      laptops = DEFAULT_LAPTOPS;
+    }
+  } else {
+    laptops = DEFAULT_LAPTOPS;
+  }
 
   const savedWatch = localStorage.getItem(WATCHLIST_KEY);
   watchlist = savedWatch ? JSON.parse(savedWatch) : ['predator-helios-neo-16', 'dell-g16-7630', 'lenovo-legion-pro-5i'];
@@ -478,6 +551,20 @@ function bindEvents() {
     btnSaveOcr.addEventListener('click', saveOcrParsedLaptop);
   }
 
+  const btnRecalcBr = document.getElementById('btnRecalcOcrBr');
+  if (btnRecalcBr) {
+    btnRecalcBr.addEventListener('click', () => {
+      recalcOcrBrPrice(true);
+    });
+  }
+
+  const ocrPriceUsInput = document.getElementById('ocrParsedPriceUs');
+  if (ocrPriceUsInput) {
+    ocrPriceUsInput.addEventListener('change', () => {
+      recalcOcrBrPrice(false);
+    });
+  }
+
   // Central de Busca Direta nas Lojas
   const btnStoreSearch = document.getElementById('btnExecuteStoreSearch');
   if (btnStoreSearch) {
@@ -498,6 +585,9 @@ function bindEvents() {
       }
     });
   }
+
+  // Inicializar o Guia de Placas de Vídeo & Bateria
+  initGpuGuideModal();
 
   // Fechar ao clicar fora
   window.addEventListener('click', (e) => {
@@ -820,13 +910,17 @@ function render() {
 
   // Filtragem
   let filtered = laptops.filter(laptop => {
-    // Busca por texto
+    // Busca por texto ampliada
     const matchQuery = 
       laptop.name.toLowerCase().includes(query) ||
       laptop.gpu.toLowerCase().includes(query) ||
       laptop.cpu.toLowerCase().includes(query) ||
       laptop.storeBr.toLowerCase().includes(query) ||
-      laptop.storeUs.toLowerCase().includes(query);
+      laptop.storeUs.toLowerCase().includes(query) ||
+      (laptop.ports && laptop.ports.toLowerCase().includes(query)) ||
+      (laptop.biometrics && laptop.biometrics.toLowerCase().includes(query)) ||
+      (laptop.chargingInfo && laptop.chargingInfo.toLowerCase().includes(query)) ||
+      (laptop.battery && laptop.battery.toLowerCase().includes(query));
 
     if (!matchQuery) return false;
 
@@ -852,6 +946,15 @@ function render() {
     }
     if (currentFilter === 'rtx4060') {
       return laptop.gpu.includes('4060');
+    }
+    if (currentFilter === 'usbc_charging') {
+      return laptop.hasUsbCCharging === true || (laptop.chargingInfo && laptop.chargingInfo.includes('USB-C'));
+    }
+    if (currentFilter === 'biometrics') {
+      return laptop.hasBiometrics === true || (laptop.biometrics && !laptop.biometrics.includes('❌'));
+    }
+    if (currentFilter === 'rich_ports') {
+      return laptop.ports && laptop.ports.includes('USB-C') && laptop.ports.includes('USB-A');
     }
     if (currentFilter === 'watchlist') {
       return watchlist.includes(laptop.id);
@@ -964,6 +1067,20 @@ function render() {
           </div>
           <div class="screen-highlight">
             🖥️ <strong>Tela:</strong> ${laptop.screen}
+          </div>
+          <div class="card-extra-row" style="grid-column: span 2; display: flex; flex-direction: column; gap: 4px; font-size: 0.76rem; background: rgba(0, 0, 0, 0.25); padding: 6px 8px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+              <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">🔌 <strong>Portas:</strong> ${laptop.ports || 'USB-C + USB-A'}</span>
+              <span class="badge ${laptop.hasUsbCCharging ? 'badge-accent' : 'badge-purple'}" style="font-size:0.68rem; padding: 1px 6px; white-space: nowrap;">
+                ${laptop.hasUsbCCharging ? '⚡ Aceita Type-C' : '🔌 Só Pino Redondo'}
+              </span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+              <span>🔋 <strong>Bateria:</strong> ${laptop.battery || '80Wh (~4h)'}</span>
+              <span style="color: ${laptop.hasBiometrics ? 'var(--accent)' : 'var(--text-dim)'}; font-weight: 600; font-size: 0.72rem; white-space: nowrap;">
+                ${laptop.biometrics ? laptop.biometrics.split('(')[0] : '❌ Sem Digital'}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -1193,6 +1310,9 @@ function renderDuel() {
           <div>🧠 <strong>Processador:</strong> ${lapBr.cpu.split('(')[0]}</div>
           <div>🖥️ <strong>Tela:</strong> ${lapBr.screen}</div>
           <div>💾 <strong>RAM & Armazenamento:</strong> ${lapBr.ram.split('(')[0]} | ${lapBr.storage}</div>
+          <div>🔌 <strong>Portas:</strong> ${lapBr.ports || 'USB-C + USB-A'}</div>
+          <div>🔋 <strong>Bateria:</strong> ${lapBr.battery || '80Wh'} (${lapBr.hasUsbCCharging ? '⚡ Aceita Type-C' : '🔌 Só Pino Redondo'})</div>
+          <div>🔐 <strong>Biometria:</strong> ${lapBr.biometrics || '❌ Apenas Senha'}</div>
         </div>
 
         <ul class="pros-cons-list" style="margin-top:auto;">
@@ -1250,6 +1370,9 @@ function renderDuel() {
           <div>🧠 <strong>Processador:</strong> ${lapUs.cpu.split('(')[0]}</div>
           <div>🖥️ <strong>Tela:</strong> ${lapUs.screen}</div>
           <div>💾 <strong>RAM & Armazenamento:</strong> ${lapUs.ram.split('(')[0]} | ${lapUs.storage}</div>
+          <div>🔌 <strong>Portas:</strong> ${lapUs.ports || 'USB-C + USB-A'}</div>
+          <div>🔋 <strong>Bateria:</strong> ${lapUs.battery || '80Wh'} (${lapUs.hasUsbCCharging ? '⚡ Aceita Type-C' : '🔌 Só Pino Redondo'})</div>
+          <div>🔐 <strong>Biometria:</strong> ${lapUs.biometrics || '❌ Apenas Senha'}</div>
         </div>
 
         <ul class="pros-cons-list" style="margin-top:auto;">
@@ -1258,6 +1381,12 @@ function renderDuel() {
           <li>⚠️ Teclado padrão americano (US Internacional, sem tecla física Ç)</li>
           <li>⚠️ Garantia internacional depende da fabricante (Dell e Asus oferecem global)</li>
         </ul>
+      </div>
+
+      <div style="grid-column: 1 / -1; text-align: center; margin-top: 0.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="openGpuGuideWithGpu('${lapUs.gpu}')" style="font-size:0.82rem; padding: 0.6rem 1rem;">
+          ⚡ Ver Comparativo Detalhado de Ganho da Placa: ${lapBr.gpu} vs ${lapUs.gpu} ↗
+        </button>
       </div>
     </div>
   `;
@@ -1319,20 +1448,175 @@ async function processOcrImage(imageSrc) {
     // Extração inteligente de dados
     const parsed = parseSpecsFromText(recognizedText);
 
+    // Preencher campos com dados extraídos
     document.getElementById('ocrParsedName').value = parsed.name || 'Notebook Gamer Detectado';
     document.getElementById('ocrParsedGpu').value = parsed.gpu || 'NVIDIA RTX 4060';
     document.getElementById('ocrParsedCpu').value = parsed.cpu || 'Intel Core i7 / Ryzen 7';
     document.getElementById('ocrParsedRam').value = parsed.ram || '16GB DDR5';
     document.getElementById('ocrParsedPriceUs').value = parsed.priceUs || 1199;
-    document.getElementById('ocrParsedPriceBr').value = parsed.priceBr || '';
+    
+    // O Preço no Brasil SEMPRE é preenchido automaticamente (nunca fica em branco!)
+    const resolvedPriceBr = parsed.priceBr || estimateOrFindPriceBr(parsed.name, parsed.gpu, parsed.priceUs, recognizedText);
+    document.getElementById('ocrParsedPriceBr').value = resolvedPriceBr;
     document.getElementById('ocrParsedStore').value = parsed.store || 'Best Buy';
 
+    const helpBr = document.getElementById('ocrPriceBrHelp');
+    if (helpBr) {
+      helpBr.innerHTML = `⚡ <strong>R$ ${Number(resolvedPriceBr).toLocaleString('pt-BR')}</strong> estimado automaticamente com base no mercado brasileiro!`;
+    }
+
     formWrap.style.display = 'block';
-    statusText.innerText = '🎉 Dados extraídos do print! Confira e confirme abaixo:';
+    statusText.innerText = '🎉 Dados extraídos do print com Preço Brasil preenchido! Confira abaixo:';
   } catch (err) {
     console.warn('Erro ao rodar OCR:', err);
     statusText.innerText = '⚠️ Imagem carregada! Complete os campos abaixo:';
     formWrap.style.display = 'block';
+  }
+}
+
+// Extrai e normaliza o preço em dólar de prints de lojas americanas (Best Buy, Amazon, Dell, etc.)
+function extractUsdPrice(text) {
+  const candidates = [];
+
+  // 1. Procurar preços completos com separador de milhar: ex $1,229.99, $1,299.99, $1,599.00
+  const thousandRegex = /(?:save|off|was|economize|desconto)?\s*(?:\$|USD\s*)\s*([1-4],[0-9]{3}(?:\.[0-9]{2})?)/gi;
+  let m;
+  while ((m = thousandRegex.exec(text)) !== null) {
+    const isPromoOrWas = /save|off|was|economize|desconto/i.test(m[0]);
+    const val = parseFloat(m[1].replace(/,/g, ''));
+    if (!isNaN(val) && val >= 650 && val <= 4500) {
+      candidates.push({ val, priority: isPromoOrWas ? 1 : 4 });
+    }
+  }
+
+  // 2. Procurar preços sem vírgula ou na faixa de notebook gamer: $1229.99, $999.99, $849
+  const standardRegex = /(?:save|off|was|economize|desconto)?\s*(?:\$|USD\s*)\s*([6-9][0-9]{2}(?:\.[0-9]{2})?|[1-4][0-9]{3}(?:\.[0-9]{2})?)/gi;
+  while ((m = standardRegex.exec(text)) !== null) {
+    const isPromoOrWas = /save|off|was|economize|desconto/i.test(m[0]);
+    const val = parseFloat(m[1]);
+    if (!isNaN(val) && val >= 650 && val <= 4500) {
+      candidates.push({ val, priority: isPromoOrWas ? 1 : 3 });
+    }
+  }
+
+  // Se encontramos candidatos dentro do valor de notebook gamer ($650 a $4500)
+  if (candidates.length > 0) {
+    candidates.sort((a, b) => b.priority - a.priority);
+    return candidates[0].val;
+  }
+
+  // 3. Padrão Best Buy: detecção de corte de milhar onde o "1," foi separado da fonte (ex: "$ 1, 229.99" ou "$229.99")
+  const splitThousandMatch = text.match(/(?:^|\s)1[,\s.]([0-4]\d{2}(?:\.\d{2})?)/);
+  if (splitThousandMatch) {
+    const reconstructed = parseFloat('1' + splitThousandMatch[1].replace(/[,\s]/, ''));
+    if (reconstructed >= 650 && reconstructed <= 4500) return reconstructed;
+  }
+
+  // 4. Se encontrou apenas um valor entre $150 e $499 (como 229.99 do teste do usuário):
+  // Nenhum notebook gamer com RTX custa $229. Reconstruir o milhar faltante ($1,229.99)
+  const lowMatch = text.match(/\$\s*([1-4]\d{2}(?:\.\d{2})?)/);
+  if (lowMatch) {
+    const val = parseFloat(lowMatch[1]);
+    if (val >= 150 && val <= 499) {
+      return Math.round((val + 1000) * 100) / 100;
+    }
+  }
+
+  return 1199;
+}
+
+// Estima ou busca o valor equivalente no mercado brasileiro para que NUNCA fique em branco
+function estimateOrFindPriceBr(name, gpu, priceUs, rawText = '') {
+  // 1. Se o próprio print for de loja brasileira e tiver R$
+  if (rawText) {
+    const brMatch = rawText.match(/R\$\s*([1-9][0-9]{3,4}(?:[.,]\d{2})?)/i);
+    if (brMatch) {
+      const val = parseFloat(brMatch[1].replace('.', '').replace(',', '.'));
+      if (val >= 3500 && val <= 35000) return Math.round(val);
+    }
+  }
+
+  const cleanName = (name || '').toLowerCase();
+  const cleanGpu = (gpu || '').toLowerCase();
+
+  // 2. Busca direta no banco de dados existente (DEFAULT_LAPTOPS e customizados)
+  const allKnown = (typeof laptops !== 'undefined' && laptops.length > 0) ? laptops : DEFAULT_LAPTOPS;
+  for (const item of allKnown) {
+    const itemLower = item.name.toLowerCase();
+    if (cleanName.includes('zephyrus') && itemLower.includes('zephyrus')) {
+      return item.priceBr || 14899;
+    }
+    if (cleanName.includes('helios') && itemLower.includes('helios')) {
+      return item.priceBr || 8299;
+    }
+    if (cleanName.includes('dell g16') && itemLower.includes('g16')) {
+      return item.priceBr || 8799;
+    }
+    if (cleanName.includes('legion pro 5') && itemLower.includes('legion pro 5')) {
+      return item.priceBr || 11499;
+    }
+    if (cleanName.includes('legion slim') && itemLower.includes('legion slim')) {
+      return item.priceBr || 8499;
+    }
+    if (cleanName.includes('tuf') && itemLower.includes('tuf')) {
+      return item.priceBr || 8699;
+    }
+    if (cleanName.includes('dell g15') && itemLower.includes('g15')) {
+      return item.priceBr || 6999;
+    }
+    if (cleanName.includes('nitro') && itemLower.includes('nitro')) {
+      return item.priceBr || 7299;
+    }
+  }
+
+  // 3. Modelos Premium específicos (Zephyrus OLED, Alienware, Strix)
+  if (cleanName.includes('zephyrus')) {
+    if (cleanGpu.includes('4080')) return 18999;
+    if (cleanGpu.includes('4070')) return 14899;
+    if (cleanGpu.includes('4060')) return 12499;
+    return 13999;
+  }
+  if (cleanName.includes('alienware')) {
+    if (cleanGpu.includes('4080')) return 19999;
+    if (cleanGpu.includes('4070')) return 15999;
+    return 13999;
+  }
+  if (cleanName.includes('strix')) {
+    if (cleanGpu.includes('4070')) return 12999;
+    return 10999;
+  }
+
+  // 4. Estimativa por categoria de GPU no Brasil (Preço Médio de Mercado)
+  if (cleanGpu.includes('4090')) return 22999;
+  if (cleanGpu.includes('4080')) return 16999;
+  if (cleanGpu.includes('4070')) return 8899;
+  if (cleanGpu.includes('4060')) return 7899;
+  if (cleanGpu.includes('4050')) return 5999;
+
+  // 5. Estimativa baseada no Preço em Dólar convertido com margem de varejo Brasil (~40%)
+  if (priceUs && priceUs > 500) {
+    const rate = (typeof usdRate !== 'undefined' && usdRate > 0) ? usdRate : 5.65;
+    const estimatedBr = Math.round((priceUs * rate * 1.40) / 100) * 100 - 1;
+    return Math.max(5499, estimatedBr);
+  }
+
+  return 7999;
+}
+
+// Recalcula o Preço no Brasil na tela do modal
+function recalcOcrBrPrice(force = true) {
+  const name = document.getElementById('ocrParsedName').value;
+  const gpu = document.getElementById('ocrParsedGpu').value;
+  const priceUs = parseFloat(document.getElementById('ocrParsedPriceUs').value) || 0;
+  const currentBr = document.getElementById('ocrParsedPriceBr').value;
+
+  if (force || !currentBr) {
+    const est = estimateOrFindPriceBr(name, gpu, priceUs);
+    document.getElementById('ocrParsedPriceBr').value = est;
+    const help = document.getElementById('ocrPriceBrHelp');
+    if (help) {
+      help.innerHTML = `⚡ <strong>R$ ${est.toLocaleString('pt-BR')}</strong> estimado com base em ${name || gpu} no mercado brasileiro`;
+    }
   }
 }
 
@@ -1347,15 +1631,15 @@ function parseSpecsFromText(rawText) {
   else if (/4060/i.test(text)) gpu = 'NVIDIA RTX 4060';
   else if (/4050/i.test(text)) gpu = 'NVIDIA RTX 4050';
 
-  // 2. CPU
+  // 2. CPU (Prioriza Intel Core e AMD Ryzen detectados)
   let cpu = '';
-  const cpuMatch = text.match(/(i7[- ]?14\d{3}HX|i7[- ]?13\d{3}HX|i9[- ]?14\d{3}HX|Ryzen\s*[79]\s*8\d{3}HS|Ryzen\s*[79]\s*7\d{3}HS|Core\s*Ultra\s*7)/i);
+  const cpuMatch = text.match(/(i7[- ]?14\d{3}HX|i7[- ]?13\d{3}HX|i9[- ]?14\d{3}HX|Ryzen\s*[79]\s*8\d{3}HS|Ryzen\s*[79]\s*7\d{3}HS|Core\s*Ultra\s*7|Core\s*Ultra\s*9)/i);
   if (cpuMatch) {
     cpu = cpuMatch[0];
-  } else if (/i9/i.test(text)) cpu = 'Intel Core i9';
-  else if (/i7/i.test(text)) cpu = 'Intel Core i7';
+  } else if (/Ryzen 9/i.test(text)) cpu = 'AMD Ryzen 9';
   else if (/Ryzen 7/i.test(text)) cpu = 'AMD Ryzen 7';
-  else if (/Ryzen 9/i.test(text)) cpu = 'AMD Ryzen 9';
+  else if (/i9/i.test(text)) cpu = 'Intel Core i9';
+  else if (/i7/i.test(text)) cpu = 'Intel Core i7';
   else cpu = 'Intel Core i7 / AMD Ryzen 7';
 
   // 3. RAM
@@ -1363,21 +1647,10 @@ function parseSpecsFromText(rawText) {
   const ramMatch = text.match(/(\b(16|32|64)\s*GB\b)/i);
   if (ramMatch) ram = ramMatch[0].toUpperCase() + ' DDR5';
 
-  // 4. Preço em Dólar
-  let priceUs = null;
-  const usMatch = text.match(/\$\s*([1-9][0-9]{2,3}(?:[.,]\d{2})?)/);
-  if (usMatch) {
-    priceUs = parseFloat(usMatch[1].replace(',', ''));
-  }
+  // 4. Preço em Dólar inteligente (resistente a quebras de formatação da Best Buy)
+  const priceUs = extractUsdPrice(text);
 
-  // 5. Preço em Real
-  let priceBr = null;
-  const brMatch = text.match(/R\$\s*([1-9][0-9]{3,4}(?:[.,]\d{2})?)/i);
-  if (brMatch) {
-    priceBr = parseFloat(brMatch[1].replace('.', '').replace(',', '.'));
-  }
-
-  // 6. Nome / Linha do Modelo
+  // 5. Nome / Linha do Modelo
   let name = '';
   if (/Legion Pro 5/i.test(text)) name = 'Lenovo Legion Pro 5';
   else if (/Legion Slim 5/i.test(text)) name = 'Lenovo Legion Slim 5';
@@ -1390,6 +1663,9 @@ function parseSpecsFromText(rawText) {
   else if (/Dell G15/i.test(text)) name = 'Dell G15 5530';
   else if (/Alienware/i.test(text)) name = 'Dell Alienware m16';
   else name = 'Notebook Gamer ' + gpu.replace('NVIDIA ', '');
+
+  // 6. Preço no Brasil (SEMPRE preenchido, nunca nulo!)
+  const priceBr = estimateOrFindPriceBr(name, gpu, priceUs, text);
 
   // 7. Loja
   let store = 'Best Buy';
@@ -1414,8 +1690,11 @@ function saveOcrParsedLaptop() {
   const cpu = document.getElementById('ocrParsedCpu').value.trim();
   const ram = document.getElementById('ocrParsedRam').value.trim();
   const priceUs = parseFloat(document.getElementById('ocrParsedPriceUs').value) || 1199;
-  const priceBr = parseFloat(document.getElementById('ocrParsedPriceBr').value) || (priceUs * usdRate * 1.25);
-  const store = document.getElementById('ocrParsedStore').value.trim() || 'EUA';
+  let priceBr = parseFloat(document.getElementById('ocrParsedPriceBr').value);
+  if (!priceBr || isNaN(priceBr)) {
+    priceBr = estimateOrFindPriceBr(name, gpu, priceUs);
+  }
+  const store = document.getElementById('ocrParsedStore').value.trim() || 'Best Buy';
 
   const newLaptop = {
     id: 'ocr-' + Date.now(),
@@ -1448,6 +1727,7 @@ function saveOcrParsedLaptop() {
   render();
 
   document.getElementById('ocrModal').style.display = 'none';
+  resetOcr();
   resetOcr();
   alert(`✓ "${newLaptop.name}" adicionado com sucesso ao seu Radar!`);
 }
@@ -1521,4 +1801,262 @@ window.executeDirectStoreSearch = function(store, query) {
       url = `https://www.bestbuy.com/site/searchpage.jsp?st=${enc}&qp=seller_facet%3DSeller~Best+Buy`;
   }
   window.open(url, '_blank');
+};
+
+// ============================================================
+// GUIA PRÁTICO DO COMPRADOR: PLACAS DE VÍDEO & BATERIA
+// ============================================================
+
+const GPU_DATABASE = {
+  'rtx4050': {
+    name: 'NVIDIA RTX 4050',
+    shortName: 'RTX 4050',
+    vram: '6GB GDDR6',
+    bus: '96-bit',
+    cudaCores: 2560,
+    tgp: '115W',
+    fps1080p: 68,
+    fps1440p: 46,
+    score: 70,
+    cyberpunk: 52,
+    warzone: 74,
+    gta: 95,
+    verdict: 'Placa básica de entrada. 6GB de VRAM já engasga e sofre quedas bruscas em jogos pesados atuais (Hogwarts, Cyberpunk, The Last of Us).'
+  },
+  'rtx4060': {
+    name: 'NVIDIA RTX 4060',
+    shortName: 'RTX 4060',
+    vram: '8GB GDDR6',
+    bus: '128-bit',
+    cudaCores: 3072,
+    tgp: '140W',
+    fps1080p: 88,
+    fps1440p: 65,
+    score: 100,
+    cyberpunk: 72,
+    warzone: 98,
+    gta: 125,
+    verdict: '🏆 O MELHOR PONTO DE PARTIDA. 8GB de VRAM GDDR6 e TGP de 140W garantem 60+ FPS em 1440p com DLSS 3 ativado em tudo.'
+  },
+  'rtx4070': {
+    name: 'NVIDIA RTX 4070',
+    shortName: 'RTX 4070',
+    vram: '8GB GDDR6',
+    bus: '128-bit',
+    cudaCores: 4608,
+    tgp: '140W',
+    fps1080p: 105,
+    fps1440p: 82,
+    score: 125,
+    cyberpunk: 88,
+    warzone: 120,
+    gta: 148,
+    verdict: '🔥 SALTO IDEAL SE ATÉ R$ 1.000 / $180 A MAIS! Possui 50% mais núcleos CUDA (4608 vs 3072), entregando +22% de FPS em 1440p QHD.'
+  },
+  'rtx4080': {
+    name: 'NVIDIA RTX 4080',
+    shortName: 'RTX 4080',
+    vram: '12GB GDDR6X',
+    bus: '192-bit',
+    cudaCores: 7424,
+    tgp: '175W',
+    fps1080p: 138,
+    fps1440p: 112,
+    score: 175,
+    cyberpunk: 118,
+    warzone: 155,
+    gta: 185,
+    verdict: '💎 MONSTRO DE DESEMPENHO (12GB VRAM 192-bit). É +55% superior à 4070, porém custa mais de R$ 14.000 no BR ($1.900+ EUA).'
+  },
+  'rtx50series': {
+    name: 'RTX Série 50 (Blackwell - RTX 5060 / 5070)',
+    shortName: 'RTX 50-Series (Nova Geração)',
+    vram: '8GB - 12GB GDDR7',
+    bus: '128-bit / 192-bit',
+    cudaCores: 'Blackwell AI Cores',
+    tgp: '140W',
+    fps1080p: 115,
+    fps1440p: 92,
+    score: 142,
+    cyberpunk: 98,
+    warzone: 135,
+    gta: 165,
+    verdict: '⚠️ CUIDADO COM PREÇO DE LANÇAMENTO: Chega custando de 30% a 50% a mais. A RTX 4070 em liquidação nos EUA por $1.199 é muito mais negócio hoje.'
+  }
+};
+
+function renderGpuGuideComparison() {
+  const selectA = document.getElementById('guideGpuA');
+  const selectB = document.getElementById('guideGpuB');
+  if (!selectA || !selectB) return;
+
+  const gpuAKey = selectA.value;
+  const gpuBKey = selectB.value;
+  const gpuA = GPU_DATABASE[gpuAKey] || GPU_DATABASE['rtx4060'];
+  const gpuB = GPU_DATABASE[gpuBKey] || GPU_DATABASE['rtx4070'];
+
+  const fpsDiff1440p = gpuB.fps1440p - gpuA.fps1440p;
+  const percentGain = Math.round((fpsDiff1440p / gpuA.fps1440p) * 100);
+  const isSuperior = percentGain > 0;
+  const isSame = percentGain === 0;
+
+  let advice = '';
+  if (gpuAKey === 'rtx4050' && gpuBKey === 'rtx4060') {
+    advice = '🏆 <strong>VALE TOTALMENTE A PENA!</strong> O salto de 6GB para 8GB de VRAM e +28% de performance é o maior retorno pelo menor acréscimo de preço (em média apenas R$ 700 / $100 a mais). Fuja da 4050!';
+  } else if (gpuAKey === 'rtx4060' && gpuBKey === 'rtx4070') {
+    advice = '⚖️ <strong>VALE A PENA SE A DIFERENÇA FOR DE ATÉ R$ 1.000 / $180:</strong> A RTX 4070 entrega cerca de +22% de FPS em 1440p devido a ter 50% mais núcleos CUDA. Se seu irmão achar uma 4070 nos EUA por até $1.299 (dentro dos seus R$ 8.900), é a escolha perfeita!';
+  } else if ((gpuAKey === 'rtx4060' || gpuAKey === 'rtx4070') && gpuBKey === 'rtx4080') {
+    advice = '💎 <strong>SALTO DE LUXO / FORA DO ORÇAMENTO:</strong> A RTX 4080 é brutal (+55% a +75%), tem 12GB de VRAM com barramento 192-bit, mas ultrapassa os R$ 13.000 no Brasil ou $1.900 nos EUA. Se fugir do seu teto de R$ 8.900, foque na 4070!';
+  } else if (gpuBKey === 'rtx50series') {
+    advice = '🔮 <strong>ANÁLISE DE PRÓXIMA GERAÇÃO:</strong> A Série 50 móvel chega com sobrepreço inicial (ágio de novidade de $1.800+). A RTX 4060 / 4070 atual em promoção nos EUA ($999 a $1.299) oferece muito mais jogo pelo seu dinheiro hoje!';
+  } else if (isSuperior) {
+    advice = `A ${gpuB.name} entrega cerca de <strong>+${percentGain}% de FPS</strong> em relação à ${gpuA.name}. Avalie se a diferença no preço compensa essa taxa extra de quadros.`;
+  } else if (isSame) {
+    advice = 'Você selecionou o mesmo patamar de placa gráfica. O desempenho em jogos será idêntico, dependendo apenas do TGP (Watts) e refrigeração do modelo.';
+  } else {
+    advice = `Atenção: a ${gpuB.name} é inferior à ${gpuA.name} em ${Math.abs(percentGain)}%.`;
+  }
+
+  const resultContainer = document.getElementById('guideComparisonResult');
+  if (!resultContainer) return;
+
+  resultContainer.innerHTML = `
+    <div class="gpu-comparison-card">
+      <div class="gpu-gain-hero" style="${isSuperior ? '' : 'background:rgba(255,255,255,0.03); border-color:var(--border-subtle);'}">
+        <div>
+          <div class="gpu-gain-title">${gpuA.shortName} ➔ ${gpuB.shortName}</div>
+          <div class="gpu-gain-subtitle">Diferença técnica em jogos rodando em resolução 1440p (QHD):</div>
+        </div>
+        <div class="gpu-gain-number" style="color:${isSuperior ? 'var(--accent)' : (isSame ? 'var(--text-muted)' : 'var(--danger)')};">
+          ${isSuperior ? `+${percentGain}%` : (isSame ? '0%' : `${percentGain}%`)}
+          <span style="font-size:0.9rem; font-weight:600; color:var(--text-muted);">de FPS</span>
+        </div>
+      </div>
+
+      <div class="gpu-verdict-banner">
+        ${advice}
+      </div>
+
+      <div class="gpu-specs-compare-grid">
+        <div class="gpu-side-box">
+          <div class="gpu-side-header">
+            <span class="gpu-side-title">${gpuA.name}</span>
+            <span class="badge badge-cyan">${gpuA.vram}</span>
+          </div>
+          <div class="gpu-side-item"><span class="gpu-side-label">VRAM & Memória:</span><span class="gpu-side-val">${gpuA.vram} (${gpuA.bus})</span></div>
+          <div class="gpu-side-item"><span class="gpu-side-label">Núcleos CUDA:</span><span class="gpu-side-val">${gpuA.cudaCores}</span></div>
+          <div class="gpu-side-item"><span class="gpu-side-label">TGP Máximo:</span><span class="gpu-side-val">${gpuA.tgp}</span></div>
+          <div class="gpu-side-item"><span class="gpu-side-label">FPS Médio (1440p):</span><span class="gpu-side-val">~${gpuA.fps1440p} FPS</span></div>
+          <div class="gpu-side-item"><span class="gpu-side-label">FPS Médio (1080p):</span><span class="gpu-side-val">~${gpuA.fps1080p} FPS</span></div>
+        </div>
+
+        <div class="gpu-side-box ${isSuperior ? 'winner' : ''}">
+          <div class="gpu-side-header">
+            <span class="gpu-side-title">${gpuB.name}</span>
+            <span class="badge badge-accent">${gpuB.vram}</span>
+          </div>
+          <div class="gpu-side-item"><span class="gpu-side-label">VRAM & Memória:</span><span class="gpu-side-val" style="color:${gpuB.vram !== gpuA.vram ? 'var(--accent)' : 'inherit'}; font-weight:700;">${gpuB.vram} (${gpuB.bus})</span></div>
+          <div class="gpu-side-item"><span class="gpu-side-label">Núcleos CUDA:</span><span class="gpu-side-val">${gpuB.cudaCores}</span></div>
+          <div class="gpu-side-item"><span class="gpu-side-label">TGP Máximo:</span><span class="gpu-side-val">${gpuB.tgp}</span></div>
+          <div class="gpu-side-item"><span class="gpu-side-label">FPS Médio (1440p):</span><span class="gpu-side-val" style="color:var(--accent); font-weight:700;">~${gpuB.fps1440p} FPS</span></div>
+          <div class="gpu-side-item"><span class="gpu-side-label">FPS Médio (1080p):</span><span class="gpu-side-val" style="color:var(--accent); font-weight:700;">~${gpuB.fps1080p} FPS</span></div>
+        </div>
+      </div>
+
+      <div class="gpu-games-meter-box">
+        <h5 style="font-size:0.88rem; color:var(--text-main); margin-bottom:0.2rem;">🎮 Estimativa de FPS em Jogos Pesados (1440p Alto / DLSS Ativo):</h5>
+        
+        <div class="meter-row">
+          <div class="meter-header">
+            <span>Cyberpunk 2077 (Ray Tracing Médio + DLSS)</span>
+            <span>${gpuA.cyberpunk} FPS vs <strong style="color:var(--accent);">${gpuB.cyberpunk} FPS</strong></span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill gpu" style="width:${Math.min(100, (gpuB.cyberpunk / 130) * 100)}%;"></div>
+          </div>
+        </div>
+
+        <div class="meter-row">
+          <div class="meter-header">
+            <span>Call of Duty: Warzone (Competitivo / QHD)</span>
+            <span>${gpuA.warzone} FPS vs <strong style="color:var(--accent);">${gpuB.warzone} FPS</strong></span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill gpu" style="width:${Math.min(100, (gpuB.warzone / 160) * 100)}%;"></div>
+          </div>
+        </div>
+
+        <div class="meter-row">
+          <div class="meter-header">
+            <span>GTA V / GTA VI Ready (Muito Alto)</span>
+            <span>${gpuA.gta} FPS vs <strong style="color:var(--accent);">${gpuB.gta} FPS</strong></span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill gpu" style="width:${Math.min(100, (gpuB.gta / 200) * 100)}%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function initGpuGuideModal() {
+  const btnOpen = document.getElementById('btnOpenGpuGuide');
+  const btnClose = document.getElementById('btnCloseGpuGuideModal');
+  const modal = document.getElementById('gpuGuideModal');
+
+  if (btnOpen && modal) {
+    btnOpen.addEventListener('click', () => {
+      modal.style.display = 'flex';
+      renderGpuGuideComparison();
+    });
+  }
+
+  if (btnClose && modal) {
+    btnClose.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+  }
+
+  const selectA = document.getElementById('guideGpuA');
+  const selectB = document.getElementById('guideGpuB');
+  if (selectA) selectA.addEventListener('change', renderGpuGuideComparison);
+  if (selectB) selectB.addEventListener('change', renderGpuGuideComparison);
+
+  // Tab switching
+  const tabBtns = document.querySelectorAll('#guideTabsNav .guide-tab-btn');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const targetTab = btn.getAttribute('data-tab');
+      const panes = document.querySelectorAll('.guide-tab-pane');
+      panes.forEach(pane => { pane.style.display = 'none'; pane.classList.remove('active'); });
+
+      const targetPane = document.getElementById(
+        targetTab === 'interactive' ? 'paneInteractive' :
+        (targetTab === 'battery' ? 'paneBattery' :
+        (targetTab === 'usbc' ? 'paneUsbc' : 'paneNextGen'))
+      );
+      if (targetPane) {
+        targetPane.style.display = 'block';
+        targetPane.classList.add('active');
+      }
+    });
+  });
+}
+
+window.openGpuGuideWithGpu = function(gpuString) {
+  const modal = document.getElementById('gpuGuideModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  const selectB = document.getElementById('guideGpuB');
+  if (selectB && gpuString) {
+    if (gpuString.includes('4070')) selectB.value = 'rtx4070';
+    else if (gpuString.includes('4080')) selectB.value = 'rtx4080';
+    else if (gpuString.includes('4060')) selectB.value = 'rtx4060';
+    else if (gpuString.includes('4050')) selectB.value = 'rtx4050';
+  }
+  renderGpuGuideComparison();
 };
