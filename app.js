@@ -5231,10 +5231,12 @@ window.switchVideoPlayer = switchVideoPlayer;
 // ==========================================
 // SISTEMA DE VERIFICAÇÃO DE NOVA VERSÃO VIA API & GITHUB
 // ==========================================
-const CURRENT_APP_VERSION = '20261014_v31';
+const CURRENT_APP_VERSION = '20261014_v32';
 const GITHUB_REPO_API = 'https://api.github.com/repos/brunoserra123/radar-notebooks/commits/main';
 
 let isCheckingUpdate = false;
+let pendingUpdateVersion = null;
+let pendingUpdateSha = null;
 
 async function checkForNewAppVersion(isManual = false) {
   if (isCheckingUpdate) return;
@@ -5245,23 +5247,35 @@ async function checkForNewAppVersion(isManual = false) {
     let newVersionLabel = '';
     let commitMessage = '';
 
-    // Método 1: Checa version.json com no-store e timestamp para furar qualquer cache
+    // Método 1 (Principal e Confiável): Checa version.json com no-store e timestamp
+    let versionJsonLoaded = false;
     try {
       const res = await fetch(`version.json?_t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
+        versionJsonLoaded = true;
         const data = await res.json();
+        
         if (data.version && data.version !== CURRENT_APP_VERSION) {
-          updateFound = true;
-          newVersionLabel = data.version;
-          commitMessage = data.releaseNotes || 'Novas melhorias e recursos disponíveis.';
+          // Só notifica se o usuário não tiver dispensado essa versão recentemente
+          const dismissed = localStorage.getItem('gamer_radar_dismissed_version');
+          if (dismissed !== data.version) {
+            updateFound = true;
+            newVersionLabel = data.version;
+            commitMessage = data.releaseNotes || 'Novas melhorias e recursos disponíveis.';
+            pendingUpdateVersion = data.version;
+          }
+        } else {
+          // Se já está na mesma versão do version.json, estamos 100% atualizados!
+          localStorage.setItem('gamer_radar_dismissed_version', CURRENT_APP_VERSION);
+          dismissUpdateBanner();
         }
       }
     } catch (e) {
-      console.warn('Checagem via version.json falhou, tentando API do GitHub...', e);
+      console.warn('Checagem via version.json falhou:', e);
     }
 
-    // Método 2: Consulta a API oficial do GitHub para detectar commits novos em tempo real
-    if (!updateFound) {
+    // Método 2: Consulta GitHub API apenas como fallback se version.json falhou na rede
+    if (!updateFound && !versionJsonLoaded) {
       try {
         const ghRes = await fetch(GITHUB_REPO_API, {
           headers: { 'Accept': 'application/vnd.github.v3+json' },
@@ -5273,11 +5287,11 @@ async function checkForNewAppVersion(isManual = false) {
           const savedSha = localStorage.getItem('gamer_radar_last_sha');
           
           if (latestSha) {
-            // Se já tínhamos um sha salvo e o novo sha é diferente, há versão nova!
             if (savedSha && savedSha !== latestSha) {
               updateFound = true;
               newVersionLabel = `Commit ${latestSha}`;
               commitMessage = ghData.commit?.message?.split('\n')[0] || 'Atualização recente no repositório.';
+              pendingUpdateSha = latestSha;
             } else if (!savedSha) {
               localStorage.setItem('gamer_radar_last_sha', latestSha);
             }
@@ -5291,7 +5305,7 @@ async function checkForNewAppVersion(isManual = false) {
     if (updateFound) {
       showNewVersionBanner(newVersionLabel, commitMessage);
     } else if (isManual) {
-      showToastNotification('✅ Você já está usando a versão mais recente do GamerRadar!');
+      showToastNotification(`✅ Você já está usando a versão mais recente do GamerRadar (${CURRENT_APP_VERSION})!`);
     }
   } catch (err) {
     console.error('Erro na checagem de atualizações:', err);
@@ -5318,9 +5332,26 @@ function showNewVersionBanner(versionName, message) {
 function dismissUpdateBanner() {
   const banner = document.getElementById('newVersionBanner');
   if (banner) banner.classList.remove('show');
+  if (pendingUpdateVersion) {
+    localStorage.setItem('gamer_radar_dismissed_version', pendingUpdateVersion);
+  }
+  if (pendingUpdateSha) {
+    localStorage.setItem('gamer_radar_last_sha', pendingUpdateSha);
+  }
 }
 
 function applyAppUpdate() {
+  // Salva no localStorage para nunca reexibir o banner para esta mesma versão
+  if (pendingUpdateVersion) {
+    localStorage.setItem('gamer_radar_dismissed_version', pendingUpdateVersion);
+  }
+  if (pendingUpdateSha) {
+    localStorage.setItem('gamer_radar_last_sha', pendingUpdateSha);
+  }
+
+  // Esconde o banner na hora
+  dismissUpdateBanner();
+
   // Limpa caches do navegador se suportado
   if ('caches' in window) {
     caches.keys().then(keys => {
@@ -5334,8 +5365,8 @@ function applyAppUpdate() {
     // Força recarregamento com parâmetro timestamp único para furar qualquer cache de CDN/Navegador
     const url = new URL(window.location.href);
     url.searchParams.set('v', Date.now());
-    window.location.href = url.toString();
-  }, 250);
+    window.location.replace(url.toString());
+  }, 300);
 }
 
 // Inicia verificação automática ao carregar a página (delay suave de 1.5s)

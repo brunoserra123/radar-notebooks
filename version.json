@@ -1,5 +1,5 @@
 {
-  "version": "20261014_v31",
-  "releaseNotes": "Player do YouTube 100% corrigido com IDs oficiais de vídeos reais (Dan Ferreira, Jarrod's Tech, Lucas Ishii, Adrenaline), playlist com thumbnails e abas funcionais.",
-  "updatedAt": "2026-10-14T17:31:00-03:00"
+  "version": "20261014_v32",
+  "releaseNotes": "Correção definitiva do loop de atualização: sincronização de cache de versão, eliminação de falsos-positivos da API do GitHub e fechamento imediato do banner.",
+  "updatedAt": "2026-10-14T18:02:00-03:00"
 }
