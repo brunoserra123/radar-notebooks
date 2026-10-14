@@ -1301,6 +1301,28 @@ function render() {
               </span>
             `}
           </div>
+
+          <!-- Comparador de Lojas: Onde Está Mais Barato? -->
+          <div style="background: rgba(0, 0, 0, 0.25); border-radius: 6px; padding: 7px 10px; margin-top: 0.6rem; border: 1px solid rgba(255, 255, 255, 0.04); display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.74rem;">
+              <span style="color: var(--accent); font-weight: 700;">🛒 Onde está mais barato?</span>
+              <span style="color: var(--text-muted); font-size: 0.68rem;">Checar lojas ao vivo:</span>
+            </div>
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+              <a href="https://www.amazon.com/s?k=${encodeURIComponent(laptop.name)}" target="_blank" style="font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(255, 153, 0, 0.15); color: #ff9900; border: 1px solid rgba(255, 153, 0, 0.35); text-decoration: none; font-weight: 600;">
+                🇺🇸 Amazon EUA ↗
+              </a>
+              <a href="https://www.bestbuy.com/site/searchpage.jsp?st=${encodeURIComponent(laptop.name)}&qp=seller_facet%3DSeller~Best+Buy" target="_blank" style="font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); text-decoration: none; font-weight: 600;">
+                🇺🇸 Best Buy ↗
+              </a>
+              <a href="https://www.kabum.com.br/busca/${encodeURIComponent(laptop.name)}" target="_blank" style="font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.35); text-decoration: none; font-weight: 600;">
+                🇧🇷 Kabum BR ↗
+              </a>
+              <a href="https://lista.mercadolivre.com.br/${encodeURIComponent(laptop.name)}" target="_blank" style="font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.35); text-decoration: none; font-weight: 600;">
+                🇧🇷 Mercado Livre ↗
+              </a>
+            </div>
+          </div>
         </div>
 
         <!-- Ações do Card -->
@@ -1952,6 +1974,8 @@ function saveOcrParsedLaptop() {
     alert('Erro ao salvar: ' + err.message);
   }
 }
+
+window.saveOcrParsedLaptop = saveOcrParsedLaptop;
 
 // ==========================================
 // CENTRAL DE BUSCA DIRETA NAS LOJAS
