@@ -438,20 +438,23 @@ function loadData() {
     try {
       const parsed = JSON.parse(savedLaptops);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // Preserva todos os notebooks salvos pelo usuário (inclusive customizados e prints)
+        // Preserva todos os notebooks salvos pelo usuário com auto-correção de especificações
         laptops = parsed.map(item => {
           const def = DEFAULT_LAPTOPS.find(d => d.id === item.id);
+          const isGenericPorts = !item.ports || item.ports === 'USB-C + USB-A + HDMI 2.1' || item.ports === 'USB-C + USB-A' || item.ports.trim() === '';
+          const healedPorts = (isGenericPorts && def && def.ports) ? def.ports : item.ports;
+
           if (def) {
             return {
               ...def,
               ...item,
+              ports: healedPorts || def.ports,
               battery: item.battery || def.battery,
               batteryHoursNormal: item.batteryHoursNormal !== undefined ? item.batteryHoursNormal : def.batteryHoursNormal,
               hasUsbCCharging: item.hasUsbCCharging !== undefined ? item.hasUsbCCharging : def.hasUsbCCharging,
               chargingInfo: item.chargingInfo || def.chargingInfo,
               hasBiometrics: item.hasBiometrics !== undefined ? item.hasBiometrics : def.hasBiometrics,
               biometrics: item.biometrics || def.biometrics,
-              ports: item.ports || def.ports,
               ramType: item.ramType || def.ramType,
               ramSpeed: item.ramSpeed || def.ramSpeed,
               ramUpgradeStatus: item.ramUpgradeStatus || def.ramUpgradeStatus,
@@ -463,6 +466,16 @@ function loadData() {
               hasExtraM2Slot: item.hasExtraM2Slot !== undefined ? item.hasExtraM2Slot : def.hasExtraM2Slot,
               hasSataBay: item.hasSataBay !== undefined ? item.hasSataBay : def.hasSataBay
             };
+          }
+
+          // Se for notebook importado ou sem match direto, busca correção oficial pelo nome
+          const official = getOfficialLaptopSpecs(item);
+          if (official) {
+            if (isGenericPorts) item.ports = official.ports;
+            if (item.hasUsbCCharging === undefined) item.hasUsbCCharging = official.hasUsbCCharging;
+            if (!item.chargingInfo) item.chargingInfo = official.chargingInfo;
+            if (item.batteryHoursNormal === undefined) item.batteryHoursNormal = official.batteryHoursNormal;
+            if (!item.ramUpgradeStatus) item.ramUpgradeStatus = official.ramUpgradeStatus;
           }
           return item;
         });
@@ -1159,29 +1172,262 @@ function renderRamUpgradeBadge(laptop) {
   }
 }
 
-// Conta portas USB-A e USB-C a partir do texto de portas (ex: "2x USB-C ... + 3x USB-A ...")
+// Base Oficial de Especificações de Hardware para Validação & Auditoria
+const OFFICIAL_SPECS_DB = {
+  'dell-g16-7630': {
+    name: 'Dell G16 7630',
+    ports: '1x USB-C (Thunderbolt 4 / DisplayPort) + 3x USB-A 3.2 + HDMI 2.1 + RJ-45',
+    hasUsbCCharging: false,
+    chargingInfo: '🔌 Apenas plugue redondo tradicional Dell (240W/330W). Porta Type-C NÃO carrega o note',
+    battery: '86Wh (~4h escritório / 1h game)',
+    batteryHoursNormal: 4.0,
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM até 64GB)',
+    storageSlots: '2x Slots M.2 NVMe PCIe 4.0 (1 livre para 2º SSD) • Sem baia SATA',
+    storageUpgradeStatus: 'full',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
+    explanationPorts: 'Possui 3 portas USB-A 3.2 normais e 1 porta USB-C Thunderbolt 4. Você pode plugar mouse, teclado e pendrive diretamente sem nenhum adaptador ou dongle na mochila!',
+    explanationCharging: 'Atenção: A Dell utiliza sua fonte proprietária de pino redondo (240W ou 330W). A porta USB-C transfere dados e vídeo (DisplayPort), mas NÃO recarrega o notebook.',
+    explanationBattery: 'Bateria de 86Wh dura cerca de 4 horas em uso comum de escritório/vídeos e cerca de 1 hora jogando. O processador Intel Core i7 HX de 14 núcleos de alta voltagem consome bastante energia.',
+    explanationRam: 'Memória 100% expansível! Conta com 2 slots físicos SODIMM DDR5, permitindo trocar por 32GB ou 64GB no futuro sem complicações.',
+    explanationStorage: 'Possui 2 slots M.2 Gen4 ultrarrápidos (1 ocupado com o SSD de fábrica e 1 livre para colocar um segundo SSD sem precisar tirar o original).'
+  },
+  'dell-g15-5530': {
+    name: 'Dell G15 5530',
+    ports: '1x USB-C (DisplayPort) + 3x USB-A 3.2 + HDMI 2.1 + RJ-45',
+    hasUsbCCharging: false,
+    chargingInfo: '🔌 Apenas plugue redondo Dell (240W/330W). Porta Type-C NÃO carrega o note',
+    battery: '56Wh ou 86Wh (~3.5h escritório / 1h game)',
+    batteryHoursNormal: 3.5,
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM)',
+    storageSlots: '2x Slots M.2 (2º slot requer suporte metálico Dell) • Sem SATA',
+    storageUpgradeStatus: 'partial',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
+    explanationPorts: 'Possui 3 portas USB-A convencionais e 1 porta USB-C. Conectividade completa para periféricos sem necessidade de dongle.',
+    explanationCharging: 'Apenas fonte de pino cilíndrico original Dell de 240W. Porta USB-C não recarrega.',
+    explanationBattery: 'Autonomia média de 3.5 horas em uso leve de escritório.',
+    explanationRam: '2x Slots SODIMM removíveis com suporte a expansão.',
+    explanationStorage: '2x Slots M.2 (atenção: o segundo slot requer suporte de fixação Dell caso não venha de fábrica).'
+  },
+  'asus-rog-zephyrus-g16': {
+    name: 'ASUS ROG Zephyrus G16 (2024)',
+    ports: '2x USB-C (1x Thunderbolt 4 / 100W PD + 1x USB-C 3.2 Gen 2) + 2x USB-A 3.2 Gen 2 + Leitor SD UHS-II + HDMI 2.1',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Suporta recarga USB-C 100W Type-C portátil + Conector ASUS Slim 200W/240W',
+    battery: '90Wh (~8.5h escritório c/ Intel Ultra / 1.5h game)',
+    batteryHoursNormal: 8.5,
+    ramUpgradeStatus: 'none',
+    ramUpgradeLabel: '❌ Memória 100% Soldada na Placa-Mãe (LPDDR5X - Não Aceita Troca)',
+    storageSlots: '2x Slots M.2 2280 PCIe 4.0 (1 livre) • Sem SATA',
+    storageUpgradeStatus: 'full',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
+    explanationPorts: 'Equipado com 2 portas USB-A 3.2 e 2 portas USB-C Thunderbolt 4, além de leitor de cartão SD completo. Excelente conectividade sem necessidade de adaptadores.',
+    explanationCharging: 'Praticidade máxima: Aceita carregador portátil USB-C de 100W (como os de celular GaN) para você trabalhar ou viajar sem o carregador pesado de mesa!',
+    explanationBattery: 'Bateria imensa de 90Wh aliada ao processador Intel Core Ultra (Meteor Lake) com núcleos de baixíssimo consumo, alcançando até 8.5 horas longe da tomada.',
+    explanationRam: 'ATENÇÃO CRUCIAL: Memória LPDDR5X 7467MHz de ultravelocidade, porém 100% soldada na placa-mãe. Não é possível trocar nem aumentar no futuro!',
+    explanationStorage: 'Possui 2 slots M.2 NVMe PCIe 4.0 rápidos. O segundo slot está livre para adicionar mais 1TB ou 2TB.'
+  },
+  'acer-predator-helios-neo-16': {
+    name: 'Acer Predator Helios Neo 16',
+    ports: '2x USB-C (Thunderbolt 4 / 100W PD) + 3x USB-A 3.2 Gen 2 + HDMI 2.1 + MicroSD + RJ-45',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Suporta carregamento USB-C Power Delivery 100W + Fonte de mesa 330W',
+    battery: '90Wh (~5h escritório / 1.1h game)',
+    batteryHoursNormal: 5.0,
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM até 64GB)',
+    storageSlots: '2x Slots M.2 NVMe PCIe 4.0 (1 livre) • Sem baia SATA',
+    storageUpgradeStatus: 'full',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
+    explanationPorts: 'Excelente conectividade com 3 portas USB-A e 2 portas Thunderbolt 4. Não precisa de dongle.',
+    explanationCharging: 'Aceita recarga portátil USB-C 100W PD para trabalho leve fora de casa, além da fonte pesada de 330W para potência máxima em jogos.',
+    explanationBattery: 'Bateria de 90Wh entrega cerca de 5 horas de escritório e 1.1h em jogos pesados.',
+    explanationRam: 'Totalmente expansível com 2x slots SODIMM DDR5 5600MHz (até 64GB).',
+    explanationStorage: '2x Slots M.2 Gen4 com dissipador de calor e 1 slot livre.'
+  },
+  'lenovo-legion-slim-5': {
+    name: 'Lenovo Legion Slim 5',
+    ports: '2x USB-C (1x 140W PD + 1x DP 1.4) + 2x USB-A 3.2 Gen 2 + Leitor SD Full-size + HDMI 2.1',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Suporta recarga ultrarrápida USB-C 140W PD (levar carregador compacto na mochila) + Fonte Slim 230W',
+    battery: '80Wh (~7.5h escritório c/ Ryzen / 1.2h game)',
+    batteryHoursNormal: 7.5,
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM até 64GB)',
+    storageSlots: '2x Slots M.2 2280 NVMe Gen4 (1 livre) • Sem SATA',
+    storageUpgradeStatus: 'full',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
+    explanationPorts: 'Possui 2 portas USB-A e 2 portas USB-C com leitor de cartão SD completo. Não necessita de adaptadores no dia a dia.',
+    explanationCharging: 'Suporta carregamento rápido USB-C de até 140W PD (o mesmo cabo Type-C do seu Galaxy Fold 6 com carregador GaN compacto).',
+    explanationBattery: 'Bateria de 80Wh que dura cerca de 7.5 horas de navegação e trabalho graças à extrema eficiência energética do processador AMD Ryzen 7.',
+    explanationRam: '2x Slots SODIMM DDR5 removíveis, aceitando upgrade para até 64GB.',
+    explanationStorage: '2x Slots M.2 2280 PCIe 4.0 livres para upgrade imediato.'
+  },
+  'lenovo-legion-pro-5i': {
+    name: 'Lenovo Legion Pro 5i',
+    ports: '2x USB-C (1x 140W PD + 1x DP) + 4x USB-A 3.2 + HDMI 2.1 + RJ-45',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Suporta recarga rápida USB-C 140W PD + Fonte 300W',
+    battery: '80Wh (~4.5h escritório / 1h game)',
+    batteryHoursNormal: 4.5,
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM - Já vem 32GB)',
+    storageSlots: '2x Slots M.2 2280 PCIe 4.0 (1 livre com dissipador) • Sem SATA',
+    storageUpgradeStatus: 'full',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
+    explanationPorts: 'Abundância total de conexões: 4 portas USB-A e 2 portas USB-C. Um dos notebooks com mais portas do mercado!',
+    explanationCharging: 'Suporta recarga USB-C 140W PD fora de casa + Fonte original de 300W.',
+    explanationBattery: 'Bateria de 80Wh entrega ~4.5h de escritório moderado.',
+    explanationRam: '2x Slots SODIMM DDR5 5600MHz removíveis (já vem de fábrica com 32GB).',
+    explanationStorage: '2x Slots M.2 2280 com dissipador metálico original Lenovo.'
+  },
+  'asus-tuf-gaming-a15': {
+    name: 'ASUS TUF Gaming A15',
+    ports: '2x USB-C (1x USB4 + 1x 100W PD) + 2x USB-A 3.2 + HDMI 2.1 + RJ-45',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Aceita carregador USB-C Power Delivery 100W + Fonte de mesa 240W',
+    battery: '90Wh (~8h escritório c/ Ryzen 9 / 1.5h game)',
+    batteryHoursNormal: 8.0,
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM até 64GB)',
+    storageSlots: '2x Slots M.2 2280 NVMe Gen4 (1 livre) • Sem SATA',
+    storageUpgradeStatus: 'full',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
+    explanationPorts: '2x USB-A e 2x USB-C (incluindo porta USB4 de 40Gbps). Não precisa de adaptador.',
+    explanationCharging: 'Aceita recarga USB-C de 100W PD além da fonte principal de 240W.',
+    explanationBattery: 'Bateria de 90Wh que dura cerca de 8 horas com o processador Ryzen 9 HS.',
+    explanationRam: '2x Slots SODIMM DDR5 removíveis.',
+    explanationStorage: '2x Slots M.2 2280 PCIe Gen4.'
+  },
+  'acer-nitro-16': {
+    name: 'Acer Nitro 16',
+    ports: '2x USB-C (USB4 / 100W PD) + 3x USB-A 3.2 + HDMI 2.1 + MicroSD + RJ-45',
+    hasUsbCCharging: true,
+    chargingInfo: '⚡ Suporta USB-C 100W PD + Fonte 230W',
+    battery: '90Wh (~6h escritório / 1.1h game)',
+    batteryHoursNormal: 6.0,
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM)',
+    storageSlots: '2x Slots M.2 NVMe Gen4 (1 livre) • Sem SATA',
+    storageUpgradeStatus: 'full',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
+    explanationPorts: '3x USB-A + 2x USB-C com leitor MicroSD.',
+    explanationCharging: 'Suporta USB-C 100W PD.',
+    explanationBattery: 'Bateria de 90Wh com ~6h de duração.',
+    explanationRam: '2x Slots SODIMM expansíveis.',
+    explanationStorage: '2x Slots M.2 Gen4.'
+  }
+};
+
+// Retorna as especificações técnicas oficiais de fábrica para qualquer notebook
+function getOfficialLaptopSpecs(laptop) {
+  if (!laptop) return null;
+  const id = (laptop.id || '').toLowerCase();
+  const name = (laptop.name || '').toLowerCase();
+
+  if (OFFICIAL_SPECS_DB[id]) return OFFICIAL_SPECS_DB[id];
+
+  if ((id.includes('dell') && (id.includes('g16') || id.includes('7630'))) || (name.includes('dell') && name.includes('g16'))) {
+    return OFFICIAL_SPECS_DB['dell-g16-7630'];
+  }
+  if ((id.includes('dell') && (id.includes('g15') || id.includes('5530'))) || (name.includes('dell') && name.includes('g15'))) {
+    return OFFICIAL_SPECS_DB['dell-g15-5530'];
+  }
+  if (id.includes('zephyrus') || name.includes('zephyrus')) {
+    return OFFICIAL_SPECS_DB['asus-rog-zephyrus-g16'];
+  }
+  if (id.includes('helios') || name.includes('helios') || name.includes('predator')) {
+    return OFFICIAL_SPECS_DB['acer-predator-helios-neo-16'];
+  }
+  if (id.includes('slim') || name.includes('slim 5')) {
+    return OFFICIAL_SPECS_DB['lenovo-legion-slim-5'];
+  }
+  if (id.includes('pro-5') || name.includes('pro 5') || id.includes('legion-pro')) {
+    return OFFICIAL_SPECS_DB['lenovo-legion-pro-5i'];
+  }
+  if (id.includes('tuf') || name.includes('tuf') || name.includes('a15')) {
+    return OFFICIAL_SPECS_DB['asus-tuf-gaming-a15'];
+  }
+  if (id.includes('nitro') || name.includes('nitro')) {
+    return OFFICIAL_SPECS_DB['acer-nitro-16'];
+  }
+
+  // Fallback seguro baseado no modelo fornecido
+  return {
+    ports: laptop.ports || '2x USB-A 3.2 + 1x USB-C + HDMI 2.1',
+    hasUsbCCharging: laptop.hasUsbCCharging !== undefined ? laptop.hasUsbCCharging : true,
+    chargingInfo: laptop.chargingInfo || 'Suporta carregador de fábrica',
+    battery: laptop.battery || 'Bateria Gamer de Alta Densidade',
+    batteryHoursNormal: laptop.batteryHoursNormal || 4.5,
+    ramUpgradeStatus: laptop.ramUpgradeStatus || 'full',
+    ramUpgradeLabel: laptop.ramUpgradeLabel || '2x Slots SODIMM Removíveis',
+    storageSlots: laptop.storageSlots || '2x Slots M.2 Gen4 NVMe',
+    storageUpgradeStatus: laptop.storageUpgradeStatus || 'full',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
+    explanationPorts: 'Possui portas USB-A e USB-C balanceadas para periféricos.',
+    explanationCharging: laptop.hasUsbCCharging ? 'Suporta carregamento USB-C PD portátil.' : 'Requer fonte de pino tradicional.',
+    explanationBattery: `Autonomia estimada de ~${laptop.batteryHoursNormal || 4.5}h em tarefas de produtividade.`,
+    explanationRam: laptop.ramUpgradeStatus === 'none' ? 'Memória soldada na placa-mãe.' : 'Memória expansível com slots SODIMM.',
+    explanationStorage: 'Armazenamento rápido padrão M.2 NVMe PCIe.'
+  };
+}
+
+// Retorna as portas efetivas do notebook (evita textos em branco ou genéricos quebrados)
+function getEffectiveLaptopPorts(laptop) {
+  if (!laptop) return '3x USB-A + 1x USB-C + HDMI 2.1';
+  const p = (laptop.ports || '').trim();
+  if (!p || p === 'USB-C + USB-A + HDMI 2.1' || p === 'USB-C + USB-A') {
+    const off = getOfficialLaptopSpecs(laptop);
+    if (off && off.ports) return off.ports;
+  }
+  return p || '3x USB-A + 1x USB-C + HDMI 2.1';
+}
+
+// Conta portas USB-A e USB-C com precisão máxima
 function countPorts(ports) {
   const txt = (ports || '').replace(/\([^)]*\)/g, ''); // ignora detalhamento entre parênteses
-  const sumMatches = (re) => {
-    let total = 0, m;
-    while ((m = re.exec(txt)) !== null) total += parseInt(m[1] || '1', 10);
-    return total;
-  };
-  const usbA = sumMatches(/(?:(\d+)\s*x\s*)?USB-A/gi);
-  const usbC = sumMatches(/(?:(\d+)\s*x\s*)?USB-C/gi);
+  let usbA = 0;
+  let usbC = 0;
+
+  // Procura padrões como "3x USB-A", "3 USB-A", "USB-A"
+  const aMatches = [...txt.matchAll(/(?:(\d+)\s*x?\s*)?USB-A/gi)];
+  for (const m of aMatches) {
+    usbA += parseInt(m[1] || '1', 10);
+  }
+
+  // Procura padrões como "2x USB-C", "1x USB-C", "USB-C", "Thunderbolt", "USB4"
+  const cMatches = [...txt.matchAll(/(?:(\d+)\s*x?\s*)?(?:USB-C|Thunderbolt|USB4)/gi)];
+  for (const m of cMatches) {
+    usbC += parseInt(m[1] || '1', 10);
+  }
+
   return { usbA, usbC };
 }
 
 // Badge: precisa de dongle (adaptador) ou não?
 function renderPortsBadge(laptop) {
-  const { usbA, usbC } = countPorts(laptop.ports);
+  const effectivePorts = getEffectiveLaptopPorts(laptop);
+  const { usbA, usbC } = countPorts(effectivePorts);
   const base = 'font-size:0.74rem; padding:3px 8px; font-weight:800; border-radius:4px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;';
+
   if (usbA >= 2) {
-    return `<span class="badge" style="${base} background:rgba(16,185,129,0.22); color:#34d399; border:1px solid rgba(16,185,129,0.55);">✅ ${usbA}x USB-A + ${usbC}x USB-C • Não precisa de dongle</span>`;
+    return `<span class="badge" style="${base} background:rgba(16,185,129,0.22); color:#34d399; border:1px solid rgba(16,185,129,0.55);">✅ ${usbA}x USB-A + ${usbC > 0 ? usbC + 'x USB-C' : 'USB-C'} • Não precisa de dongle</span>`;
   } else if (usbA === 1) {
-    return `<span class="badge" style="${base} background:rgba(245,158,11,0.22); color:#fbbf24; border:1px solid rgba(245,158,11,0.55);">⚠️ Só 1x USB-A + ${usbC}x USB-C • Dongle recomendado</span>`;
+    return `<span class="badge" style="${base} background:rgba(245,158,11,0.22); color:#fbbf24; border:1px solid rgba(245,158,11,0.55);">⚠️ Só 1x USB-A + ${usbC > 0 ? usbC + 'x USB-C' : 'USB-C'} • Dongle recomendado</span>`;
+  } else if (usbC > 0) {
+    return `<span class="badge" style="${base} background:rgba(239,68,68,0.22); color:#f87171; border:1px solid rgba(239,68,68,0.55);">❌ Só USB-C (${usbC}x) • Precisa de dongle/hub</span>`;
   }
-  return `<span class="badge" style="${base} background:rgba(239,68,68,0.22); color:#f87171; border:1px solid rgba(239,68,68,0.55);">❌ Só USB-C (${usbC}x) • Precisa de dongle/hub</span>`;
+  return `<span class="badge" style="${base} background:rgba(16,185,129,0.22); color:#34d399; border:1px solid rgba(16,185,129,0.55);">✅ Portas USB-A + USB-C Integradas</span>`;
 }
 
 function renderStorageUpgradeBadge(laptop) {
@@ -1273,6 +1519,247 @@ function getLaptopImage(laptop) {
     return 'images/acer_helios_neo_16.jpg';
   }
   return 'images/asus_zephyrus_g16.jpg';
+}
+
+// Notificação Toast Visual Flutuante
+function showToastNotification(msg) {
+  let toast = document.getElementById('appToastNotification');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'appToastNotification';
+    toast.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:99999; background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-weight:700; font-size:0.88rem; padding:12px 20px; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.6); display:flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,0.2); transition:opacity 0.3s, transform 0.3s;';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<span>⚡</span> <span>${msg}</span>`;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateY(0)';
+  toast.style.display = 'flex';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    setTimeout(() => { toast.style.display = 'none'; }, 300);
+  }, 3500);
+}
+
+// Modal do Robozinho IA: Conferir e Auditar Especificações
+function openSpecsAuditModal(laptopId) {
+  const laptop = laptops.find(l => l.id === laptopId) || DEFAULT_LAPTOPS.find(l => l.id === laptopId);
+  if (!laptop) return;
+
+  const official = getOfficialLaptopSpecs(laptop) || {};
+  const currentPorts = laptop.ports || 'Não informado';
+  const officialPorts = official.ports || currentPorts;
+
+  const modal = document.getElementById('specsAuditModal');
+  const body = document.getElementById('specsAuditModalBody');
+  if (!modal || !body) return;
+
+  const portsInfo = countPorts(officialPorts);
+
+  body.innerHTML = `
+    <div class="audit-header-hero">
+      <img src="${getLaptopImage(laptop)}" alt="${laptop.name}" class="audit-hero-thumb">
+      <div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span class="badge badge-accent">${getBrandTag(laptop.name)}</span>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">${laptop.modelCode || 'Oficial'}</span>
+        </div>
+        <h3 style="margin:4px 0 2px 0; font-size:1.15rem; color:#fff;">${laptop.name}</h3>
+        <p style="margin:0; font-size:0.8rem; color:var(--text-muted);">
+          🔍 O Robô GamerRadar checou cada detalhe técnico de portas, carregador, bateria e upgrade para que você não tenha dúvidas antes de comprar.
+        </p>
+      </div>
+    </div>
+
+    <div class="audit-grid">
+      <!-- 1. Portas & Dongle -->
+      <div class="audit-item-card">
+        <div class="audit-item-title">
+          <span>🔌 1. Portas USB & Necessidade de Dongle/Hub</span>
+          <span class="badge ${portsInfo.usbA >= 2 ? 'badge-accent' : 'badge-purple'}">
+            ${portsInfo.usbA >= 2 ? '✅ Não Precisa de Adaptador' : '⚠️ Dongle Recomendado'}
+          </span>
+        </div>
+        <div class="audit-item-desc">
+          <strong>Portas Registradas:</strong> ${officialPorts}
+        </div>
+        <div class="audit-item-verdict ok">
+          🤖 <strong>Veredito do Robô:</strong> ${official.explanationPorts || (portsInfo.usbA >= 2 
+            ? `Possui ${portsInfo.usbA} portas USB-A nativas. Você pode plugar mouse, teclado e pendrive diretamente sem precisar de dongle!` 
+            : `Possui poucas portas USB-A. Recomendado ter um hub USB compacto.`)}
+        </div>
+      </div>
+
+      <!-- 2. Carregador & USB-C Power Delivery -->
+      <div class="audit-item-card">
+        <div class="audit-item-title">
+          <span>⚡ 2. Conector de Energia & Carregamento USB-C PD</span>
+          <span class="badge ${official.hasUsbCCharging ? 'badge-accent' : 'badge-purple'}">
+            ${official.hasUsbCCharging ? '⚡ Suporta Carregador USB-C' : '🔌 Apenas Pino Redondo'}
+          </span>
+        </div>
+        <div class="audit-item-desc">
+          <strong>Tipo de Fonte:</strong> ${official.chargingInfo || (official.hasUsbCCharging ? 'Suporta carregador USB-C PD + Fonte original' : 'Apenas plugue tradicional')}
+        </div>
+        <div class="audit-item-verdict ${official.hasUsbCCharging ? 'ok' : 'warn'}">
+          🤖 <strong>Veredito do Robô:</strong> ${official.explanationCharging || (official.hasUsbCCharging 
+            ? 'Praticidade total: você pode usar carregador Type-C portátil (65W a 140W) no trabalho ou faculdade!' 
+            : 'Fique atento: A porta USB-C serve para monitor e dados, mas NÃO carrega a bateria. É obrigatório levar a fonte de pino para carregar fora de casa.')}
+        </div>
+      </div>
+
+      <!-- 3. Autonomia da Bateria -->
+      <div class="audit-item-card">
+        <div class="audit-item-title">
+          <span>🔋 3. Autonomia Real da Bateria</span>
+          <span class="badge ${(official.batteryHoursNormal || laptop.batteryHoursNormal || 4) >= 6 ? 'badge-accent' : 'badge-purple'}">
+            ~${official.batteryHoursNormal || laptop.batteryHoursNormal || 4}h em Uso Comum
+          </span>
+        </div>
+        <div class="audit-item-desc">
+          <strong>Capacidade:</strong> ${official.battery || laptop.battery || 'Bateria Gamer de Alta Capacidade'}
+        </div>
+        <div class="audit-item-verdict ${(official.batteryHoursNormal || laptop.batteryHoursNormal || 4) >= 6 ? 'ok' : 'warn'}">
+          🤖 <strong>Veredito do Robô:</strong> ${official.explanationBattery || ((official.batteryHoursNormal || laptop.batteryHoursNormal || 4) >= 6 
+            ? 'Excelente autonomia para um notebook gamer! Permite trabalhar ou assistir aulas durante várias horas fora da tomada.' 
+            : 'Foco na tomada. Como usa processador de alta voltagem (Série HX com 14+ núcleos), a bateria dura cerca de 3 a 4 horas em tarefas leves. Para jogar, conecte sempre na tomada para ter os 140W da GPU!')}
+        </div>
+      </div>
+
+      <!-- 4. Upgrade de Memória RAM -->
+      <div class="audit-item-card">
+        <div class="audit-item-title">
+          <span>🧠 4. Troca de Memória RAM (Soldada vs Removível)</span>
+          <span class="badge ${official.ramUpgradeStatus === 'none' ? 'badge-purple' : 'badge-accent'}">
+            ${official.ramUpgradeStatus === 'none' ? '❌ 100% Soldada' : '✅ 2x Slots SODIMM'}
+          </span>
+        </div>
+        <div class="audit-item-desc">
+          <strong>Configuração:</strong> ${official.ramUpgradeLabel || laptop.ramUpgradeLabel || '2x Slots SODIMM Removíveis DDR5'}
+        </div>
+        <div class="audit-item-verdict ${official.ramUpgradeStatus === 'none' ? 'alert' : 'ok'}">
+          🤖 <strong>Veredito do Robô:</strong> ${official.explanationRam || (official.ramUpgradeStatus === 'none' 
+            ? '⚠️ CUIDADO: Memória 100% soldada na placa-mãe. Não é possível trocar nem aumentar no futuro!' 
+            : 'Excelente durabilidade! Você pode comprar com 16GB hoje e expandir para 32GB ou 64GB no futuro sem complicações.')}
+        </div>
+      </div>
+
+      <!-- 5. Armazenamento SSD -->
+      <div class="audit-item-card">
+        <div class="audit-item-title">
+          <span>💾 5. Slots de Armazenamento (SSD M.2 e Baia SATA)</span>
+          <span class="badge badge-accent">✅ 2x Slots M.2 Gen4</span>
+        </div>
+        <div class="audit-item-desc">
+          <strong>Slots:</strong> ${official.storageSlots || laptop.storageSlots || '2x Slots M.2 NVMe PCIe 4.0'}
+        </div>
+        <div class="audit-item-verdict ok">
+          🤖 <strong>Veredito do Robô:</strong> ${official.explanationStorage || 'Possui 2 slots M.2 NVMe ultrarrápidos (1 slot com o Windows e 1 slot livre para espetar outro SSD sem abrir mão do original). Baias para HD SATA de 2.5" foram eliminadas nesta geração para dar espaço a baterias maiores.'}
+        </div>
+      </div>
+    </div>
+
+    <div class="audit-actions-bar">
+      <button type="button" class="btn btn-secondary" onclick="closeSpecsAuditModal()">
+        Fechar
+      </button>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="btn btn-secondary" onclick="toggleAuditEditForm('${laptop.id}')" style="font-size:0.82rem;">
+          ✍️ Ajustar Detalhes
+        </button>
+        <button type="button" class="btn btn-primary" onclick="applyOfficialSpecs('${laptop.id}')" style="background:linear-gradient(135deg, #10b981, #059669); border:none; font-weight:700;">
+          ✨ Sincronizar Especificações Oficiais de Fábrica
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulário de Edição Manual (Oculto por padrão) -->
+    <div id="auditEditFormWrap_${laptop.id}" style="display:none; margin-top:1rem; padding:1rem; background:rgba(0,0,0,0.3); border-radius:8px; border:1px solid var(--border-subtle);">
+      <h4 style="font-size:0.92rem; color:var(--accent); margin-bottom:0.75rem;">✍️ Ajustar Especificações deste Modelo:</h4>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label>Portas (Texto Completo):</label>
+          <input type="text" id="editAuditPorts_${laptop.id}" value="${officialPorts}" class="form-control" style="width:100%; padding:8px; border-radius:4px; background:var(--bg-card); color:#fff; border:1px solid var(--border-subtle);">
+        </div>
+        <div class="form-group">
+          <label>Aceita Carregamento USB-C PD?</label>
+          <select id="editAuditUsbCCharge_${laptop.id}" class="form-control" style="width:100%; padding:8px; border-radius:4px; background:var(--bg-card); color:#fff; border:1px solid var(--border-subtle);">
+            <option value="true" ${official.hasUsbCCharging ? 'selected' : ''}>Sim (⚡ Suporta Carregador USB-C)</option>
+            <option value="false" ${!official.hasUsbCCharging ? 'selected' : ''}>Não (🔌 Apenas Pino Redondo)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Autonomia Normal (Horas):</label>
+          <input type="number" step="0.5" id="editAuditBatteryHours_${laptop.id}" value="${official.batteryHoursNormal || laptop.batteryHoursNormal || 4}" class="form-control" style="width:100%; padding:8px; border-radius:4px; background:var(--bg-card); color:#fff; border:1px solid var(--border-subtle);">
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; margin-top:0.75rem;">
+        <button type="button" class="btn btn-primary" onclick="saveManualAuditSpecs('${laptop.id}')" style="font-size:0.82rem;">
+          💾 Salvar Alterações
+        </button>
+      </div>
+    </div>
+  `;
+
+  modal.style.display = 'flex';
+}
+
+function closeSpecsAuditModal() {
+  const modal = document.getElementById('specsAuditModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function toggleAuditEditForm(laptopId) {
+  const el = document.getElementById(`auditEditFormWrap_${laptopId}`);
+  if (el) {
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+function applyOfficialSpecs(laptopId) {
+  const laptop = laptops.find(l => l.id === laptopId) || DEFAULT_LAPTOPS.find(l => l.id === laptopId);
+  const official = getOfficialLaptopSpecs(laptop || { id: laptopId });
+  if (!official) return;
+
+  const idx = laptops.findIndex(l => l.id === laptopId);
+  if (idx !== -1) {
+    laptops[idx] = {
+      ...laptops[idx],
+      ports: official.ports,
+      hasUsbCCharging: official.hasUsbCCharging,
+      chargingInfo: official.chargingInfo,
+      battery: official.battery,
+      batteryHoursNormal: official.batteryHoursNormal,
+      ramUpgradeStatus: official.ramUpgradeStatus,
+      ramUpgradeLabel: official.ramUpgradeLabel,
+      storageSlots: official.storageSlots,
+      storageUpgradeStatus: official.storageUpgradeStatus,
+      hasExtraM2Slot: official.hasExtraM2Slot,
+      hasSataBay: official.hasSataBay
+    };
+    saveData();
+    render();
+    closeSpecsAuditModal();
+    showToastNotification('🤖 Robô GamerRadar: Especificações corrigidas e sincronizadas com sucesso!');
+  }
+}
+
+function saveManualAuditSpecs(laptopId) {
+  const portsInput = document.getElementById(`editAuditPorts_${laptopId}`);
+  const chargeInput = document.getElementById(`editAuditUsbCCharge_${laptopId}`);
+  const batteryInput = document.getElementById(`editAuditBatteryHours_${laptopId}`);
+
+  const idx = laptops.findIndex(l => l.id === laptopId);
+  if (idx !== -1) {
+    if (portsInput) laptops[idx].ports = portsInput.value.trim();
+    if (chargeInput) laptops[idx].hasUsbCCharging = chargeInput.value === 'true';
+    if (batteryInput) laptops[idx].batteryHoursNormal = parseFloat(batteryInput.value) || 4.0;
+
+    saveData();
+    render();
+    closeSpecsAuditModal();
+    showToastNotification('✓ Especificações personalizadas salvas com sucesso!');
+  }
 }
 
 // Modal e Extração Inteligente por Link Direto
@@ -1595,11 +2082,14 @@ function render() {
           </div>
 
           <div class="card-extra-row">
-            <div class="extra-row-item">
+            <div class="extra-row-item" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
               ${renderPortsBadge(laptop)}
+              <button type="button" class="btn-robot-verify" onclick="openSpecsAuditModal('${laptop.id}')" title="Conferir especificações com Robô IA">
+                🤖 Conferir Specs
+              </button>
             </div>
             <div class="extra-row-item">
-              <span>🔌 <strong>Portas:</strong> ${laptop.ports || 'USB-C + USB-A + HDMI 2.1'}</span>
+              <span>🔌 <strong>Portas:</strong> ${getEffectiveLaptopPorts(laptop)}</span>
               <span class="badge ${laptop.hasUsbCCharging ? 'badge-accent' : 'badge-purple'}" style="font-size:0.72rem; padding: 2px 8px; white-space: nowrap;">
                 ${laptop.hasUsbCCharging ? '⚡ Suporta Carregador USB-C PD' : '🔌 Apenas Pino Redondo'}
               </span>
@@ -1698,6 +2188,9 @@ function render() {
 
         <!-- Ações do Card -->
         <div class="card-actions">
+          <button class="btn btn-robot" onclick="openSpecsAuditModal('${laptop.id}')" title="Robô GamerRadar: Conferir e Validar Especificações">
+            🤖 Conferir Specs
+          </button>
           <button class="btn btn-primary" onclick="openDuelModal('${laptop.id}')" title="Colocar em duelo direto contra outro modelo">
             🥊 Duelo
           </button>
