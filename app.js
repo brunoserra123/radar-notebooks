@@ -478,6 +478,27 @@ function bindEvents() {
     btnSaveOcr.addEventListener('click', saveOcrParsedLaptop);
   }
 
+  // Central de Busca Direta nas Lojas
+  const btnStoreSearch = document.getElementById('btnExecuteStoreSearch');
+  if (btnStoreSearch) {
+    btnStoreSearch.addEventListener('click', () => {
+      const query = document.getElementById('storeCustomQuery').value.trim() || 'gaming laptop rtx 4070';
+      const targetStore = document.getElementById('storeSelectTarget').value;
+      executeDirectStoreSearch(targetStore, query);
+    });
+  }
+
+  const storeInput = document.getElementById('storeCustomQuery');
+  if (storeInput) {
+    storeInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const query = storeInput.value.trim() || 'gaming laptop rtx 4070';
+        const targetStore = document.getElementById('storeSelectTarget').value;
+        executeDirectStoreSearch(targetStore, query);
+      }
+    });
+  }
+
   // Fechar ao clicar fora
   window.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal-backdrop')) {
@@ -810,6 +831,14 @@ function render() {
     if (!matchQuery) return false;
 
     // Filtros por chip
+    if (currentFilter === 'intel') {
+      const cpu = laptop.cpu.toLowerCase();
+      return cpu.includes('intel') || cpu.includes('i7') || cpu.includes('i9') || cpu.includes('ultra');
+    }
+    if (currentFilter === 'amd') {
+      const cpu = laptop.cpu.toLowerCase();
+      return cpu.includes('amd') || cpu.includes('ryzen');
+    }
     if (currentFilter === 'budget') {
       return laptop.priceBr >= 7900 && laptop.priceBr <= 9100;
     }
@@ -1422,3 +1451,74 @@ function saveOcrParsedLaptop() {
   resetOcr();
   alert(`✓ "${newLaptop.name}" adicionado com sucesso ao seu Radar!`);
 }
+
+// ==========================================
+// CENTRAL DE BUSCA DIRETA NAS LOJAS
+// ==========================================
+
+window.quickSearch = function(type) {
+  let url = '';
+  switch(type) {
+    case 'bestbuy_intel':
+      // Best Buy: Somente Intel Core i7 / i9 e apenas vendido pela própria Best Buy
+      url = 'https://www.bestbuy.com/site/searchpage.jsp?st=gaming+laptop+intel&qp=processorbrand_facet%3DProcessor+Brand~Intel%5Ecurrentprice_facet%3DPrice~%241000+-+%241499.99%5Eseller_facet%3DSeller~Best+Buy';
+      break;
+    case 'bestbuy_rtx4070':
+      // Best Buy: RTX 4070 oficial até $1499
+      url = 'https://www.bestbuy.com/site/searchpage.jsp?st=gaming+laptop+rtx+4070&qp=currentprice_facet%3DPrice~%241000+-+%241499.99%5Eseller_facet%3DSeller~Best+Buy';
+      break;
+    case 'bestbuy_oled':
+      // Best Buy: Telas OLED Gamer
+      url = 'https://www.bestbuy.com/site/searchpage.jsp?st=oled+gaming+laptop&qp=seller_facet%3DSeller~Best+Buy';
+      break;
+    case 'bestbuy_openbox':
+      // Best Buy: Promoções e Open-Box (Reembalados)
+      url = 'https://www.bestbuy.com/site/promo/gaming-laptop-deals';
+      break;
+    case 'microcenter_deals':
+      // Micro Center: Ofertas de Notebook Gamer
+      url = 'https://www.microcenter.com/search/search_results.aspx?N=4294967288+4294806085';
+      break;
+    case 'bh_laptops':
+      // B&H Photo: DealZone
+      url = 'https://www.bhphotovideo.com/c/browse/gaming-laptops/ci/24610';
+      break;
+    case 'kabum_rtx':
+      // Kabum Brasil: RTX 4060 / 4070
+      url = 'https://www.kabum.com.br/busca/notebook-gamer-rtx-4060';
+      break;
+    default:
+      url = 'https://www.bestbuy.com/site/searchpage.jsp?st=gaming+laptop&qp=seller_facet%3DSeller~Best+Buy';
+  }
+  window.open(url, '_blank');
+};
+
+window.executeDirectStoreSearch = function(store, query) {
+  const enc = encodeURIComponent(query);
+  let url = '';
+  switch(store) {
+    case 'bestbuy':
+      // Injeta filtro anti-vendedores terceiros (apenas Best Buy oficial)
+      url = `https://www.bestbuy.com/site/searchpage.jsp?st=${enc}&qp=seller_facet%3DSeller~Best+Buy`;
+      break;
+    case 'microcenter':
+      url = `https://www.microcenter.com/search/search_results.aspx?Ntt=${enc}`;
+      break;
+    case 'bhphoto':
+      url = `https://www.bhphotovideo.com/c/search?Ntt=${enc}`;
+      break;
+    case 'amazon_us':
+      url = `https://www.amazon.com/s?k=${encodeURIComponent(query + ' gaming laptop')}`;
+      break;
+    case 'kabum':
+      url = `https://www.kabum.com.br/busca/${enc}`;
+      break;
+    case 'all':
+      window.open(`https://www.bestbuy.com/site/searchpage.jsp?st=${enc}&qp=seller_facet%3DSeller~Best+Buy`, '_blank');
+      window.open(`https://www.microcenter.com/search/search_results.aspx?Ntt=${enc}`, '_blank');
+      return;
+    default:
+      url = `https://www.bestbuy.com/site/searchpage.jsp?st=${enc}&qp=seller_facet%3DSeller~Best+Buy`;
+  }
+  window.open(url, '_blank');
+};

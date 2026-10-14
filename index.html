@@ -86,16 +86,64 @@
       </div>
     </section>
 
+    <!-- Central de Busca Direta nas Lojas com Filtros Anti-Pegadinha -->
+    <section class="store-search-section">
+      <div class="store-search-card">
+        <div class="store-search-header">
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="badge badge-purple">Buscador Oficial</span>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">🔍 Pesquisar Direto nas Lojas (EUA & Brasil)</h3>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--accent);">
+            🛡️ Filtro Anti-Pegadinha Ativo: Exclui vendedores terceiros e foca só em estoque oficial
+          </span>
+        </div>
+
+        <!-- Barra de Busca Multiloja -->
+        <div class="store-search-inputs">
+          <div class="search-input-wrap">
+            <span style="font-size: 1rem; margin-right: 0.4rem;">🔎</span>
+            <input type="text" id="storeCustomQuery" placeholder="Digite o que procura (ex: RTX 4070, OLED, Zephyrus G16, Legion Pro 5i)...">
+          </div>
+          <select id="storeSelectTarget">
+            <option value="bestbuy">🇺🇸 Best Buy (Apenas Oficial Best Buy)</option>
+            <option value="microcenter">🇺🇸 Micro Center (Clearance & Promoções)</option>
+            <option value="bhphoto">🇺🇸 B&H Photo Video (DealZone)</option>
+            <option value="amazon_us">🇺🇸 Amazon EUA</option>
+            <option value="kabum">🇧🇷 Kabum (Brasil)</option>
+            <option value="all">🌐 Abrir Melhores Lojas Juntas</option>
+          </select>
+          <button class="btn btn-primary" id="btnExecuteStoreSearch">🚀 Buscar na Loja</button>
+        </div>
+
+        <!-- Atalhos Rápidos Recomendados (1 Clique) -->
+        <div class="quick-store-shortcuts">
+          <span class="shortcuts-label">⚡ Atalhos Rápidos (Filtros já configurados):</span>
+          <div class="shortcuts-chips">
+            <button class="quick-chip" onclick="quickSearch('bestbuy_intel')">🔵 Best Buy: Só Intel Core i7 / i9</button>
+            <button class="quick-chip" onclick="quickSearch('bestbuy_rtx4070')">🔥 Best Buy: RTX 4070 até $1.450</button>
+            <button class="quick-chip" onclick="quickSearch('bestbuy_oled')">🌈 Best Buy: OLED Gamer</button>
+            <button class="quick-chip" onclick="quickSearch('bestbuy_openbox')">🏷️ Best Buy: Open-Box / Clearance</button>
+            <button class="quick-chip" onclick="quickSearch('microcenter_deals')">🏢 Micro Center: Gaming Deals</button>
+            <button class="quick-chip" onclick="quickSearch('bh_laptops')">📸 B&H: Deals</button>
+            <button class="quick-chip" onclick="quickSearch('kabum_rtx')">🇧🇷 Kabum: RTX 4060/4070 BR</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Navigation & Filters -->
     <section class="controls-section">
       <div class="search-filter-bar">
         <div class="search-box">
           <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="Buscar por modelo (ex: Legion, Predator, G16, RTX 4070)...">
+          <input type="text" id="searchInput" placeholder="Buscar por modelo (ex: Legion, Predator, G16, RTX 4070, i7, i9)...">
         </div>
 
         <div class="filter-chips" id="filterChips">
           <button class="chip active" data-filter="all">Todos</button>
+          <button class="chip" data-filter="intel">🔵 Só Intel Core (Foco)</button>
+          <button class="chip" data-filter="amd">🔴 AMD Ryzen</button>
           <button class="chip" data-filter="budget">Na Faixa (R$ 8k - 8.9k)</button>
           <button class="chip" data-filter="gpu_upgrade">🚀 Upgrade Grátis de GPU nos EUA</button>
           <button class="chip" data-filter="rtx4070">Com RTX 4070</button>
