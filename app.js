@@ -1002,31 +1002,41 @@ function handleAddLaptop(e) {
     ]
   };
 
-  // Trava anti-duplicidade: se já existe modelo com mesmas configurações, atualiza preços e histórico
-  const duplicate = findDuplicateLaptop(newLaptop, laptops);
-  if (duplicate) {
-    duplicate.priceBr = priceBr || duplicate.priceBr;
-    duplicate.priceUs = priceUs || duplicate.priceUs;
-    duplicate.storeBr = storeBr || duplicate.storeBr;
-    duplicate.storeUs = storeUs || duplicate.storeUs;
-    if (!duplicate.history) duplicate.history = [];
-    duplicate.history.push({ date: 'Hoje (Atualizado)', br: duplicate.priceBr, us: duplicate.priceUs });
-    saveData();
-    render();
-    document.getElementById('addLaptopForm').reset();
-    document.getElementById('addModal').style.display = 'none';
-    showToastNotification(`ℹ️ "${duplicate.name}" já constava no Radar! Os preços foram atualizados no modelo existente sem duplicar.`);
-    return;
-  }
-
+  // Sempre insere no topo para o usuário ver imediatamente
   laptops.unshift(newLaptop);
-  watchlist.push(newLaptop.id);
-  saveData();
+  if (!watchlist.includes(newLaptop.id)) watchlist.push(newLaptop.id);
 
+  // Garante que o notebook apareça imediatamente sem ser escondido por filtros ativos
+  currentFilter = 'all';
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  document.querySelector('.chip[data-filter="all"]')?.classList.add('active');
+
+  // Limpa a barra de busca
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.value = '';
+  const btnClear = document.getElementById('btnClearSearch');
+  if (btnClear) btnClear.style.display = 'none';
+
+  saveData();
   document.getElementById('addLaptopForm').reset();
   document.getElementById('addModal').style.display = 'none';
   render();
-  showToastNotification(`✓ "${newLaptop.name}" adicionado com sucesso ao Radar!`);
+
+  // Rola a tela até o notebook recém-adicionado
+  setTimeout(() => {
+    const cardEl = document.getElementById('card-' + newLaptop.id);
+    if (cardEl) {
+      cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      cardEl.style.boxShadow = '0 0 30px #10b981, 0 0 60px rgba(16, 185, 129, 0.5)';
+      cardEl.style.borderColor = '#10b981';
+      setTimeout(() => {
+        cardEl.style.boxShadow = '';
+        cardEl.style.borderColor = '';
+      }, 4000);
+    }
+  }, 150);
+
+  showToastNotification(`✓ "${newLaptop.name}" adicionado com sucesso ao topo do Radar!`);
 }
 
 function toggleWatch(id) {
@@ -2155,29 +2165,71 @@ function processPastedLink() {
   showToastNotification(`✓ Dados extraídos do link da ${store}! Confira e clique em Confirmar e Salvar.`);
 }
 
+// Tabela de Equivalência Inteligente de Processadores (AMD Ryzen vs Intel Core)
+function getCpuEquivalence(cpu) {
+  if (!cpu) return 'Processador Gamer de Alta Performance';
+  const c = cpu.toLowerCase();
+
+  // 1. AMD Ryzen 9
+  if (c.includes('ryzen 9') || c.includes('8945hs') || c.includes('7945hx') || c.includes('7940hs') || c.includes('r9')) {
+    return 'Equivale ao Intel Core i9-13900HX / i7-14700HX (Com até 2x mais bateria fora da tomada)';
+  }
+  // 2. AMD Ryzen 7
+  if (c.includes('ryzen 7') || c.includes('7735hs') || c.includes('7840hs') || c.includes('8845hs') || c.includes('r7')) {
+    return 'Equivale ao Intel Core i7-13700H / Core Ultra 7 (Excelente eficiência térmica)';
+  }
+  // 3. Intel Core i9
+  if (c.includes('i9') || c.includes('13900hx') || c.includes('14900hx')) {
+    return 'Equivale ao AMD Ryzen 9 7945HX (Top de linha extremo para jogos e 3D)';
+  }
+  // 4. Intel Core i7 HX
+  if (c.includes('i7') && (c.includes('hx') || c.includes('14700') || c.includes('13650') || c.includes('13700'))) {
+    return 'Equivale ao AMD Ryzen 9 8945HS (Força bruta em multitarefa)';
+  }
+  // 5. Intel Core Ultra 7 / 9
+  if (c.includes('ultra 7') || c.includes('ultra 9') || c.includes('155h') || c.includes('185h')) {
+    return 'Equivale ao AMD Ryzen 7 8845HS (Arquitetura moderna com IA / NPU dedicada)';
+  }
+  // 6. Intel Core i7 padrão
+  if (c.includes('i7')) {
+    return 'Equivale ao AMD Ryzen 7 7840HS';
+  }
+  // 7. AMD Ryzen 5 / Intel Core i5
+  if (c.includes('ryzen 5') || c.includes('i5')) {
+    return 'Processador gamer equilibrado';
+  }
+  return 'Equivalente de Alta Performance Gamer';
+}
+
 // Renderização Principal do Grid
 function render() {
   const grid = document.getElementById('notebookGrid');
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
+  const searchTerms = query.split(/\s+/).filter(Boolean);
 
   // Filtragem
   let filtered = laptops.filter(laptop => {
-    // Busca por texto ampliada
-    const matchQuery = 
-      laptop.name.toLowerCase().includes(query) ||
-      laptop.gpu.toLowerCase().includes(query) ||
-      laptop.cpu.toLowerCase().includes(query) ||
-      laptop.storeBr.toLowerCase().includes(query) ||
-      laptop.storeUs.toLowerCase().includes(query) ||
-      (laptop.ports && laptop.ports.toLowerCase().includes(query)) ||
-      (laptop.biometrics && laptop.biometrics.toLowerCase().includes(query)) ||
-      (laptop.chargingInfo && laptop.chargingInfo.toLowerCase().includes(query)) ||
-      (laptop.battery && laptop.battery.toLowerCase().includes(query)) ||
-      (laptop.ram && laptop.ram.toLowerCase().includes(query)) ||
-      (laptop.storage && laptop.storage.toLowerCase().includes(query)) ||
-      (laptop.storageSlots && laptop.storageSlots.toLowerCase().includes(query));
+    // Busca por texto ampliada (suporta múltiplos termos em qualquer ordem)
+    if (searchTerms.length > 0) {
+      const equivalence = getCpuEquivalence(laptop.cpu);
+      const searchable = [
+        laptop.name,
+        laptop.modelCode,
+        laptop.gpu,
+        laptop.cpu,
+        equivalence,
+        laptop.storeBr,
+        laptop.storeUs,
+        laptop.ports,
+        laptop.ram,
+        laptop.storage,
+        laptop.screen,
+        laptop.bestFor
+      ].filter(Boolean).join(' ').toLowerCase();
 
-    if (!matchQuery) return false;
+      const allTermsMatch = searchTerms.every(term => searchable.includes(term));
+      if (!allTermsMatch) return false;
+    }
 
     // Filtros por chip
     if (currentFilter === 'intel') {
@@ -2337,7 +2389,7 @@ function render() {
     }
 
     return `
-      <div class="laptop-card ${inBudget ? 'in-budget' : ''}">
+      <div class="laptop-card ${inBudget ? 'in-budget' : ''}" id="card-${laptop.id}">
         <!-- Imagem do Produto no Topo (Identificação Visual Imediata) -->
         <div class="card-image-hero">
           <img src="${getLaptopImage(laptop)}" alt="${laptop.name}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=700&q=80';">
@@ -2375,7 +2427,12 @@ function render() {
             </div>
             <div class="spec-item">
               <span class="spec-label">⚡ Processador (CPU)</span>
-              <span class="spec-value">${laptop.cpu.split('(')[0].trim()}</span>
+              <span class="spec-value">
+                <div><strong>${laptop.cpu.split('(')[0].trim()}</strong></div>
+                <div style="margin-top: 4px; font-size: 0.73rem; background: rgba(56, 189, 248, 0.08); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.25); padding: 3px 6px; border-radius: 4px; font-weight: 600; line-height: 1.3;">
+                  ⚔️ ${getCpuEquivalence(laptop.cpu)}
+                </div>
+              </span>
             </div>
             <div class="spec-item">
               <span class="spec-label">🧠 Memória RAM & Tecnologia</span>
@@ -3296,53 +3353,44 @@ function saveOcrParsedLaptop() {
       ]
     };
 
-    // Trava anti-duplicidade para print/OCR
-    const duplicate = findDuplicateLaptop(newLaptop, laptops);
-    if (duplicate) {
-      duplicate.priceBr = newLaptop.priceBr || duplicate.priceBr;
-      duplicate.priceUs = newLaptop.priceUs || duplicate.priceUs;
-      if (newLaptop.storeUs) duplicate.storeUs = newLaptop.storeUs;
-      if (newLaptop.ram && newLaptop.ram !== duplicate.ram) duplicate.ram = newLaptop.ram;
-      if (newLaptop.ramUpgradeStatus) duplicate.ramUpgradeStatus = newLaptop.ramUpgradeStatus;
-      if (!duplicate.history) duplicate.history = [];
-      duplicate.history.push({
-        date: 'Hoje (Scan Atualizado)',
-        br: duplicate.priceBr,
-        us: duplicate.priceUs
-      });
-      saveData();
-      render();
-
-      const modal = document.getElementById('ocrModal');
-      if (modal) modal.style.display = 'none';
-      resetOcr();
-
-      showToastNotification(`⚡ "${duplicate.name}" já existia no Radar! Atualizamos os preços e histórico sem duplicar.`);
-      return;
-    }
-
+    // Sempre insere no topo da lista para o usuário ver imediatamente o que acabou de colocar!
     laptops.unshift(newLaptop);
     if (!watchlist.includes(newLaptop.id)) watchlist.push(newLaptop.id);
+
+    // Garante que o notebook apareça imediatamente sem ser escondido por filtros ativos
+    currentFilter = 'all';
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    document.querySelector('.chip[data-filter="all"]')?.classList.add('active');
+
+    // Limpa a barra de busca para não filtrar indevidamente
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    const btnClear = document.getElementById('btnClearSearch');
+    if (btnClear) btnClear.style.display = 'none';
+
     saveData();
     render();
 
-    // Fecha o modal e limpa
+    // Fecha o modal e limpa formulário
     const modal = document.getElementById('ocrModal');
     if (modal) modal.style.display = 'none';
     resetOcr();
 
-    // Notificação visual toast e contagem
-    const catalogSummary = document.getElementById('catalogSummary');
-    if (catalogSummary) {
-      catalogSummary.innerText = `✓ "${newLaptop.name}" adicionado com sucesso ao Radar!`;
-      catalogSummary.style.color = 'var(--accent)';
-      setTimeout(() => {
-        catalogSummary.style.color = '';
-        catalogSummary.innerText = `Exibindo ${laptops.length} modelos`;
-      }, 5000);
-    }
+    // Rola a tela até o notebook recém-adicionado e destaca visualmente
+    setTimeout(() => {
+      const cardEl = document.getElementById('card-' + newLaptop.id);
+      if (cardEl) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        cardEl.style.boxShadow = '0 0 30px #10b981, 0 0 60px rgba(16, 185, 129, 0.5)';
+        cardEl.style.borderColor = '#10b981';
+        setTimeout(() => {
+          cardEl.style.boxShadow = '';
+          cardEl.style.borderColor = '';
+        }, 4000);
+      }
+    }, 150);
 
-    showToastNotification(`✓ "${newLaptop.name}" salvo com sucesso no topo do Radar!`);
+    showToastNotification(`🎉 Notebook "${newLaptop.name}" salvo no topo do Radar!`);
   } catch (err) {
     console.error('Erro ao salvar notebook do OCR:', err);
     alert('Erro ao salvar: ' + err.message);
