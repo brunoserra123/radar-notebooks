@@ -400,7 +400,7 @@
                     </div>
                     <div class="form-group">
                       <label for="ocrParsedPriceUs">Preço em Dólar (US$) 🇺🇸</label>
-                      <input type="number" id="ocrParsedPriceUs" step="10">
+                      <input type="text" id="ocrParsedPriceUs" inputmode="decimal" placeholder="Ex: 1495.99">
                       <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">Preço original na loja dos EUA</div>
                     </div>
                     <div class="form-group">
@@ -408,7 +408,7 @@
                         <label for="ocrParsedPriceBr">Preço no Brasil (R$) 🇧🇷</label>
                         <button type="button" id="btnRecalcOcrBr" style="background: none; border: none; color: var(--accent); font-size: 0.72rem; cursor: pointer; text-decoration: underline; padding: 0;">↻ Recalcular Estimativa</button>
                       </div>
-                      <input type="number" id="ocrParsedPriceBr" step="50">
+                      <input type="text" id="ocrParsedPriceBr" inputmode="numeric" placeholder="Ex: 14899">
                       <div id="ocrPriceBrHelp" style="font-size: 0.72rem; color: var(--accent); margin-top: 3px;">⚡ Calculado automaticamente para o mercado brasileiro</div>
                     </div>
                     <div class="form-group">

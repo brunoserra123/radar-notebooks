@@ -1153,6 +1153,13 @@ function render() {
     const convertedUs = calculateConvertedUsPrice(laptop.priceUs);
     const diff = laptop.priceBr - convertedUs;
     const isUsCheaper = diff > 0;
+    const tax = getTaxBreakdown(laptop.priceUs);
+
+    const historyBr = (laptop.history && laptop.history.length > 0) ? laptop.history.map(h => h.br) : [laptop.priceBr];
+    const historyUs = (laptop.history && laptop.history.length > 0) ? laptop.history.map(h => h.us) : [laptop.priceUs];
+    const lowestBr = Math.min(...historyBr);
+    const lowestUs = Math.min(...historyUs);
+    const isCurrentLowest = laptop.priceBr <= lowestBr;
 
     // Decisão Inteligente: Vale a pena lá ou aqui?
     let decisionBadge = '';
@@ -1767,7 +1774,9 @@ function estimateOrFindPriceBr(name, gpu, priceUs, rawText = '') {
 function recalcOcrBrPrice(force = true) {
   const name = document.getElementById('ocrParsedName').value;
   const gpu = document.getElementById('ocrParsedGpu').value;
-  const priceUs = parseFloat(document.getElementById('ocrParsedPriceUs').value) || 0;
+  const priceUsRaw = document.getElementById('ocrParsedPriceUs').value;
+  const cleanUs = String(priceUsRaw || '').replace(/[^0-9.,]/g, '').replace(',', '.');
+  const priceUs = parseFloat(cleanUs) || 0;
   const currentBr = document.getElementById('ocrParsedPriceBr').value;
 
   if (force || !currentBr) {
@@ -1839,57 +1848,109 @@ function parseSpecsFromText(rawText) {
 }
 
 function resetOcr() {
-  document.getElementById('ocrFileInput').value = '';
-  document.getElementById('ocrPreviewWrap').style.display = 'none';
-  document.getElementById('ocrResultFormWrap').style.display = 'none';
+  const fileInput = document.getElementById('ocrFileInput');
+  if (fileInput) fileInput.value = '';
+  const prevWrap = document.getElementById('ocrPreviewWrap');
+  if (prevWrap) prevWrap.style.display = 'none';
+  const formWrap = document.getElementById('ocrResultFormWrap');
+  if (formWrap) formWrap.style.display = 'none';
 }
 
 function saveOcrParsedLaptop() {
-  const name = document.getElementById('ocrParsedName').value.trim();
-  const gpu = document.getElementById('ocrParsedGpu').value.trim();
-  const cpu = document.getElementById('ocrParsedCpu').value.trim();
-  const ram = document.getElementById('ocrParsedRam').value.trim();
-  const priceUs = parseFloat(document.getElementById('ocrParsedPriceUs').value) || 1199;
-  let priceBr = parseFloat(document.getElementById('ocrParsedPriceBr').value);
-  if (!priceBr || isNaN(priceBr)) {
-    priceBr = estimateOrFindPriceBr(name, gpu, priceUs);
+  try {
+    const name = (document.getElementById('ocrParsedName').value || '').trim() || 'Notebook Gamer Importado';
+    const gpu = (document.getElementById('ocrParsedGpu').value || '').trim() || 'NVIDIA RTX 4060';
+    const cpu = (document.getElementById('ocrParsedCpu').value || '').trim() || 'Intel Core i7 / Ryzen 7';
+    const ram = (document.getElementById('ocrParsedRam').value || '').trim() || '16GB DDR5';
+
+    // Conversão segura de preço em dólar (aceita vírgula ou ponto)
+    const priceUsRaw = document.getElementById('ocrParsedPriceUs').value;
+    const cleanUs = String(priceUsRaw || '').replace(/[^0-9.,]/g, '').replace(',', '.');
+    const priceUs = parseFloat(cleanUs) || 1199;
+
+    // Conversão segura de preço no Brasil
+    const priceBrRaw = document.getElementById('ocrParsedPriceBr').value;
+    const cleanBr = String(priceBrRaw || '').replace(/[^0-9.,]/g, '').replace(',', '.');
+    let priceBr = parseFloat(cleanBr);
+    if (!priceBr || isNaN(priceBr)) {
+      priceBr = estimateOrFindPriceBr(name, gpu, priceUs);
+    }
+
+    const store = (document.getElementById('ocrParsedStore').value || '').trim() || 'Best Buy';
+
+    // Detecção inteligente de características para os novos filtros e badges
+    const isZephyrus = name.toLowerCase().includes('zephyrus');
+    const isRyzenOrUltra = cpu.toLowerCase().includes('ryzen') || cpu.toLowerCase().includes('ultra');
+
+    const newLaptop = {
+      id: 'ocr-' + Date.now(),
+      name: name,
+      modelCode: 'Print OCR',
+      gpu: gpu,
+      gpuTgp: '140W',
+      gpuTier: gpu.includes('4070') ? 'high' : (gpu.includes('4080') ? 'ultra' : 'mid-high'),
+      cpu: cpu,
+      ram: ram,
+      ramType: isZephyrus ? 'LPDDR5X' : 'DDR5',
+      ramSpeed: isZephyrus ? '7467MHz' : '5600MHz',
+      ramUpgradeStatus: isZephyrus ? 'none' : 'full',
+      ramUpgradeLabel: isZephyrus ? '❌ Não Aceita Troca (Soldada)' : '✅ Aceita Troca (2x SODIMM)',
+      storage: '1TB SSD NVMe',
+      storageType: 'M.2 NVMe',
+      storageUpgradeStatus: 'full',
+      storageUpgradeLabel: '✅ +1 Slot M.2 Gen4 Livre',
+      storageSlots: '2x Slots M.2 NVMe (1 livre para expansão)',
+      hasExtraM2Slot: true,
+      hasSataBay: false,
+      screen: '16" QHD 165Hz / 240Hz',
+      cooling: 'Dual Fan Gamer',
+      battery: isRyzenOrUltra ? '90Wh (~7.5h uso normal / 1.2h game)' : '80Wh (~4.5h uso normal / 1.0h game)',
+      batteryHoursNormal: isRyzenOrUltra ? 7.5 : 4.5,
+      hasUsbCCharging: true,
+      chargingInfo: '⚡ Suporta recarga USB-C PD',
+      hasBiometrics: isZephyrus,
+      biometrics: isZephyrus ? '📷 Windows Hello Facial' : '❌ Sem Leitor de Digital',
+      ports: '2x USB-C + 2x USB-A + HDMI 2.1',
+      priceBr: Math.round(priceBr),
+      priceUs: Math.round(priceUs),
+      storeBr: 'Brasil',
+      storeUs: store,
+      urlBr: '#',
+      urlUs: '#',
+      score: gpu.includes('4070') ? 95 : 91,
+      bestFor: 'Importado via Print de Tela',
+      history: [
+        { date: 'Hoje (Scan de Print)', br: Math.round(priceBr), us: Math.round(priceUs) }
+      ]
+    };
+
+    laptops.unshift(newLaptop);
+    watchlist.push(newLaptop.id);
+    saveData();
+    render();
+
+    // Fecha o modal e limpa o formulário
+    const modal = document.getElementById('ocrModal');
+    if (modal) modal.style.display = 'none';
+    resetOcr();
+
+    // Notificação visual na barra de contagem de catálogo
+    const catalogSummary = document.getElementById('catalogSummary');
+    if (catalogSummary) {
+      catalogSummary.innerText = `✓ "${newLaptop.name}" adicionado com sucesso ao topo do Radar!`;
+      catalogSummary.style.color = 'var(--accent)';
+      setTimeout(() => {
+        catalogSummary.style.color = '';
+        catalogSummary.innerText = `Exibindo ${laptops.length} modelos`;
+      }, 5000);
+    }
+
+    // Alerta confirmação
+    alert(`✓ Sucesso! "${newLaptop.name}" foi salvo e já está aparecendo no topo do seu Radar!`);
+  } catch (err) {
+    console.error('Erro ao salvar notebook do OCR:', err);
+    alert('Erro ao salvar: ' + err.message);
   }
-  const store = document.getElementById('ocrParsedStore').value.trim() || 'Best Buy';
-
-  const newLaptop = {
-    id: 'ocr-' + Date.now(),
-    name: name || 'Notebook Gamer Importado',
-    modelCode: 'Print OCR',
-    gpu,
-    gpuTgp: '140W',
-    gpuTier: gpu.includes('4070') ? 'high' : (gpu.includes('4080') ? 'ultra' : 'mid-high'),
-    cpu,
-    ram,
-    storage: '1TB SSD NVMe',
-    screen: '16" QHD 165Hz / 240Hz',
-    cooling: 'Dual Fan Gamer',
-    priceBr: Math.round(priceBr),
-    priceUs: Math.round(priceUs),
-    storeBr: 'Brasil',
-    storeUs: store,
-    urlBr: '#',
-    urlUs: '#',
-    score: gpu.includes('4070') ? 95 : 91,
-    bestFor: 'Importado via Print de Tela',
-    history: [
-      { date: 'Hoje (Scan de Print)', br: Math.round(priceBr), us: Math.round(priceUs) }
-    ]
-  };
-
-  laptops.unshift(newLaptop);
-  watchlist.push(newLaptop.id);
-  saveData();
-  render();
-
-  document.getElementById('ocrModal').style.display = 'none';
-  resetOcr();
-  resetOcr();
-  alert(`✓ "${newLaptop.name}" adicionado com sucesso ao seu Radar!`);
 }
 
 // ==========================================
