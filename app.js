@@ -4959,7 +4959,7 @@ window.switchVideoPlayer = switchVideoPlayer;
 // ==========================================
 // SISTEMA DE VERIFICAÇÃO DE NOVA VERSÃO VIA API & GITHUB
 // ==========================================
-const CURRENT_APP_VERSION = '20261014_v29';
+const CURRENT_APP_VERSION = '20261014_v30';
 const GITHUB_REPO_API = 'https://api.github.com/repos/brunoserra123/radar-notebooks/commits/main';
 
 let isCheckingUpdate = false;

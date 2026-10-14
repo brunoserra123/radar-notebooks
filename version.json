@@ -1,5 +1,5 @@
 {
-  "version": "20261014_v29",
-  "releaseNotes": "Novo Player de Vídeo do YouTube Embutido diretamente no site com abas interativas (Reviews Brasil, Global, Testes de FPS e Upgrades)",
-  "updatedAt": "2026-10-14T16:35:00-03:00"
+  "version": "20261014_v30",
+  "releaseNotes": "Correção crítica estrutural HTML: fechamento do ocrModal e reposicionamento do modal de vídeos como filho direto do body + Player Embutido",
+  "updatedAt": "2026-10-14T16:50:00-03:00"
 }
