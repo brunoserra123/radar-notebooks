@@ -862,6 +862,18 @@ function bindEvents() {
   initGpuGuideModal();
   initWeightConverter();
 
+  // Delegação global para botões de Vídeos / Reviews (garante funcionamento mesmo em tabelas dinâmicas)
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-video, [data-action="open-video-reviews"]');
+    if (btn) {
+      const laptopId = btn.getAttribute('data-laptop-id');
+      if (laptopId) {
+        e.preventDefault();
+        window.openVideoReviewsModal(laptopId);
+      }
+    }
+  });
+
   // Fechar ao clicar fora
   window.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal-backdrop')) {
@@ -2105,8 +2117,16 @@ function resetLaptopToDefault(laptopId) {
 // MODAL DE VÍDEOS & REVIEWS DE ESPECIALISTAS
 // ==========================================
 function openVideoReviewsModal(laptopId) {
-  const laptop = laptops.find(l => l.id === laptopId) || DEFAULT_LAPTOPS.find(l => l.id === laptopId);
-  if (!laptop) return;
+  let laptop = laptops.find(l => String(l.id) === String(laptopId)) || DEFAULT_LAPTOPS.find(l => String(l.id) === String(laptopId));
+  if (!laptop && typeof laptopId === 'string') {
+    laptop = laptops.find(l => (l.name && l.name.toLowerCase().includes(laptopId.toLowerCase())) || (l.id && l.id.toLowerCase().includes(laptopId.toLowerCase())));
+  }
+  if (!laptop) {
+    if (typeof showToastNotification === 'function') {
+      showToastNotification('⚠️ Modelo de notebook não encontrado para buscar vídeos.');
+    }
+    return;
+  }
 
   const modal = document.getElementById('videoReviewsModal');
   const body = document.getElementById('videoReviewsModalBody');
@@ -2114,14 +2134,16 @@ function openVideoReviewsModal(laptopId) {
   if (!modal || !body) return;
 
   if (title) {
-    title.innerHTML = `🎬 Reviews & Benchmarks: <span style="color:#f87171;">${laptop.name}</span>`;
+    title.innerHTML = `🎬 Reviews & Benchmarks: <span style="color:#f87171;">${laptop.name || 'Notebook Gamer'}</span>`;
   }
 
-  // Prepara termos de busca limpos
-  const rawName = laptop.name;
-  const cleanName = rawName.replace(/notebook\s*gamer/gi, '').trim();
-  const gpuTerm = (laptop.gpu || '').replace(/NVIDIA\s*/gi, '').trim();
-  const cpuTerm = (laptop.cpu || '').split('(')[0].trim();
+  // Prepara termos de busca limpos de forma segura
+  const rawName = (laptop && laptop.name) ? String(laptop.name) : 'Notebook Gamer';
+  const cleanName = rawName.replace(/notebook\s*gamer/gi, '').trim() || rawName;
+  const gpuTerm = ((laptop && laptop.gpu) ? String(laptop.gpu) : 'RTX 4060').replace(/NVIDIA\s*/gi, '').trim();
+  const cpuTerm = ((laptop && laptop.cpu) ? String(laptop.cpu) : 'Processador Gamer').split('(')[0].trim();
+  const ramTerm = (laptop && laptop.ram) ? String(laptop.ram) : '16GB DDR5';
+  const screenTerm = (laptop && laptop.screen) ? String(laptop.screen) : '16" QHD';
 
   // URLs de busca rápida no YouTube
   // 1. Reviews Brasil nos canais top (Dan Ferreira, Adrenaline, Lucas Ishii, TecMundo)
@@ -2437,6 +2459,7 @@ function openVideoReviewsModal(laptopId) {
   `;
 
   modal.style.display = 'flex';
+  modal.style.zIndex = '999999';
 }
 
 function closeVideoReviewsModal() {
@@ -3651,7 +3674,7 @@ function executeMultiCompare(scrollInto = true) {
               <td class="tc-param-header">🎬 Vídeos dos Melhores Canais</td>
               ${selectedLaptops.map(l => `
                 <td>
-                  <button type="button" class="btn btn-video" onclick="openVideoReviewsModal('${l.id}')" style="font-size:0.75rem; padding:4px 8px; width:100%; justify-content:center;">
+                  <button type="button" class="btn btn-video" data-laptop-id="${l.id}" onclick="window.openVideoReviewsModal('${l.id}')" style="font-size:0.75rem; padding:6px 10px; width:100%; justify-content:center; cursor:pointer;">
                     ▶️ Ver Vídeos / Reviews
                   </button>
                 </td>
@@ -4839,7 +4862,7 @@ window.searchVideoWithTerm = searchVideoWithTerm;
 // ==========================================
 // SISTEMA DE VERIFICAÇÃO DE NOVA VERSÃO VIA API & GITHUB
 // ==========================================
-const CURRENT_APP_VERSION = '20261014_v27';
+const CURRENT_APP_VERSION = '20261014_v28';
 const GITHUB_REPO_API = 'https://api.github.com/repos/brunoserra123/radar-notebooks/commits/main';
 
 let isCheckingUpdate = false;

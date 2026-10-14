@@ -1273,21 +1273,49 @@ select {
   white-space: nowrap;
 }
 
-.btn-video {
-  background: rgba(239, 68, 68, 0.15);
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.35);
+.btn-video,
+.tc-compare-table .btn-video,
+button.btn-video {
+  background: rgba(239, 68, 68, 0.22) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.5) !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
-.btn-video:hover {
-  background: rgba(239, 68, 68, 0.28);
-  color: #ffffff;
-  border-color: #ef4444;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+.btn-video:hover,
+.tc-compare-table .btn-video:hover,
+button.btn-video:hover {
+  background: rgba(239, 68, 68, 0.4) !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.55) !important;
   transform: translateY(-1px);
 }
 
 /* Modals */
+#videoReviewsModal {
+  z-index: 999999 !important;
+}
+
+#videoReviewsModal .modal-dialog {
+  border: 1px solid rgba(239, 68, 68, 0.5) !important;
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.3), 0 20px 40px rgba(0, 0, 0, 0.85);
+  animation: videoModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes videoModalPop {
+  from { transform: scale(0.93); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
 .modal-backdrop {
   position: fixed;
   inset: 0;
