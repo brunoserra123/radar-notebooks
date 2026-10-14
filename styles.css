@@ -1771,13 +1771,142 @@ select {
   line-height: 1.4;
 }
 
+/* Guia de RAM e Armazenamento (SSD / HD) */
+.ram-storage-guide-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.guide-alert-box {
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.ram-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.ram-tech-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ram-tech-card.highlight {
+  border-color: var(--accent);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.ram-tech-card.warning-soldered {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.04);
+}
+
+.ram-tech-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+.ram-tech-badge.ddr5 {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent);
+}
+
+.ram-tech-badge.lpddr5x {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.ram-tech-badge.ddr4 {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+.ram-speed-label {
+  font-size: 1.35rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--text-main);
+}
+
+.storage-comparison-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.storage-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.storage-card.good {
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.storage-card.legacy {
+  border-color: rgba(148, 163, 184, 0.25);
+}
+
+.upgrade-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+.upgrade-matrix-table th {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.upgrade-matrix-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+}
+
+.upgrade-matrix-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
 /* Responsividade Mobile e Fold 6 */
 @media (max-width: 820px) {
   .battery-cards-grid,
   .usbc-comparison-cards,
   .nextgen-reasons-grid,
-  .gpu-specs-compare-grid {
+  .gpu-specs-compare-grid,
+  .ram-comparison-grid,
+  .storage-comparison-cards {
     grid-template-columns: 1fr;
   }
 }
+
 

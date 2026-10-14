@@ -148,6 +148,10 @@
           <button class="chip" data-filter="gpu_upgrade">🚀 Upgrade Grátis de GPU nos EUA</button>
           <button class="chip" data-filter="rtx4070">Com RTX 4070</button>
           <button class="chip" data-filter="rtx4060">Com RTX 4060</button>
+          <button class="chip" data-filter="battery_long">🔋 Bateria Longa (6h+ Uso Normal)</button>
+          <button class="chip" data-filter="ram_upgrade">🔄 Aceita Upgrade de RAM (2x SODIMM)</button>
+          <button class="chip" data-filter="ddr5">⚡ RAM DDR5 (Mais Rápida)</button>
+          <button class="chip" data-filter="m2_extra">💾 Slot M.2 NVMe Extra Livre</button>
           <button class="chip" data-filter="usbc_charging">🔌 Carrega por Type-C (USB-C PD)</button>
           <button class="chip" data-filter="biometrics">🔐 Com Leitor de Digital / Facial</button>
           <button class="chip" data-filter="rich_ports">⚡ Portas: USB-A + Type-C</button>
@@ -159,13 +163,15 @@
         <span>Ordenar por:</span>
         <select id="sortSelect">
           <option value="value_score">Melhor Custo-Benefício (Score)</option>
+          <option value="battery_desc">🔋 Maior Autonomia de Bateria (Uso Normal)</option>
+          <option value="ram_desc">🧠 Maior Memória RAM (32GB / 16GB)</option>
           <option value="price_br_asc">Menor Preço no Brasil (R$)</option>
           <option value="price_us_asc">Menor Preço nos EUA (US$)</option>
           <option value="diff_desc">Maior Economia trazendo dos EUA</option>
           <option value="gpu_power">Potência da GPU (TGP / Tier)</option>
         </select>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border: none; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);">⚡ Comparativo de Placas & Bateria</button>
+          <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border: none; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);">⚡ Guia: Placas, Bateria, RAM & SSD</button>
           <button class="btn btn-screenshot" id="btnOpenOcrModal">📸 Puxar por Print</button>
           <button class="btn btn-primary" id="btnOpenDuel">🥊 Duelo: Qual Vale Mais a Pena?</button>
           <button class="btn btn-secondary" id="btnOpenAddModal">➕ Novo Modelo</button>
@@ -427,7 +433,7 @@
         <div class="modal-header">
           <div>
             <span class="badge badge-warning">Guia Prático do Comprador</span>
-            <h3 class="modal-title">⚡ Comparativo de Placas de Vídeo, Bateria & Tipo de Carregador</h3>
+            <h3 class="modal-title">⚡ Guia Completo: Placas, Bateria, RAM & Armazenamento</h3>
           </div>
           <button class="btn-close" id="btnCloseGpuGuideModal">✕</button>
         </div>
@@ -436,6 +442,7 @@
           <div class="guide-tabs" id="guideTabsNav">
             <button class="guide-tab-btn active" data-tab="interactive">⚔️ Comparador Interativo de Placas</button>
             <button class="guide-tab-btn" data-tab="battery">🔋 Autonomia Real da Bateria</button>
+            <button class="guide-tab-btn" data-tab="ramstorage">💾 RAM (DDR5/Troca) & SSD/SATA</button>
             <button class="guide-tab-btn" data-tab="usbc">🔌 Carregador Type-C vs Pino Tradicional</button>
             <button class="guide-tab-btn" data-tab="nextgen">🔮 Próxima Geração (RTX Série 50)</button>
           </div>
@@ -584,6 +591,165 @@
                   <p>A arquitetura Ada Lovelace da RTX 40 já possui gerador de quadros por IA (Frame Gen) e suporte a Ray Tracing de 3ª geração. Uma RTX 4070 roda qualquer lançamento no Ultra pelos próximos 4 anos com folga.</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Aba 5: RAM (DDR5 vs DDR4 vs LPDDR5X) e Armazenamento (M.2 NVMe vs SATA) -->
+          <div class="guide-tab-pane" id="paneRamStorage" style="display: none;">
+            <div class="ram-storage-guide-box">
+              <div class="guide-alert-box">
+                <h4 style="color: var(--accent); margin-bottom: 0.4rem;">🧠 Legenda de Troca & Upgrades (RAM & Armazenamento):</h4>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.85rem;">
+                  <span><strong style="color: #34d399;">✅ Verde (Troca Total):</strong> 2x Slots SODIMM Removíveis (até 64GB) ou Slot M.2 Extra Livre</span>
+                  <span><strong style="color: #fbbf24;">⚠️ Amarelo (Parcial):</strong> 1 Slot Livre + Memória Soldada, ou Slot M.2 2230 menor</span>
+                  <span><strong style="color: #f87171;">❌ Vermelho (Sem Troca):</strong> 100% Soldada na Placa-Mãe (Não aceita upgrade)</span>
+                </div>
+              </div>
+
+              <h4 style="font-size: 1.05rem; color: var(--text-main); margin-top: 0.5rem;">
+                ⚡ 1. Tecnologias de Memória RAM: Qual a diferença?
+              </h4>
+              <div class="ram-comparison-grid">
+                <div class="ram-tech-card highlight">
+                  <span class="ram-tech-badge ddr5">DDR5 (Padrão Gamer Atual)</span>
+                  <div class="ram-speed-label">4800 a 5600 MHz</div>
+                  <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
+                    Padrão de alta velocidade com dois subcanais de 32 bits independentes por pente. Entrega até <strong>+50% de largura de banda</strong> para o processador comparado ao DDR4, mantendo os FPS mínimos mais estáveis.
+                  </p>
+                  <div style="font-size: 0.75rem; color: var(--accent); margin-top: auto; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 6px;">
+                    ✅ <strong>Vantagem:</strong> Usa pentes SODIMM removíveis (fácil upgrade até 64GB).
+                  </div>
+                </div>
+
+                <div class="ram-tech-card warning-soldered">
+                  <span class="ram-tech-badge lpddr5x">LPDDR5X (Ultrafinos / Estilo Mac)</span>
+                  <div class="ram-speed-label">7467 MHz</div>
+                  <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
+                    Velocidade absurda e baixo consumo elétrico, porém <strong>vem 100% SOLDADA na placa-mãe</strong>. Não existem slots físicos!
+                  </p>
+                  <div style="font-size: 0.75rem; color: #fbbf24; margin-top: auto; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 6px;">
+                    ❌ <strong>Atenção:</strong> Se comprar com 16GB, vai morrer com 16GB. Não aceita troca! (Ex: Zephyrus G16).
+                  </div>
+                </div>
+
+                <div class="ram-tech-card">
+                  <span class="ram-tech-badge ddr4">DDR4 (Geração Passada)</span>
+                  <div class="ram-speed-label">3200 MHz</div>
+                  <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
+                    Tecnologia de gerações anteriores (2020-2023). Mais barata, mas com menor largura de banda. Praticamente extinta em notebooks gamer modernos de R$ 8.000+.
+                  </p>
+                  <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: auto; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 6px;">
+                    ⚠️ Evite em compras novas acima de R$ 7.000.
+                  </div>
+                </div>
+              </div>
+
+              <h4 style="font-size: 1.05rem; color: var(--text-main); margin-top: 0.5rem;">
+                💾 2. Armazenamento: O que aconteceu com o HD SATA 2.5" e M.2 NVMe?
+              </h4>
+              <div class="storage-comparison-cards">
+                <div class="storage-card good">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="badge badge-accent">✅ Padrão Moderno</span>
+                    <strong style="font-size:0.95rem;">2x Slots M.2 NVMe PCIe 4.0</strong>
+                  </div>
+                  <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.4;">
+                    Todos os notebooks gamer atuais adotam <strong>dois slots M.2 NVMe</strong>.
+                  </p>
+                  <ul class="pros-cons-list">
+                    <li>✓ <strong>Velocidades brutais:</strong> 5.000 a 7.500 MB/s (14x mais rápido que qualquer SSD SATA).</li>
+                    <li>✓ <strong>Slot livre para 2º SSD:</strong> Você pode espetar um segundo SSD M.2 (1TB ou 2TB) a qualquer momento sem remover o original com o Windows!</li>
+                    <li>✓ Compacto no chassi: permite espaço para baterias maiores de 80Wh a 90Wh.</li>
+                  </ul>
+                </div>
+
+                <div class="storage-card legacy">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="badge badge-purple">⚠️ Descontinuado</span>
+                    <strong style="font-size:0.95rem;">Baia para HD / SSD SATA 2.5"</strong>
+                  </div>
+                  <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.4;">
+                    Praticamente <strong>nenhum notebook gamer moderno possui baia interna SATA de 2.5"</strong>.
+                  </p>
+                  <ul class="pros-cons-list">
+                    <li>❌ Espaço foi eliminado para caber baterias maiores e câmaras de vapor com tubos de cobre duplos.</li>
+                    <li>💡 <strong>Como usar meu HD antigo?</strong> Compre um case externo USB 3.0 (R$ 35) e ligue via USB como HD externo!</li>
+                  </ul>
+                </div>
+              </div>
+
+              <h4 style="font-size: 1.05rem; color: var(--text-main); margin-top: 0.5rem;">
+                📋 Matriz de Upgrades dos Notebooks Monitorados:
+              </h4>
+              <table class="upgrade-matrix-table">
+                <thead>
+                  <tr>
+                    <th>Notebook</th>
+                    <th>Troca de RAM?</th>
+                    <th>Tecnologia</th>
+                    <th>Slots M.2 (SSD)</th>
+                    <th>Uso Normal (Bateria)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Acer Predator Helios Neo 16</strong></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM até 64GB)</span></td>
+                    <td>DDR5 5600MHz</td>
+                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
+                    <td>~5.0h</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Lenovo Legion Slim 5</strong></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM até 64GB)</span></td>
+                    <td>DDR5 5600MHz</td>
+                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ ~7.5h (Top)</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>ASUS TUF Gaming A15</strong></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM até 64GB)</span></td>
+                    <td>DDR5 5600MHz</td>
+                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ ~8.0h (Top)</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Lenovo Legion Pro 5i</strong></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM - Já vem 32GB)</span></td>
+                    <td>DDR5 5600MHz</td>
+                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
+                    <td>~4.5h</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Acer Nitro 16</strong></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM)</span></td>
+                    <td>DDR5 4800MHz</td>
+                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ ~6.0h</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Dell G16 7630</strong></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM)</span></td>
+                    <td>DDR5 4800MHz</td>
+                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
+                    <td>~4.0h</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Dell G15 5530</strong></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM)</span></td>
+                    <td>DDR5 4800MHz</td>
+                    <td><span style="color:#fbbf24; font-weight:700;">⚠️ 2x M.2 (2º slot precisa suporte Dell)</span></td>
+                    <td>~3.5h</td>
+                  </tr>
+                  <tr>
+                    <td><strong>ASUS ROG Zephyrus G16</strong></td>
+                    <td><span style="color:#f87171; font-weight:700;">❌ Não Aceita Troca (100% Soldada)</span></td>
+                    <td>LPDDR5X 7467MHz</td>
+                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">✅ ~8.5h (Top)</span></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 

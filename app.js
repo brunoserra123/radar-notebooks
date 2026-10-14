@@ -15,10 +15,21 @@ const DEFAULT_LAPTOPS = [
     gpuTier: 'mid-high',
     cpu: 'Intel Core i7-14700HX (20 Cores, 28 Threads)',
     ram: '16GB DDR5 5600MHz (Expansível até 64GB)',
+    ramType: 'DDR5',
+    ramSpeed: '5600MHz',
+    ramUpgradeStatus: 'full', // 'full' = ✅ Verde, 'partial' = ⚠️ Amarelo, 'none' = ❌ Vermelho
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM até 64GB)',
     storage: '1TB SSD NVMe M.2 Gen4',
+    storageType: 'M.2 NVMe',
+    storageUpgradeStatus: 'full',
+    storageUpgradeLabel: '✅ +1 Slot M.2 Gen4 Livre',
+    storageSlots: '2x Slots M.2 NVMe PCIe 4.0 (1 ocupado 1TB + 1 slot livre para 2º SSD) • Sem baia SATA',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
     screen: '16" WQXGA (2560x1600) 165Hz, 100% sRGB, 400 nits, G-Sync',
     cooling: 'Liquid Metal + Dual 5th Gen AeroBlade 3D Fans',
     battery: '90Wh (~5h escritório / 1.1h game)',
+    batteryHoursNormal: 5.0,
     hasUsbCCharging: true,
     chargingInfo: '⚡ Suporta carregamento USB-C Power Delivery 100W + Fonte de mesa 330W',
     hasBiometrics: false,
@@ -47,10 +58,21 @@ const DEFAULT_LAPTOPS = [
     gpuTier: 'high',
     cpu: 'Intel Core i7-13650HX (14 Cores)',
     ram: '16GB DDR5 4800MHz',
+    ramType: 'DDR5',
+    ramSpeed: '4800MHz',
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM)',
     storage: '1TB SSD NVMe M.2 Gen4',
+    storageType: 'M.2 NVMe',
+    storageUpgradeStatus: 'full',
+    storageUpgradeLabel: '✅ +1 Slot M.2 Gen4 Livre',
+    storageSlots: '2x Slots M.2 NVMe PCIe 4.0 (1 ocupado 1TB + 1 slot livre) • Sem baia SATA',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
     screen: '16" QHD+ (2560x1600) 240Hz, 100% DCI-P3, 300 nits',
     cooling: 'Vapor Chamber inspirada na Alienware + 4 saídas de ar',
     battery: '86Wh (~4h escritório / 1h game)',
+    batteryHoursNormal: 4.0,
     hasUsbCCharging: false,
     chargingInfo: '🔌 Apenas plugue redondo tradicional Dell (240W/330W). Porta Type-C NÃO carrega o note',
     hasBiometrics: false,
@@ -79,10 +101,21 @@ const DEFAULT_LAPTOPS = [
     gpuTier: 'mid-high',
     cpu: 'AMD Ryzen 7 7840HS / 8845HS (Eficiência térmica e bateria top)',
     ram: '16GB DDR5 5600MHz (Slots livres)',
+    ramType: 'DDR5',
+    ramSpeed: '5600MHz',
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM até 64GB)',
     storage: '1TB SSD NVMe M.2',
+    storageType: 'M.2 NVMe',
+    storageUpgradeStatus: 'full',
+    storageUpgradeLabel: '✅ +1 Slot M.2 2280 Livre',
+    storageSlots: '2x Slots M.2 2280 NVMe Gen4 (1 ocupado 1TB + 1 slot 2280 livre) • Sem SATA',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
     screen: '16" WQXGA (2560x1600) 165Hz, 100% sRGB, 350 nits',
     cooling: 'Legion ColdFront 5.0 (Silencioso e robusto)',
     battery: '80Wh (~7.5h escritório c/ Ryzen / 1.2h game)',
+    batteryHoursNormal: 7.5,
     hasUsbCCharging: true,
     chargingInfo: '⚡ Suporta recarga ultrarrápida USB-C 140W PD (levar carregador de celular na mochila) + Fonte Slim 230W',
     hasBiometrics: true,
@@ -111,10 +144,21 @@ const DEFAULT_LAPTOPS = [
     gpuTier: 'high',
     cpu: 'AMD Ryzen 9 8945HS (Com NPU AI dedicada)',
     ram: '16GB DDR5 5600MHz',
+    ramType: 'DDR5',
+    ramSpeed: '5600MHz',
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM até 64GB)',
     storage: '1TB SSD NVMe',
+    storageType: 'M.2 NVMe',
+    storageUpgradeStatus: 'full',
+    storageUpgradeLabel: '✅ +1 Slot M.2 2280 Livre',
+    storageSlots: '2x Slots M.2 2280 NVMe Gen4 (1 ocupado 1TB + 1 slot livre) • Sem SATA',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
     screen: '15.6" WQHD (2560x1440) 165Hz, 100% DCI-P3, G-Sync',
     cooling: 'Dual Arc Flow Fans + 5 Heatpipes',
     battery: '90Wh Bateria Enorme (~8h escritório c/ Ryzen 9 / 1.5h game)',
+    batteryHoursNormal: 8.0,
     hasUsbCCharging: true,
     chargingInfo: '⚡ Aceita carregador USB-C Power Delivery 100W + Fonte de mesa 240W',
     hasBiometrics: false,
@@ -143,10 +187,21 @@ const DEFAULT_LAPTOPS = [
     gpuTier: 'high',
     cpu: 'Intel Core i7-14700HX',
     ram: '32GB DDR5 5600MHz (Já vem com 32GB)',
+    ramType: 'DDR5',
+    ramSpeed: '5600MHz',
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM - Já vem 32GB)',
     storage: '1TB SSD NVMe Gen4',
+    storageType: 'M.2 NVMe',
+    storageUpgradeStatus: 'full',
+    storageUpgradeLabel: '✅ +1 Slot M.2 2280 c/ Dissipador',
+    storageSlots: '2x Slots M.2 2280 PCIe 4.0 (1 ocupado 1TB + 1 slot 2280 livre com dissipador) • Sem SATA',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
     screen: '16" 240Hz WQXGA, 500 nits, DisplayHDR 400, 100% sRGB',
     cooling: 'Coldfront com câmara de vapor e IA Lenovo Vantage',
     battery: '80Wh (~4.5h escritório / 1h game)',
+    batteryHoursNormal: 4.5,
     hasUsbCCharging: true,
     chargingInfo: '⚡ Suporta recarga rápida USB-C 140W PD (carrega na faculdade ou trabalho) + Fonte 300W',
     hasBiometrics: false,
@@ -175,10 +230,21 @@ const DEFAULT_LAPTOPS = [
     gpuTier: 'mid-high',
     cpu: 'AMD Ryzen 7 7735HS (8 Cores)',
     ram: '16GB DDR5 4800MHz',
+    ramType: 'DDR5',
+    ramSpeed: '4800MHz',
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM)',
     storage: '512GB / 1TB SSD NVMe',
+    storageType: 'M.2 NVMe',
+    storageUpgradeStatus: 'full',
+    storageUpgradeLabel: '✅ +1 Slot M.2 Gen4 Livre',
+    storageSlots: '2x Slots M.2 NVMe Gen4 (1 ocupado + 1 slot livre) • Sem SATA',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
     screen: '16" WUXGA (1920x1200) 165Hz, 100% sRGB, 400 nits',
     cooling: 'Liquid Metal na CPU + 4 saídas de exaustão',
     battery: '90Wh (~6h escritório / 1.1h game)',
+    batteryHoursNormal: 6.0,
     hasUsbCCharging: true,
     chargingInfo: '⚡ Suporta USB-C 100W PD + Fonte 230W',
     hasBiometrics: false,
@@ -206,11 +272,22 @@ const DEFAULT_LAPTOPS = [
     gpuTgp: '105W (Perfil Fino / Ultrabook Gamer)',
     gpuTier: 'high',
     cpu: 'Intel Core Ultra 7 155H (Meteor Lake AI)',
-    ram: '16GB LPDDR5X 7467MHz',
+    ram: '16GB LPDDR5X 7467MHz (Soldada)',
+    ramType: 'LPDDR5X',
+    ramSpeed: '7467MHz',
+    ramUpgradeStatus: 'none',
+    ramUpgradeLabel: '❌ Não Aceita Troca (100% Soldada na Placa)',
     storage: '1TB NVMe PCIe 4.0',
+    storageType: 'M.2 NVMe',
+    storageUpgradeStatus: 'full',
+    storageUpgradeLabel: '✅ +1 Slot M.2 2280 Livre',
+    storageSlots: '2x Slots M.2 2280 PCIe 4.0 (1 ocupado 1TB + 1 slot livre) • Sem SATA',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
     screen: '16" OLED 2.5K (240Hz, 0.2ms, 100% DCI-P3, HDR True Black 500)',
     cooling: 'Tri-Fan Technology com metal líquido e câmara',
     battery: '90Wh (~8.5h escritório c/ Intel Ultra / 1.5h game)',
+    batteryHoursNormal: 8.5,
     hasUsbCCharging: true,
     chargingInfo: '⚡ Suporta recarga USB-C 100W Type-C portátil + Conector ASUS Slim 200W/240W',
     hasBiometrics: true,
@@ -239,10 +316,21 @@ const DEFAULT_LAPTOPS = [
     gpuTier: 'mid-high',
     cpu: 'Intel Core i7-13650HX',
     ram: '16GB DDR5 4800MHz',
+    ramType: 'DDR5',
+    ramSpeed: '4800MHz',
+    ramUpgradeStatus: 'full',
+    ramUpgradeLabel: '✅ Aceita Troca (2x Slots SODIMM)',
     storage: '512GB SSD NVMe',
+    storageType: 'M.2 NVMe',
+    storageUpgradeStatus: 'partial',
+    storageUpgradeLabel: '⚠️ 2º Slot M.2 (Requer Suporte Dell)',
+    storageSlots: '2x Slots M.2 (1 slot ocupado + 1 slot 2230/2280 requer suporte metálico Dell) • Sem SATA',
+    hasExtraM2Slot: true,
+    hasSataBay: false,
     screen: '15.6" FHD (1920x1080) 165Hz, 100% sRGB, 300 nits',
     cooling: 'Design Alienware dual-fan',
     battery: '56Wh (~3.5h escritório / 50min game)',
+    batteryHoursNormal: 3.5,
     hasUsbCCharging: false,
     chargingInfo: '🔌 Apenas plugue convencional redondo Dell (240W). Não carrega por Type-C',
     hasBiometrics: false,
@@ -285,7 +373,7 @@ function loadData() {
   if (savedLaptops) {
     try {
       const parsed = JSON.parse(savedLaptops);
-      // Mesclar propriedades novas (battery, ports, biometrics, hasUsbCCharging) caso venham do DEFAULT_LAPTOPS
+      // Mesclar propriedades novas (battery, ports, biometrics, hasUsbCCharging, ramUpgrade, storage) caso venham do DEFAULT_LAPTOPS
       laptops = parsed.map(item => {
         const def = DEFAULT_LAPTOPS.find(d => d.id === item.id);
         if (def) {
@@ -293,11 +381,22 @@ function loadData() {
             ...def,
             ...item,
             battery: item.battery || def.battery,
+            batteryHoursNormal: item.batteryHoursNormal !== undefined ? item.batteryHoursNormal : def.batteryHoursNormal,
             hasUsbCCharging: item.hasUsbCCharging !== undefined ? item.hasUsbCCharging : def.hasUsbCCharging,
             chargingInfo: item.chargingInfo || def.chargingInfo,
             hasBiometrics: item.hasBiometrics !== undefined ? item.hasBiometrics : def.hasBiometrics,
             biometrics: item.biometrics || def.biometrics,
-            ports: item.ports || def.ports
+            ports: item.ports || def.ports,
+            ramType: item.ramType || def.ramType,
+            ramSpeed: item.ramSpeed || def.ramSpeed,
+            ramUpgradeStatus: item.ramUpgradeStatus || def.ramUpgradeStatus,
+            ramUpgradeLabel: item.ramUpgradeLabel || def.ramUpgradeLabel,
+            storageType: item.storageType || def.storageType,
+            storageUpgradeStatus: item.storageUpgradeStatus || def.storageUpgradeStatus,
+            storageUpgradeLabel: item.storageUpgradeLabel || def.storageUpgradeLabel,
+            storageSlots: item.storageSlots || def.storageSlots,
+            hasExtraM2Slot: item.hasExtraM2Slot !== undefined ? item.hasExtraM2Slot : def.hasExtraM2Slot,
+            hasSataBay: item.hasSataBay !== undefined ? item.hasSataBay : def.hasSataBay
           };
         }
         return item;
@@ -903,6 +1002,29 @@ window.savePriceAlert = function(laptopId) {
   }
 };
 
+// Badges Visuais de Troca & Upgrade: Verde (✅), Amarelo (⚠️), Vermelho (❌)
+function renderRamUpgradeBadge(laptop) {
+  const status = laptop.ramUpgradeStatus || (laptop.ram && laptop.ram.toLowerCase().includes('soldada') ? 'none' : 'full');
+  if (status === 'full') {
+    return `<span class="badge" style="background:rgba(16, 185, 129, 0.15); color:#34d399; border:1px solid rgba(16, 185, 129, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">✅ Aceita Troca (2x SODIMM)</span>`;
+  } else if (status === 'partial') {
+    return `<span class="badge" style="background:rgba(245, 158, 11, 0.15); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">⚠️ Troca Parcial (Híbrido)</span>`;
+  } else {
+    return `<span class="badge" style="background:rgba(239, 68, 68, 0.15); color:#f87171; border:1px solid rgba(239, 68, 68, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">❌ Não Aceita Troca (Soldada)</span>`;
+  }
+}
+
+function renderStorageUpgradeBadge(laptop) {
+  const status = laptop.storageUpgradeStatus || (laptop.storageSlots && laptop.storageSlots.includes('suporte') ? 'partial' : 'full');
+  if (status === 'full') {
+    return `<span class="badge" style="background:rgba(16, 185, 129, 0.15); color:#34d399; border:1px solid rgba(16, 185, 129, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">✅ +1 Slot M.2 Livre</span>`;
+  } else if (status === 'partial') {
+    return `<span class="badge" style="background:rgba(245, 158, 11, 0.15); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">⚠️ 2º Slot M.2 c/ Suporte</span>`;
+  } else {
+    return `<span class="badge" style="background:rgba(239, 68, 68, 0.15); color:#f87171; border:1px solid rgba(239, 68, 68, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">❌ Apenas 1 Slot M.2</span>`;
+  }
+}
+
 // Renderização Principal do Grid
 function render() {
   const grid = document.getElementById('notebookGrid');
@@ -920,7 +1042,10 @@ function render() {
       (laptop.ports && laptop.ports.toLowerCase().includes(query)) ||
       (laptop.biometrics && laptop.biometrics.toLowerCase().includes(query)) ||
       (laptop.chargingInfo && laptop.chargingInfo.toLowerCase().includes(query)) ||
-      (laptop.battery && laptop.battery.toLowerCase().includes(query));
+      (laptop.battery && laptop.battery.toLowerCase().includes(query)) ||
+      (laptop.ram && laptop.ram.toLowerCase().includes(query)) ||
+      (laptop.storage && laptop.storage.toLowerCase().includes(query)) ||
+      (laptop.storageSlots && laptop.storageSlots.toLowerCase().includes(query));
 
     if (!matchQuery) return false;
 
@@ -946,6 +1071,18 @@ function render() {
     }
     if (currentFilter === 'rtx4060') {
       return laptop.gpu.includes('4060');
+    }
+    if (currentFilter === 'battery_long') {
+      return (laptop.batteryHoursNormal !== undefined && laptop.batteryHoursNormal >= 6);
+    }
+    if (currentFilter === 'ram_upgrade') {
+      return (laptop.ramUpgradeStatus === 'full');
+    }
+    if (currentFilter === 'ddr5') {
+      return (laptop.ramType === 'DDR5' || (laptop.ram && laptop.ram.includes('DDR5')));
+    }
+    if (currentFilter === 'm2_extra') {
+      return (laptop.storageUpgradeStatus === 'full' || (laptop.storageSlots && laptop.storageSlots.toLowerCase().includes('livre')));
     }
     if (currentFilter === 'usbc_charging') {
       return laptop.hasUsbCCharging === true || (laptop.chargingInfo && laptop.chargingInfo.includes('USB-C'));
@@ -973,6 +1110,10 @@ function render() {
     switch (currentSort) {
       case 'value_score':
         return b.score - a.score;
+      case 'battery_desc':
+        return (b.batteryHoursNormal || 4) - (a.batteryHoursNormal || 4);
+      case 'ram_desc':
+        return (parseInt(b.ram) || 16) - (parseInt(a.ram) || 16);
       case 'price_br_asc':
         return a.priceBr - b.priceBr;
       case 'price_us_asc':
@@ -1058,17 +1199,27 @@ function render() {
             <span class="spec-value">${laptop.cpu.split('(')[0]}</span>
           </div>
           <div class="spec-item">
-            <span class="spec-label">Memória RAM</span>
-            <span class="spec-value">${laptop.ram.split('(')[0]}</span>
+            <span class="spec-label">Memória RAM & Tecnologia</span>
+            <span class="spec-value">
+              <div>${laptop.ram.split('(')[0]} <small style="color:var(--accent); font-weight:700;">(${laptop.ramType || 'DDR5'} ${laptop.ramSpeed || ''})</small></div>
+              <div style="margin-top: 4px;">
+                ${renderRamUpgradeBadge(laptop)}
+              </div>
+            </span>
           </div>
           <div class="spec-item">
-            <span class="spec-label">Armazenamento</span>
-            <span class="spec-value">${laptop.storage}</span>
+            <span class="spec-label">Armazenamento (SSD / HD)</span>
+            <span class="spec-value">
+              <div>${laptop.storage}</div>
+              <div style="margin-top: 4px;">
+                ${renderStorageUpgradeBadge(laptop)}
+              </div>
+            </span>
           </div>
           <div class="screen-highlight">
             🖥️ <strong>Tela:</strong> ${laptop.screen}
           </div>
-          <div class="card-extra-row" style="grid-column: span 2; display: flex; flex-direction: column; gap: 4px; font-size: 0.76rem; background: rgba(0, 0, 0, 0.25); padding: 6px 8px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.04);">
+          <div class="card-extra-row" style="grid-column: span 2; display: flex; flex-direction: column; gap: 5px; font-size: 0.76rem; background: rgba(0, 0, 0, 0.25); padding: 7px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.04);">
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
               <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">🔌 <strong>Portas:</strong> ${laptop.ports || 'USB-C + USB-A'}</span>
               <span class="badge ${laptop.hasUsbCCharging ? 'badge-accent' : 'badge-purple'}" style="font-size:0.68rem; padding: 1px 6px; white-space: nowrap;">
@@ -1076,10 +1227,17 @@ function render() {
               </span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
-              <span>🔋 <strong>Bateria:</strong> ${laptop.battery || '80Wh (~4h)'}</span>
-              <span style="color: ${laptop.hasBiometrics ? 'var(--accent)' : 'var(--text-dim)'}; font-weight: 600; font-size: 0.72rem; white-space: nowrap;">
-                ${laptop.biometrics ? laptop.biometrics.split('(')[0] : '❌ Sem Digital'}
+              <span>
+                ${(laptop.batteryHoursNormal >= 6) ? '✅' : ((laptop.batteryHoursNormal >= 4) ? '⚠️' : '❌')} 
+                <strong>Uso Normal:</strong> ~${laptop.batteryHoursNormal || 4}h <small style="color:var(--text-muted);">(Chrome/Estudo)</small> • <small style="color:var(--text-dim);">🎮 ~1h game</small>
               </span>
+              <span class="badge ${(laptop.batteryHoursNormal >= 6) ? 'badge-accent' : ((laptop.batteryHoursNormal >= 4) ? 'badge-cyan' : 'badge-purple')}" style="font-size:0.68rem; padding: 1px 6px; white-space: nowrap;">
+                ${(laptop.batteryHoursNormal >= 6) ? '🔋 Autonomia Top' : ((laptop.batteryHoursNormal >= 4) ? '⚠️ Moderada' : '❌ Foco Tomada')}
+              </span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 3px;">
+              <span style="color:var(--text-muted);">🔐 <strong>Biometria:</strong> ${laptop.biometrics ? laptop.biometrics.split('(')[0] : '❌ Sem Digital'}</span>
+              <span style="color:var(--text-dim); font-size:0.7rem;">💾 Sem baia interna SATA</span>
             </div>
           </div>
         </div>
@@ -1309,9 +1467,10 @@ function renderDuel() {
         <div style="font-size:0.82rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px;">
           <div>🧠 <strong>Processador:</strong> ${lapBr.cpu.split('(')[0]}</div>
           <div>🖥️ <strong>Tela:</strong> ${lapBr.screen}</div>
-          <div>💾 <strong>RAM & Armazenamento:</strong> ${lapBr.ram.split('(')[0]} | ${lapBr.storage}</div>
+          <div>💾 <strong>RAM:</strong> ${lapBr.ram.split('(')[0]} ${renderRamUpgradeBadge(lapBr)}</div>
+          <div>💾 <strong>Armazenamento:</strong> ${lapBr.storage} ${renderStorageUpgradeBadge(lapBr)}</div>
           <div>🔌 <strong>Portas:</strong> ${lapBr.ports || 'USB-C + USB-A'}</div>
-          <div>🔋 <strong>Bateria:</strong> ${lapBr.battery || '80Wh'} (${lapBr.hasUsbCCharging ? '⚡ Aceita Type-C' : '🔌 Só Pino Redondo'})</div>
+          <div>🔋 <strong>Bateria Uso Normal:</strong> ~${lapBr.batteryHoursNormal || 4}h (${lapBr.hasUsbCCharging ? '⚡ Aceita Type-C' : '🔌 Só Pino Redondo'})</div>
           <div>🔐 <strong>Biometria:</strong> ${lapBr.biometrics || '❌ Apenas Senha'}</div>
         </div>
 
@@ -1369,9 +1528,10 @@ function renderDuel() {
         <div style="font-size:0.82rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px;">
           <div>🧠 <strong>Processador:</strong> ${lapUs.cpu.split('(')[0]}</div>
           <div>🖥️ <strong>Tela:</strong> ${lapUs.screen}</div>
-          <div>💾 <strong>RAM & Armazenamento:</strong> ${lapUs.ram.split('(')[0]} | ${lapUs.storage}</div>
+          <div>💾 <strong>RAM:</strong> ${lapUs.ram.split('(')[0]} ${renderRamUpgradeBadge(lapUs)}</div>
+          <div>💾 <strong>Armazenamento:</strong> ${lapUs.storage} ${renderStorageUpgradeBadge(lapUs)}</div>
           <div>🔌 <strong>Portas:</strong> ${lapUs.ports || 'USB-C + USB-A'}</div>
-          <div>🔋 <strong>Bateria:</strong> ${lapUs.battery || '80Wh'} (${lapUs.hasUsbCCharging ? '⚡ Aceita Type-C' : '🔌 Só Pino Redondo'})</div>
+          <div>🔋 <strong>Bateria Uso Normal:</strong> ~${lapUs.batteryHoursNormal || 4}h (${lapUs.hasUsbCCharging ? '⚡ Aceita Type-C' : '🔌 Só Pino Redondo'})</div>
           <div>🔐 <strong>Biometria:</strong> ${lapUs.biometrics || '❌ Apenas Senha'}</div>
         </div>
 
@@ -2037,7 +2197,8 @@ function initGpuGuideModal() {
       const targetPane = document.getElementById(
         targetTab === 'interactive' ? 'paneInteractive' :
         (targetTab === 'battery' ? 'paneBattery' :
-        (targetTab === 'usbc' ? 'paneUsbc' : 'paneNextGen'))
+        (targetTab === 'ramstorage' ? 'paneRamStorage' :
+        (targetTab === 'usbc' ? 'paneUsbc' : 'paneNextGen')))
       );
       if (targetPane) {
         targetPane.style.display = 'block';
