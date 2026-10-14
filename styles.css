@@ -1158,63 +1158,165 @@ select {
   min-height: 40px;
 }
 
-/* Telas dobráveis / Fold aberto (650px a 980px) */
-@media (min-width: 650px) and (max-width: 980px) {
-  .main-content {
-    padding: 1.25rem 1rem;
+/* ============================================================
+   PERFIL DE ALTA PRECISÃO: SAMSUNG GALAXY Z FOLD 6
+   Tela Interna: 7.6" (20.9:18, ~754px de largura útil em pé)
+   Tela Externa: 6.3" (22.1:9, ~405px de largura fechado)
+   ============================================================ */
+
+/* Tela Interna Aberta do Galaxy Z Fold 6 (700px a 940px) */
+@media (min-width: 680px) and (max-width: 960px) {
+  :root {
+    --radius-md: 16px;
+    --radius-lg: 22px;
   }
 
+  body {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .main-content {
+    padding: 1rem 0.85rem;
+    max-width: 100%;
+  }
+
+  /* Cabeçalho do Fold 6: Distribuído sem amassar */
+  .header-container {
+    gap: 0.75rem;
+  }
+
+  .currency-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    width: 100%;
+  }
+
+  .currency-item {
+    font-size: 0.78rem;
+  }
+
+  .currency-item select, 
+  .currency-input-wrap input {
+    font-size: 0.82rem;
+  }
+
+  /* Banner de Orçamento no Fold 6 */
   .spotlight-card {
     grid-template-columns: 1fr;
-    padding: 1.25rem;
+    padding: 1.25rem 1.15rem;
     gap: 1rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .spotlight-info h2 {
+    font-size: 1.35rem;
   }
 
   .spotlight-stats {
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .stat-box {
-    padding: 0.75rem;
+    padding: 0.65rem;
+  }
+
+  .stat-label {
+    font-size: 0.68rem;
   }
 
   .stat-value {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
   }
 
-  /* 2 colunas perfeitas na tela aberta do Fold */
+  /* Catálogo: 2 Colunas Perfeitas lado a lado no Fold 6 */
   .notebook-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 0.85rem;
   }
 
   .laptop-card {
-    padding: 1rem;
+    padding: 0.95rem;
+    border-radius: var(--radius-md);
   }
 
-  /* No Fold, o duelo fica lado a lado */
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .specs-block {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+    padding: 0.65rem;
+  }
+
+  .spec-label {
+    font-size: 0.65rem;
+  }
+
+  .spec-value {
+    font-size: 0.78rem;
+  }
+
+  .price-val {
+    font-size: 0.98rem;
+  }
+
+  /* Modal de Duelo no Fold 6: 2 Colunas Lado a Lado Estilo One UI */
+  .modal-dialog.modal-large {
+    max-width: 95vw;
+    max-height: 88vh;
+    border-radius: var(--radius-lg);
+  }
+
   .duel-cards-grid {
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
   }
 
+  .duel-card {
+    padding: 0.95rem;
+  }
+
   .duel-selector-bar {
-    padding: 0.75rem;
-    gap: 0.5rem;
+    padding: 0.75rem 0.85rem;
+    gap: 0.6rem;
+  }
+
+  .duel-select-group select {
+    font-size: 0.8rem;
+    padding: 6px 8px;
+  }
+
+  .duel-vs-circle {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+  }
+
+  .card-actions {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .card-actions .btn {
+    padding: 0.45rem 0.65rem;
+    font-size: 0.78rem;
   }
 }
 
-/* Telas dobráveis com Fold fechado / smartphones comuns (< 650px) */
-@media (max-width: 649px) {
+/* Tela Externa Fechada do Galaxy Z Fold 6 (< 680px) */
+@media (max-width: 679px) {
   .main-content {
-    padding: 1rem 0.75rem;
+    padding: 0.85rem 0.65rem;
   }
 
   .spotlight-card {
     grid-template-columns: 1fr;
-    padding: 1rem;
-    gap: 1rem;
+    padding: 1rem 0.85rem;
+    gap: 0.85rem;
   }
 
   .spotlight-stats {
@@ -1224,6 +1326,7 @@ select {
 
   .notebook-grid {
     grid-template-columns: 1fr;
+    gap: 0.85rem;
   }
 
   .duel-selector-bar {
@@ -1238,6 +1341,7 @@ select {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
+    gap: 0.6rem;
   }
 
   .sort-bar {
