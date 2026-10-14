@@ -2231,15 +2231,27 @@ function switchViewMode(mode) {
   currentViewMode = mode;
   const btnCards = document.getElementById('btnViewCards');
   const btnTable = document.getElementById('btnViewTable');
+  const quickBtn = document.getElementById('btnQuickTableToggle');
 
   if (mode === 'cards') {
     if (btnCards) btnCards.classList.add('active');
     if (btnTable) btnTable.classList.remove('active');
+    if (quickBtn) quickBtn.innerHTML = '📊 Ver em Tabela / Lista';
   } else {
     if (btnTable) btnTable.classList.add('active');
     if (btnCards) btnCards.classList.remove('active');
+    if (quickBtn) quickBtn.innerHTML = '🎴 Ver em Cards';
   }
   render();
+}
+
+function toggleViewMode() {
+  const nextMode = (currentViewMode === 'table') ? 'cards' : 'table';
+  switchViewMode(nextMode);
+  if (nextMode === 'table') {
+    const el = document.getElementById('notebookTableContainer');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 // Notificação Toast não-bloqueante
@@ -2277,6 +2289,7 @@ function showToastNotification(message) {
 window.saveOcrParsedLaptop = saveOcrParsedLaptop;
 window.openManualOcrForm = openManualOcrForm;
 window.switchViewMode = switchViewMode;
+window.toggleViewMode = toggleViewMode;
 window.showToastNotification = showToastNotification;
 
 // ==========================================
