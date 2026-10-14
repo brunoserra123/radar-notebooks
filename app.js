@@ -1016,6 +1016,31 @@ function renderRamUpgradeBadge(laptop) {
   }
 }
 
+// Conta portas USB-A e USB-C a partir do texto de portas (ex: "2x USB-C ... + 3x USB-A ...")
+function countPorts(ports) {
+  const txt = (ports || '').replace(/\([^)]*\)/g, ''); // ignora detalhamento entre parênteses
+  const sumMatches = (re) => {
+    let total = 0, m;
+    while ((m = re.exec(txt)) !== null) total += parseInt(m[1] || '1', 10);
+    return total;
+  };
+  const usbA = sumMatches(/(?:(\d+)\s*x\s*)?USB-A/gi);
+  const usbC = sumMatches(/(?:(\d+)\s*x\s*)?USB-C/gi);
+  return { usbA, usbC };
+}
+
+// Badge: precisa de dongle (adaptador) ou não?
+function renderPortsBadge(laptop) {
+  const { usbA, usbC } = countPorts(laptop.ports);
+  const base = 'font-size:0.74rem; padding:3px 8px; font-weight:800; border-radius:4px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;';
+  if (usbA >= 2) {
+    return `<span class="badge" style="${base} background:rgba(16,185,129,0.22); color:#34d399; border:1px solid rgba(16,185,129,0.55);">✅ ${usbA}x USB-A + ${usbC}x USB-C • Não precisa de dongle</span>`;
+  } else if (usbA === 1) {
+    return `<span class="badge" style="${base} background:rgba(245,158,11,0.22); color:#fbbf24; border:1px solid rgba(245,158,11,0.55);">⚠️ Só 1x USB-A + ${usbC}x USB-C • Dongle recomendado</span>`;
+  }
+  return `<span class="badge" style="${base} background:rgba(239,68,68,0.22); color:#f87171; border:1px solid rgba(239,68,68,0.55);">❌ Só USB-C (${usbC}x) • Precisa de dongle/hub</span>`;
+}
+
 function renderStorageUpgradeBadge(laptop) {
   const status = laptop.storageUpgradeStatus || (laptop.storageSlots && laptop.storageSlots.includes('suporte') ? 'partial' : 'full');
   if (status === 'full') {
@@ -1094,6 +1119,9 @@ function render() {
     }
     if (currentFilter === 'biometrics') {
       return laptop.hasBiometrics === true || (laptop.biometrics && !laptop.biometrics.includes('❌'));
+    }
+    if (currentFilter === 'no_dongle') {
+      return countPorts(laptop.ports).usbA >= 2;
     }
     if (currentFilter === 'rich_ports') {
       return laptop.ports && laptop.ports.includes('USB-C') && laptop.ports.includes('USB-A');
@@ -1266,6 +1294,9 @@ function render() {
           </div>
 
           <div class="card-extra-row">
+            <div class="extra-row-item">
+              ${renderPortsBadge(laptop)}
+            </div>
             <div class="extra-row-item">
               <span>🔌 <strong>Portas:</strong> ${laptop.ports || 'USB-C + USB-A + HDMI 2.1'}</span>
               <span class="badge ${laptop.hasUsbCCharging ? 'badge-accent' : 'badge-purple'}" style="font-size:0.72rem; padding: 2px 8px; white-space: nowrap;">
@@ -1461,6 +1492,7 @@ function renderTable(filteredLaptops) {
                   ~${laptop.batteryHoursNormal || 4}h
                 </div>
                 <div style="font-size:0.72rem; color:var(--text-muted);">${laptop.hasUsbCCharging ? '⚡ USB-C PD' : '🔌 Pino'}</div>
+                <div style="margin-top:4px;">${renderPortsBadge(laptop)}</div>
               </td>
               <td>
                 <div class="table-price-br">R$ ${laptop.priceBr.toLocaleString('pt-BR')}</div>
