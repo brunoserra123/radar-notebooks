@@ -105,6 +105,57 @@
       </div>
     </section>
 
+    <!-- Checklist de Ouro do Comprador: O que Levar em Consideração -->
+    <section class="buyer-checklist-section" id="buyerChecklistSection">
+      <div class="buyer-checklist-card">
+        <div class="checklist-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="badge badge-warning" style="font-size:0.75rem; padding: 4px 10px;">🚨 Lembrete de Ouro do Comprador</span>
+            <h3 style="font-size: 1.05rem; margin:0; color: #fff;">O que você DEVE levar em consideração antes de comprar:</h3>
+          </div>
+          <button type="button" class="btn-toggle-checklist" onclick="window.toggleChecklist()" id="btnToggleChecklist" title="Minimizar / Expandir Lembrete">▾ Recolher</button>
+        </div>
+
+        <div class="checklist-grid" id="checklistGrid">
+          <!-- Item 1: Placa Dedicada vs Integrada -->
+          <div class="checklist-item alert-critical">
+            <div class="check-icon">🚨</div>
+            <div class="check-content">
+              <strong>1. Exija Placa DEDICADA (NVIDIA RTX 4060 ou 4070)</strong>
+              <p>Nunca compre se o anúncio falar apenas <em>"Gráficos Intel Iris Xe"</em>, <em>"Intel UHD"</em> ou <em>"Radeon Graphics"</em>. Isso é <strong>placa integrada</strong> da CPU e <strong>NÃO roda jogos pesados</strong>. Exija chip físico NVIDIA RTX com 140W!</p>
+            </div>
+          </div>
+
+          <!-- Item 2: TGP Watts -->
+          <div class="checklist-item highlight-power">
+            <div class="check-icon">⚡</div>
+            <div class="check-content">
+              <strong>2. Confira o TGP (Watts da Placa)</strong>
+              <p>O nome da placa não é tudo: uma <strong>RTX 4060 com 140W</strong> de potência máxima bate até uma RTX 4070 se ela for capada a 75W ou 100W. Todos os modelos recomendados no nosso Radar têm 140W de potência máxima.</p>
+            </div>
+          </div>
+
+          <!-- Item 3: RAM Soldada vs Removível -->
+          <div class="checklist-item warning-ram">
+            <div class="check-icon">🧠</div>
+            <div class="check-content">
+              <strong>3. RAM Soldada vs Slots Livres para Troca</strong>
+              <p>Notebooks ultrafinos com memória <strong>LPDDR5X vêm 100% soldados na placa</strong> (não dá para trocar nunca). Se quiser fazer upgrade para 32GB ou 64GB no futuro, escolha modelos com <strong>2x SODIMM removíveis</strong> (Legion, TUF, Helios).</p>
+            </div>
+          </div>
+
+          <!-- Item 4: Peso & Viagem de Avião -->
+          <div class="checklist-item tip-travel">
+            <div class="check-icon">⚖️</div>
+            <div class="check-content">
+              <strong>4. Peso (Lbs ⇄ Kg) & Recarga USB-C no Avião</strong>
+              <p>Para a viagem do seu irmão e mobilidade diária, o peso ideal é até <strong>2.4 kg (~5.3 lbs)</strong>. Se tiver <strong>Carregamento USB-C PD</strong> (como Legion e Zephyrus), dá para carregar com carregador compacto de celular, sem levar o tijolo na mochila!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Central de Busca Direta nas Lojas com Filtros Anti-Pegadinha (Painel Colapsável Limpo) -->
     <section class="store-search-section">
       <details class="store-search-details">
@@ -179,6 +230,7 @@
 
             <div class="quick-action-buttons">
               <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border: none; box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);">⚡ Guia Técnico</button>
+              <button class="btn btn-secondary" onclick="window.toggleChecklist(true)" style="border: 1px solid #f59e0b; color: #fbbf24; font-weight: 700; background: rgba(245, 158, 11, 0.12);" title="Ver Checklist de Ouro do Comprador">🚨 Lembretes</button>
               <button class="btn btn-primary" id="btnOpenDuel">🥊 Duelo</button>
               <button class="btn btn-secondary" id="btnQuickTableToggle" onclick="window.toggleViewMode()" style="border: 1px solid var(--primary); color: var(--primary); font-weight: 700; background: rgba(56, 189, 248, 0.1);">📊 Tabela / Cards</button>
               <button class="btn btn-secondary" id="btnOpenLinkModal" onclick="window.openLinkImportModal()" style="border: 1px solid #10b981; color: #34d399; font-weight: 700; background: rgba(16, 185, 129, 0.12);">🔗 Puxar Link</button>
@@ -980,6 +1032,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=20261014_v22"></script>
+  <script src="app.js?v=20261014_v23"></script>
 </body>
 </html>

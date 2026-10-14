@@ -3970,3 +3970,27 @@ window.openGpuGuideWithGpu = function(gpuString) {
   }
   renderGpuGuideComparison();
 };
+
+window.toggleChecklist = function(forceOpen = false) {
+  const section = document.getElementById('buyerChecklistSection');
+  const grid = document.getElementById('checklistGrid');
+  const btn = document.getElementById('btnToggleChecklist');
+  if (!section || !grid) return;
+
+  if (forceOpen) {
+    grid.style.display = 'grid';
+    if (btn) btn.innerText = '▾ Recolher';
+    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    section.style.boxShadow = '0 0 30px #f59e0b, 0 0 60px rgba(245, 158, 11, 0.4)';
+    section.style.borderColor = '#f59e0b';
+    setTimeout(() => {
+      section.style.boxShadow = '';
+      section.style.borderColor = '';
+    }, 2500);
+    return;
+  }
+
+  const isHidden = window.getComputedStyle(grid).display === 'none';
+  grid.style.display = isHidden ? 'grid' : 'none';
+  if (btn) btn.innerText = isHidden ? '▾ Recolher' : '▸ Expandir';
+};
