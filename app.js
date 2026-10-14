@@ -356,7 +356,7 @@ const DEFAULT_LAPTOPS = [
 let laptops = [];
 let watchlist = [];
 let currentFilter = 'all';
-let currentSort = 'value_score';
+let currentSort = 'ranking_desc'; // Padrão: Modo Ranking (Do Melhor para o Pior)
 let usdRate = 5.65;
 let salesTaxRate = 0.0; // 0% (Delaware / online), 6.5% (Flórida), 8.87% (NY)
 let importMode = 'wise'; // 'wise' (1.1%), 'credit_card' (4.38%), 'direct' (0%)
@@ -367,6 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadData();
   bindEvents();
   render();
+  initMultiCompare();
   // Busca cotação do dólar ao vivo imediatamente
   fetchLiveDollarRate(false);
   // Confere automaticamente a cada 5 minutos em segundo plano
@@ -2789,8 +2790,12 @@ function render() {
     const diffB = b.priceBr - convertedB;
 
     switch (currentSort) {
+      case 'ranking_desc': // Modo Ranking: Do Melhor para o Pior
+        return getLaptopOverallScore(b) - getLaptopOverallScore(a);
+      case 'ranking_asc': // Modo Ranking Invertido: Do Pior para o Melhor
+        return getLaptopOverallScore(a) - getLaptopOverallScore(b);
       case 'value_score':
-        return b.score - a.score;
+        return getLaptopOverallScore(b) - getLaptopOverallScore(a);
       case 'battery_desc':
         return (b.batteryHoursNormal || 4) - (a.batteryHoursNormal || 4);
       case 'ram_desc':
@@ -2804,9 +2809,14 @@ function render() {
       case 'gpu_power':
         return (b.gpu.includes('4070') ? 2 : 1) - (a.gpu.includes('4070') ? 2 : 1);
       default:
-        return 0;
+        return getLaptopOverallScore(b) - getLaptopOverallScore(a);
     }
   });
+
+  // Se o filtro for Top 3 Melhores do Ranking, pega apenas os 3 primeiros
+  if (currentFilter === 'ranking_top3') {
+    filtered = filtered.slice(0, 3);
+  }
 
   // Atualizar contadores
   document.getElementById('catalogSummary').innerText = `Exibindo ${filtered.length} de ${laptops.length} modelos`;
@@ -2841,19 +2851,72 @@ function render() {
     if (tableContainer) tableContainer.style.display = 'none';
   }
 
-  grid.innerHTML = filtered.map(laptop => {
+  grid.innerHTML = filtered.map((laptop, index) => {
     const isWatched = watchlist.includes(laptop.id);
     const inBudget = laptop.priceBr >= 8000 && laptop.priceBr <= 8900;
     const convertedUs = calculateConvertedUsPrice(laptop.priceUs);
     const diff = laptop.priceBr - convertedUs;
     const isUsCheaper = diff > 0;
     const tax = getTaxBreakdown(laptop.priceUs);
+    const rankPos = index + 1;
+    const laptopScore = getLaptopOverallScore(laptop);
 
     const historyBr = (laptop.history && laptop.history.length > 0) ? laptop.history.map(h => h.br) : [laptop.priceBr];
     const historyUs = (laptop.history && laptop.history.length > 0) ? laptop.history.map(h => h.us) : [laptop.priceUs];
     const lowestBr = Math.min(...historyBr);
     const lowestUs = Math.min(...historyUs);
     const isCurrentLowest = laptop.priceBr <= lowestBr;
+
+    // Faixa de Pódio e Medalhas do Modo Ranking
+    const isRankingActive = (currentSort === 'ranking_desc' || currentSort === 'ranking_asc' || currentFilter === 'ranking_top3');
+    let rankingRibbon = '';
+    if (isRankingActive) {
+      if (currentSort === 'ranking_asc') {
+        rankingRibbon = `
+          <div class="ranking-ribbon rank-inverted">
+            <span>🔻 #${rankPos} Menor Posição (Score: ${laptopScore})</span>
+            <small style="font-size:0.68rem; opacity:0.85;">Modo Pior p/ Melhor</small>
+          </div>
+        `;
+      } else {
+        if (rankPos === 1) {
+          rankingRibbon = `
+            <div class="ranking-ribbon rank-gold">
+              <span>🥇 #1 LUGAR • CAMPEÃO DO RANKING</span>
+              <span class="badge" style="background:#1a0f00; color:#fbbf24; font-weight:800; font-size:0.75rem;">Score ${laptopScore}</span>
+            </div>
+          `;
+        } else if (rankPos === 2) {
+          rankingRibbon = `
+            <div class="ranking-ribbon rank-silver">
+              <span>🥈 #2 LUGAR • VICE-CAMPEÃO</span>
+              <span class="badge" style="background:#0f172a; color:#fff; font-weight:800; font-size:0.75rem;">Score ${laptopScore}</span>
+            </div>
+          `;
+        } else if (rankPos === 3) {
+          rankingRibbon = `
+            <div class="ranking-ribbon rank-bronze">
+              <span>🥉 #3 LUGAR • 3º NO PÓDIO</span>
+              <span class="badge" style="background:#000; color:#fff; font-weight:800; font-size:0.75rem;">Score ${laptopScore}</span>
+            </div>
+          `;
+        } else if (rankPos <= 5) {
+          rankingRibbon = `
+            <div class="ranking-ribbon rank-top">
+              <span>🎖️ #${rankPos} LUGAR NO RANKING</span>
+              <span style="font-size:0.75rem; font-weight:700;">Score ${laptopScore}</span>
+            </div>
+          `;
+        } else {
+          rankingRibbon = `
+            <div class="ranking-ribbon rank-standard">
+              <span>📊 #${rankPos} Lugar Geral</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);">Score ${laptopScore}</span>
+            </div>
+          `;
+        }
+      }
+    }
 
     // Formatação limpa de RAM para evitar duplicação (ex: '32GB DDR5 5600MHz (DDR5 5600MHz)')
     const rawRamCapacity = (laptop.ram || '16GB').match(/\d+\s*GB/i) ? (laptop.ram.match(/\d+\s*GB/i)[0]) : '16GB';
@@ -2888,7 +2951,8 @@ function render() {
     }
 
     return `
-      <div class="laptop-card ${inBudget ? 'in-budget' : ''}" id="card-${laptop.id}">
+      <div class="laptop-card ${inBudget ? 'in-budget' : ''} ${rankPos === 1 && currentSort === 'ranking_desc' ? 'rank-champ' : ''}" id="card-${laptop.id}">
+        ${rankingRibbon}
         <!-- Imagem do Produto no Topo (Identificação Visual Imediata) -->
         <div class="card-image-hero">
           <img src="${getLaptopImage(laptop)}" alt="${laptop.name}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=700&q=80';">
@@ -3134,6 +3198,7 @@ function renderTable(filteredLaptops) {
     <table class="comparison-table">
       <thead>
         <tr>
+          <th style="width:75px; text-align:center;">🏆 Posição</th>
           <th>Notebook</th>
           <th>GPU (Placa)</th>
           <th>CPU (Processador)</th>
@@ -3149,7 +3214,9 @@ function renderTable(filteredLaptops) {
         </tr>
       </thead>
       <tbody>
-        ${filteredLaptops.map(laptop => {
+        ${filteredLaptops.map((laptop, index) => {
+          const rankPos = index + 1;
+          const score = getLaptopOverallScore(laptop);
           const convertedUs = calculateConvertedUsPrice(laptop.priceUs);
           const diff = laptop.priceBr - convertedUs;
           const isUsCheaper = diff > 0;
@@ -3160,12 +3227,18 @@ function renderTable(filteredLaptops) {
 
           return `
             <tr>
+              <td style="text-align:center;">
+                <span class="table-rank-pill ${rankPos === 1 ? 'gold' : (rankPos === 2 ? 'silver' : (rankPos === 3 ? 'bronze' : ''))}">
+                  ${rankPos === 1 ? '🥇 1º' : (rankPos === 2 ? '🥈 2º' : (rankPos === 3 ? '🥉 3º' : `#${rankPos}`))}
+                </span>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px; font-weight:700;">Score ${score}</div>
+              </td>
               <td>
                 <div style="display:flex; align-items:center; gap:10px;">
                   <img src="${getLaptopImage(laptop)}" alt="${laptop.name}" style="width:48px; height:36px; object-fit:cover; border-radius:4px; border:1px solid var(--border-subtle); flex-shrink:0;">
                   <div>
                     <div class="table-model-title">${laptop.name}</div>
-                    <div style="font-size:0.75rem; color:var(--text-dim);">${laptop.modelCode} • Score: <strong>${laptop.score}</strong></div>
+                    <div style="font-size:0.75rem; color:var(--text-dim);">${laptop.modelCode}</div>
                     <div style="font-size:0.72rem; color:#38bdf8; font-weight:700; margin-top:2px;">⚖️ ${getLaptopWeight(laptop).kg} kg (${getLaptopWeight(laptop).lbs} lbs)</div>
                   </div>
                 </div>
@@ -3234,6 +3307,9 @@ function renderTable(filteredLaptops) {
                   <button class="btn btn-video" onclick="openVideoReviewsModal('${laptop.id}')" style="font-size:0.75rem; padding:4px 8px; white-space:nowrap;">
                     ▶️ Vídeos
                   </button>
+                  <button class="btn btn-secondary" onclick="addNotebookToCompare('${laptop.id}')" style="font-size:0.73rem; padding:3px 6px; white-space:nowrap; border-color:#38bdf8; color:#38bdf8;">
+                    ➕ Comparador
+                  </button>
                 </div>
               </td>
             </tr>
@@ -3242,6 +3318,354 @@ function renderTable(filteredLaptops) {
       </tbody>
     </table>
   `;
+}
+
+// ==========================================
+// PONTUAÇÃO & CÁLCULO GERAL DO MODO RANKING
+// ==========================================
+function getLaptopOverallScore(laptop) {
+  if (!laptop) return 50;
+  if (typeof laptop.score === 'number' && laptop.score > 0) {
+    return laptop.score;
+  }
+  let score = 70;
+  const gpu = (laptop.gpu || '').toLowerCase();
+  const screen = (laptop.screen || '').toLowerCase();
+  const battery = laptop.batteryHoursNormal || 4;
+
+  if (gpu.includes('4080')) score += 20;
+  else if (gpu.includes('4070')) score += 16;
+  else if (gpu.includes('4060')) score += 11;
+  else if (gpu.includes('4050')) score += 4;
+  else if (gpu.includes('integrada') || gpu.includes('iris') || gpu.includes('uhd')) score -= 25;
+
+  if (screen.includes('240hz') || screen.includes('500 nits') || screen.includes('oled')) score += 6;
+  else if (screen.includes('165hz') || screen.includes('1600p') || screen.includes('qhd')) score += 4;
+  else if (screen.includes('45%') || screen.includes('ntsc')) score -= 8;
+
+  if (battery >= 7) score += 6;
+  else if (battery >= 5) score += 3;
+  else if (battery < 3.5) score -= 3;
+
+  if (laptop.hasUsbCCharging) score += 3;
+  if (laptop.ramUpgradeStatus === 'full') score += 4;
+  else if (laptop.ramUpgradeStatus === 'none') score -= 5;
+
+  return Math.min(99, Math.max(40, score));
+}
+
+// Alternar Modo Ranking (Do Melhor pro Pior ⇄ Do Pior pro Melhor)
+function toggleRankingMode() {
+  const sortSelect = document.getElementById('sortSelect');
+  if (currentSort === 'ranking_desc') {
+    currentSort = 'ranking_asc';
+    showToastNotification('🔻 Ranking Invertido: Exibindo do Pior para o Melhor!');
+  } else {
+    currentSort = 'ranking_desc';
+    showToastNotification('🏆 Modo Ranking Ativado: Exibindo do Melhor para o Pior!');
+  }
+  if (sortSelect) sortSelect.value = currentSort;
+  render();
+}
+
+// ==========================================
+// COMPARADOR MULTI-NOTEBOOK ESTILO TUDOCELULAR
+// ==========================================
+let compareSlots = [null, null, null]; // IDs dos notebooks nos 3 slots
+
+function initMultiCompare() {
+  updateCompareSelectOptions();
+  renderQuickCompareLists();
+  
+  // Defaults padrão para dar vida imediata ao comparador TudoCelular
+  if (laptops.length >= 2 && !compareSlots[0] && !compareSlots[1]) {
+    const sorted = [...laptops].sort((a, b) => getLaptopOverallScore(b) - getLaptopOverallScore(a));
+    setCompareSlot(0, sorted[0].id, false);
+    setCompareSlot(1, sorted[1].id, false);
+  }
+}
+
+function updateCompareSelectOptions() {
+  const selects = [
+    document.getElementById('compareSelect1'),
+    document.getElementById('compareSelect2'),
+    document.getElementById('compareSelect3')
+  ];
+
+  selects.forEach((select, idx) => {
+    if (!select) return;
+    const currentVal = compareSlots[idx] || '';
+    const placeholder = idx === 2 ? '3º Notebook (Opcional)...' : `${idx + 1}º Notebook (Pesquisar)...`;
+    
+    select.innerHTML = `
+      <option value="">${placeholder}</option>
+      ${laptops.map(l => `
+        <option value="${l.id}" ${l.id === currentVal ? 'selected' : ''}>
+          ${l.name} [${l.gpu}] - R$ ${l.priceBr.toLocaleString('pt-BR')} | $ ${l.priceUs}
+        </option>
+      `).join('')}
+    `;
+  });
+}
+
+function onCompareSelectChange(slotIndex, laptopId) {
+  setCompareSlot(slotIndex, laptopId, true);
+}
+
+function setCompareSlot(slotIndex, laptopId, reRenderTable = true) {
+  compareSlots[slotIndex] = laptopId || null;
+  const slotEl = document.getElementById(`compareSlot${slotIndex + 1}`);
+  const imgEl = document.getElementById(`slotImg${slotIndex + 1}`);
+  const iconEl = document.getElementById(`slotEmptyIcon${slotIndex + 1}`);
+  const btnRemove = document.getElementById(`btnRemoveSlot${slotIndex + 1}`);
+  const specsEl = document.getElementById(`slotSpecs${slotIndex + 1}`);
+  const select = document.getElementById(`compareSelect${slotIndex + 1}`);
+
+  if (select && select.value !== (laptopId || '')) {
+    select.value = laptopId || '';
+  }
+
+  if (laptopId) {
+    const laptop = laptops.find(l => l.id === laptopId);
+    if (laptop) {
+      if (slotEl) slotEl.classList.add('filled');
+      if (imgEl) {
+        imgEl.src = getLaptopImage(laptop);
+        imgEl.style.display = 'block';
+      }
+      if (iconEl) iconEl.style.display = 'none';
+      if (btnRemove) btnRemove.style.display = 'flex';
+      if (specsEl) {
+        specsEl.innerHTML = `<strong style="color:#38bdf8;">${laptop.gpu}</strong> • R$ ${laptop.priceBr.toLocaleString('pt-BR')}`;
+      }
+    }
+  } else {
+    if (slotEl) slotEl.classList.remove('filled');
+    if (imgEl) imgEl.style.display = 'none';
+    if (iconEl) iconEl.style.display = 'block';
+    if (btnRemove) btnRemove.style.display = 'none';
+    if (specsEl) specsEl.innerHTML = '';
+  }
+
+  if (reRenderTable) {
+    const activeSlots = compareSlots.filter(Boolean);
+    if (activeSlots.length >= 2) {
+      executeMultiCompare(false);
+    } else {
+      const wrap = document.getElementById('multiCompareResultWrap');
+      if (wrap) wrap.style.display = 'none';
+    }
+  }
+}
+
+function removeCompareSlot(slotIndex) {
+  setCompareSlot(slotIndex, null, true);
+}
+
+function clearAllCompareSlots() {
+  compareSlots = [null, null, null];
+  for (let i = 0; i < 3; i++) {
+    setCompareSlot(i, null, false);
+  }
+  const wrap = document.getElementById('multiCompareResultWrap');
+  if (wrap) wrap.style.display = 'none';
+  showToastNotification('🧹 Slots de comparação limpos!');
+}
+
+function addNotebookToCompare(laptopId) {
+  let targetIndex = compareSlots.findIndex(s => !s);
+  if (targetIndex === -1) {
+    targetIndex = 2; // Substitui o 3º slot
+  }
+  setCompareSlot(targetIndex, laptopId, true);
+  const laptop = laptops.find(l => l.id === laptopId);
+  showToastNotification(`➕ ${laptop ? laptop.name : 'Modelo'} adicionado ao Comparador (Slot ${targetIndex + 1})!`);
+  
+  const sec = document.getElementById('multiCompareSection');
+  if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function loadDuelPreset(id1, id2) {
+  setCompareSlot(0, id1, false);
+  setCompareSlot(1, id2, false);
+  setCompareSlot(2, null, false);
+  executeMultiCompare(true);
+  showToastNotification('🥊 Duelo carregado no comparador!');
+  const sec = document.getElementById('multiCompareSection');
+  if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function renderQuickCompareLists() {
+  const topList = document.getElementById('quickTopRankingList');
+  const duelsList = document.getElementById('quickPopularDuelsList');
+
+  // Top 3 do Ranking
+  if (topList) {
+    const sorted = [...laptops].sort((a, b) => getLaptopOverallScore(b) - getLaptopOverallScore(a)).slice(0, 3);
+    topList.innerHTML = sorted.map((l, idx) => `
+      <div class="quick-compare-item">
+        <span>${idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉')} <strong>${l.name}</strong> (${l.gpu})</span>
+        <button type="button" class="btn-add-to-compare" onclick="addNotebookToCompare('${l.id}')">+ Comparar</button>
+      </div>
+    `).join('');
+  }
+
+  // Duelos Populares
+  if (duelsList) {
+    duelsList.innerHTML = `
+      <div class="quick-compare-item">
+        <span>⚔️ <strong>Legion Pro 5i</strong> vs <strong>Zephyrus G16</strong> (Top RTX 4070)</span>
+        <button type="button" class="btn-add-to-compare" onclick="loadDuelPreset('lenovo-legion-pro-5i', 'asus-rog-zephyrus-g16')">Comparar</button>
+      </div>
+      <div class="quick-compare-item">
+        <span>⚔️ <strong>Dell G16 7630</strong> vs <strong>Acer Helios Neo 16</strong></span>
+        <button type="button" class="btn-add-to-compare" onclick="loadDuelPreset('dell-g16-7630', 'predator-helios-neo-16')">Comparar</button>
+      </div>
+      <div class="quick-compare-item">
+        <span>⚔️ <strong>Legion Slim 5</strong> vs <strong>ASUS TUF A15</strong> (Baterias Top)</span>
+        <button type="button" class="btn-add-to-compare" onclick="loadDuelPreset('lenovo-legion-slim-5', 'asus-tuf-a15')">Comparar</button>
+      </div>
+    `;
+  }
+}
+
+function executeMultiCompare(scrollInto = true) {
+  const selectedLaptops = compareSlots.map(id => laptops.find(l => l.id === id)).filter(Boolean);
+  const wrap = document.getElementById('multiCompareResultWrap');
+  if (!wrap) return;
+
+  if (selectedLaptops.length < 2) {
+    showToastNotification('⚠️ Selecione pelo menos 2 notebooks para comparar!');
+    return;
+  }
+
+  wrap.style.display = 'block';
+
+  wrap.innerHTML = `
+    <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(56,189,248,0.3); border-radius:10px; padding:1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:8px;">
+        <h4 style="margin:0; font-size:1.1rem; color:#fff; display:flex; align-items:center; gap:8px;">
+          <span>📊 Comparativo Técnico Lado a Lado (${selectedLaptops.length} Modelos)</span>
+        </h4>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('multiCompareResultWrap').style.display='none'" style="font-size:0.75rem; padding:4px 8px;">✕ Fechar Tabela</button>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="tc-compare-table">
+          <thead>
+            <tr>
+              <th class="tc-param-header">Especificação</th>
+              ${selectedLaptops.map((lap, idx) => `
+                <th>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <img src="${getLaptopImage(lap)}" alt="${lap.name}" style="width:40px; height:28px; object-fit:cover; border-radius:4px; border:1px solid rgba(255,255,255,0.15);">
+                    <div>
+                      <div style="font-size:0.92rem; font-weight:800; color:#fff;">${lap.name}</div>
+                      <div style="font-size:0.72rem; color:#38bdf8; font-weight:700;">Score: ${getLaptopOverallScore(lap)}</div>
+                    </div>
+                  </div>
+                </th>
+              `).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="tc-param-header">🎮 Placa de Vídeo (GPU)</td>
+              ${selectedLaptops.map(l => `
+                <td>
+                  <strong style="color:#38bdf8;">${l.gpu}</strong>
+                  <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">${l.gpuTgp || '140W Potência Máxima'}</div>
+                </td>
+              `).join('')}
+            </tr>
+            <tr>
+              <td class="tc-param-header">⚡ Processador (CPU)</td>
+              ${selectedLaptops.map(l => `
+                <td>
+                  <strong>${l.cpu.split('(')[0].trim()}</strong>
+                  <div style="font-size:0.72rem; color:var(--text-dim);">${getCpuEquivalence(l.cpu)}</div>
+                </td>
+              `).join('')}
+            </tr>
+            <tr>
+              <td class="tc-param-header">🧠 Memória RAM</td>
+              ${selectedLaptops.map(l => {
+                const isSoldered = (l.ramUpgradeStatus === 'none' || l.ramType === 'LPDDR5X' || (l.ram && l.ram.toLowerCase().includes('soldada')));
+                return `
+                  <td>
+                    <strong>${l.ram}</strong>
+                    <div style="font-size:0.74rem; margin-top:2px; font-weight:700; color:${isSoldered ? '#f87171' : '#34d399'};">
+                      ${isSoldered ? '🚫 RAM Soldada (Não Troca)' : '✅ 2x SODIMM Livres'}
+                    </div>
+                  </td>
+                `;
+              }).join('')}
+            </tr>
+            <tr>
+              <td class="tc-param-header">🖥️ Tela & Cores</td>
+              ${selectedLaptops.map(l => `
+                <td style="font-size:0.8rem; line-height:1.35;">${l.screen}</td>
+              `).join('')}
+            </tr>
+            <tr>
+              <td class="tc-param-header">🔋 Bateria (Uso Normal)</td>
+              ${selectedLaptops.map(l => `
+                <td>
+                  <strong style="color:${l.batteryHoursNormal >= 6 ? 'var(--accent)' : 'var(--text-main)'};">~${l.batteryHoursNormal || 4}h</strong>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">${l.hasUsbCCharging ? '⚡ Suporta Carregador USB-C' : '🔌 Apenas Pino Tradicional'}</div>
+                </td>
+              `).join('')}
+            </tr>
+            <tr>
+              <td class="tc-param-header">⚖️ Peso p/ Mala</td>
+              ${selectedLaptops.map(l => `
+                <td style="font-weight:700; color:#38bdf8;">${getLaptopWeight(l).kg} kg <small style="color:var(--text-muted);">(${getLaptopWeight(l).lbs} lbs)</small></td>
+              `).join('')}
+            </tr>
+            <tr>
+              <td class="tc-param-header">🇧🇷 Preço no Brasil</td>
+              ${selectedLaptops.map(l => `
+                <td>
+                  <strong style="font-size:1rem; color:#fff; font-family:var(--font-mono);">R$ ${l.priceBr.toLocaleString('pt-BR')}</strong>
+                  <div style="font-size:0.72rem; color:var(--text-dim);">${l.storeBr}</div>
+                </td>
+              `).join('')}
+            </tr>
+            <tr>
+              <td class="tc-param-header">🇺🇸 Preço EUA (Convertido)</td>
+              ${selectedLaptops.map(l => {
+                const conv = calculateConvertedUsPrice(l.priceUs);
+                const diff = l.priceBr - conv;
+                return `
+                  <td>
+                    <strong style="color:var(--accent); font-family:var(--font-mono); font-size:0.95rem;">$ ${l.priceUs}</strong>
+                    <div style="font-size:0.8rem; font-weight:700; color:var(--accent); margin-top:2px;">~ R$ ${Math.round(conv).toLocaleString('pt-BR')}</div>
+                    <div style="font-size:0.72rem; color:${diff > 0 ? '#34d399' : '#38bdf8'}; font-weight:700; margin-top:2px;">
+                      ${diff > 0 ? `⚡ Economiza R$ ${Math.round(diff).toLocaleString('pt-BR')} nos EUA` : `🇧🇷 Mais em conta no BR`}
+                    </div>
+                  </td>
+                `;
+              }).join('')}
+            </tr>
+            <tr>
+              <td class="tc-param-header">🎬 Vídeos dos Melhores Canais</td>
+              ${selectedLaptops.map(l => `
+                <td>
+                  <button type="button" class="btn btn-video" onclick="openVideoReviewsModal('${l.id}')" style="font-size:0.75rem; padding:4px 8px; width:100%; justify-content:center;">
+                    ▶️ Ver Vídeos / Reviews
+                  </button>
+                </td>
+              `).join('')}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  if (scrollInto) {
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 // ==========================================
@@ -4415,7 +4839,7 @@ window.searchVideoWithTerm = searchVideoWithTerm;
 // ==========================================
 // SISTEMA DE VERIFICAÇÃO DE NOVA VERSÃO VIA API & GITHUB
 // ==========================================
-const CURRENT_APP_VERSION = '20261014_v26';
+const CURRENT_APP_VERSION = '20261014_v27';
 const GITHUB_REPO_API = 'https://api.github.com/repos/brunoserra123/radar-notebooks/commits/main';
 
 let isCheckingUpdate = false;
@@ -4541,5 +4965,18 @@ setInterval(() => {
 window.checkForNewAppVersion = checkForNewAppVersion;
 window.applyAppUpdate = applyAppUpdate;
 window.dismissUpdateBanner = dismissUpdateBanner;
+
+// Exportações do Modo Ranking & Comparador TudoCelular
+window.toggleRankingMode = toggleRankingMode;
+window.getLaptopOverallScore = getLaptopOverallScore;
+window.onCompareSelectChange = onCompareSelectChange;
+window.setCompareSlot = setCompareSlot;
+window.removeCompareSlot = removeCompareSlot;
+window.clearAllCompareSlots = clearAllCompareSlots;
+window.addNotebookToCompare = addNotebookToCompare;
+window.loadDuelPreset = loadDuelPreset;
+window.executeMultiCompare = executeMultiCompare;
+window.initMultiCompare = initMultiCompare;
+
 
 

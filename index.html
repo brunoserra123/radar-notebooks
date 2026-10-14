@@ -218,6 +218,8 @@
             <div class="sort-select-box">
               <span class="sort-label">Ordenar:</span>
               <select id="sortSelect">
+                <option value="ranking_desc" selected>🏆 Ranking Geral (Do Melhor para o Pior)</option>
+                <option value="ranking_asc">🔻 Ranking Invertido (Do Pior para o Melhor)</option>
                 <option value="value_score">⭐ Melhor Custo-Benefício</option>
                 <option value="battery_desc">🔋 Maior Bateria (Uso Normal)</option>
                 <option value="ram_desc">🧠 Maior Memória RAM</option>
@@ -229,7 +231,8 @@
             </div>
 
             <div class="quick-action-buttons">
-              <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border: none; box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);">⚡ Guia Técnico</button>
+              <button class="btn btn-warning" id="btnToggleRanking" onclick="window.toggleRankingMode()" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; border: none; box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);" title="Clique para alternar entre Do Melhor para o Pior e Do Pior para o Melhor">🏆 Modo Ranking</button>
+              <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #38bdf8, #0284c7); color: #fff; font-weight: 700; border: none; box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);">⚡ Guia Técnico</button>
               <button class="btn btn-secondary" onclick="window.toggleChecklist(true)" style="border: 1px solid #f59e0b; color: #fbbf24; font-weight: 700; background: rgba(245, 158, 11, 0.12);" title="Ver Checklist de Ouro do Comprador">🚨 Lembretes</button>
               <button class="btn btn-primary" id="btnOpenDuel">🥊 Duelo</button>
               <button class="btn btn-secondary" id="btnQuickTableToggle" onclick="window.toggleViewMode()" style="border: 1px solid var(--primary); color: var(--primary); font-weight: 700; background: rgba(56, 189, 248, 0.1);">📊 Tabela / Cards</button>
@@ -247,6 +250,7 @@
             <span class="filter-group-label">🎯 Destaques:</span>
             <div class="filter-group-items">
               <button class="chip active" data-filter="all">✨ Todos os Notebooks</button>
+              <button class="chip" data-filter="ranking_top3" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: #fbbf24; font-weight: 700;">🏆 Top 3 Melhores</button>
               <button class="chip" data-filter="watchlist">⭐ Meus Monitorados</button>
               <button class="chip" data-filter="budget">💰 Na Faixa (R$ 8k - 8.9k)</button>
               <button class="chip" data-filter="gpu_upgrade">🚀 Melhor Negócio nos EUA</button>
@@ -276,6 +280,104 @@
               <button class="chip" data-filter="no_dongle">🔌 Sem Dongle (2+ USB-A)</button>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparador Multi-Notebook Estilo TudoCelular (Até 3 Notebooks Lado a Lado) -->
+    <section class="multi-compare-section" id="multiCompareSection">
+      <div class="multi-compare-container">
+        <div class="multi-compare-header">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <span class="badge" style="background:rgba(56, 189, 248, 0.18); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.45); font-size:0.78rem;">
+              ⚖️ Comparador TudoCelular de Notebooks
+            </span>
+            <h3 style="margin:0; font-size:1.15rem; color:#fff;">Comparador Direto (Até 3 Modelos)</h3>
+          </div>
+          <span style="font-size:0.8rem; color:var(--text-muted);">
+            Selecione 2 ou 3 notebooks para comparar tela a tela, hardware e preços
+          </span>
+        </div>
+
+        <div class="compare-slots-wrapper">
+          <!-- Slot 1 -->
+          <div class="compare-slot" id="compareSlot1">
+            <div class="slot-device-frame">
+              <div class="slot-empty-icon" id="slotEmptyIcon1">💻</div>
+              <img id="slotImg1" src="" alt="" class="slot-device-img" style="display:none;">
+              <button type="button" class="btn-remove-slot" id="btnRemoveSlot1" onclick="removeCompareSlot(0)" style="display:none;" title="Remover">✕</button>
+            </div>
+            <div class="slot-select-wrap">
+              <select id="compareSelect1" onchange="onCompareSelectChange(0, this.value)">
+                <option value="">1º Notebook (Pesquisar)...</option>
+              </select>
+            </div>
+            <div class="slot-mini-specs" id="slotSpecs1"></div>
+          </div>
+
+          <div class="slot-separator">+</div>
+
+          <!-- Slot 2 -->
+          <div class="compare-slot" id="compareSlot2">
+            <div class="slot-device-frame">
+              <div class="slot-empty-icon" id="slotEmptyIcon2">💻</div>
+              <img id="slotImg2" src="" alt="" class="slot-device-img" style="display:none;">
+              <button type="button" class="btn-remove-slot" id="btnRemoveSlot2" onclick="removeCompareSlot(1)" style="display:none;" title="Remover">✕</button>
+            </div>
+            <div class="slot-select-wrap">
+              <select id="compareSelect2" onchange="onCompareSelectChange(1, this.value)">
+                <option value="">2º Notebook (Pesquisar)...</option>
+              </select>
+            </div>
+            <div class="slot-mini-specs" id="slotSpecs2"></div>
+          </div>
+
+          <div class="slot-separator">+</div>
+
+          <!-- Slot 3 (Opcional) -->
+          <div class="compare-slot" id="compareSlot3">
+            <div class="slot-device-frame">
+              <div class="slot-empty-icon" id="slotEmptyIcon3">💻</div>
+              <img id="slotImg3" src="" alt="" class="slot-device-img" style="display:none;">
+              <button type="button" class="btn-remove-slot" id="btnRemoveSlot3" onclick="removeCompareSlot(2)" style="display:none;" title="Remover">✕</button>
+            </div>
+            <div class="slot-select-wrap">
+              <select id="compareSelect3" onchange="onCompareSelectChange(2, this.value)">
+                <option value="">3º Notebook (Opcional)...</option>
+              </select>
+            </div>
+            <div class="slot-mini-specs" id="slotSpecs3"></div>
+          </div>
+
+          <!-- Botão Comparar > -->
+          <div class="compare-action-slot">
+            <button type="button" class="btn-run-compare" id="btnRunCompare" onclick="executeMultiCompare()">
+              <span>Comparar</span>
+              <span class="compare-arrow-icon">&gt;</span>
+            </button>
+            <button type="button" class="btn-clear-slots" onclick="clearAllCompareSlots()">Limpar</button>
+          </div>
+        </div>
+
+        <!-- Sugestões Rápidas: Lançamentos & Mais Comparados -->
+        <div class="compare-quick-lists">
+          <div class="quick-compare-col">
+            <span class="quick-col-title">🏆 Top Melhores do Ranking:</span>
+            <div class="quick-items-list" id="quickTopRankingList">
+              <!-- Preenchido via JS -->
+            </div>
+          </div>
+          <div class="quick-compare-col">
+            <span class="quick-col-title">🥊 Duelos Populares:</span>
+            <div class="quick-items-list" id="quickPopularDuelsList">
+              <!-- Preenchido via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Área de Resultado da Comparação Lado a Lado Estilo TudoCelular -->
+        <div id="multiCompareResultWrap" style="display:none; margin-top:1.5rem;">
+          <!-- Tabela comparativa dinâmica com visual TudoCelular -->
         </div>
       </div>
     </section>
@@ -1072,6 +1174,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261014_v26"></script>
+  <script src="app.js?v=20261014_v27"></script>
 </body>
 </html>
