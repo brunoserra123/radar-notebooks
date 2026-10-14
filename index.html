@@ -7,9 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261013_v7">
-  <link rel="icon" type="image/jpeg" href="icon.jpg">
-  <link rel="apple-touch-icon" href="icon.jpg">
+  <link rel="stylesheet" href="styles.css?v=20261013_v10">
+  <!-- Favicon Único na Aba do Navegador (Verde Esmeralda Radar Target) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%2310b981'/><circle cx='50' cy='50' r='38' fill='none' stroke='%23064e3b' stroke-width='6'/><circle cx='50' cy='50' r='24' fill='none' stroke='%23ffffff' stroke-width='4'/><circle cx='50' cy='50' r='10' fill='%23ffffff'/><line x1='50' y1='8' x2='50' y2='92' stroke='%23064e3b' stroke-width='4'/><line x1='8' y1='50' x2='92' y2='50' stroke='%23064e3b' stroke-width='4'/></svg>">
+  <link rel="alternate icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' x='50' font-size='75' text-anchor='middle'>🎯</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%2310b981'/><circle cx='50' cy='50' r='38' fill='none' stroke='%23064e3b' stroke-width='6'/><circle cx='50' cy='50' r='24' fill='none' stroke='%23ffffff' stroke-width='4'/><circle cx='50' cy='50' r='10' fill='%23ffffff'/></svg>">
   <!-- Tesseract.js para leitura OCR de print de tela direto no navegador -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
@@ -18,7 +20,7 @@
   <header class="app-header">
     <div class="header-container">
       <div class="brand">
-        <div class="logo-icon">⚡</div>
+        <div class="logo-icon">🎯</div>
         <div>
           <h1 class="logo-title">GamerRadar <span>BR vs EUA</span></h1>
           <p class="logo-subtitle">Comparador Inteligente, Equivalência de Hardware & Vigia de Preços</p>
@@ -175,6 +177,7 @@
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border: none; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);">⚡ Guia: Placas, Bateria, RAM & SSD</button>
           <button class="btn btn-screenshot" id="btnOpenOcrModal">📸 Puxar por Print</button>
+          <button class="btn btn-secondary" id="btnOpenLinkModal" onclick="window.openLinkImportModal()" style="border: 1px solid #10b981; color: #34d399; font-weight: 700; background: rgba(16, 185, 129, 0.12);">🔗 Puxar por Link</button>
           <button class="btn btn-primary" id="btnOpenDuel">🥊 Duelo: Qual Vale Mais a Pena?</button>
           <button class="btn btn-secondary" id="btnQuickTableToggle" onclick="window.toggleViewMode()" style="border: 1px solid var(--primary); color: var(--primary); font-weight: 700; background: rgba(56, 189, 248, 0.1);">📊 Ver em Tabela / Lista</button>
           <button class="btn btn-secondary" id="btnOpenAddModal">➕ Novo Modelo</button>
@@ -348,6 +351,36 @@
 
           <div id="duelResultArea">
             <!-- Dynamic comparison & verdict rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Puxar por Link Direto (Best Buy, Amazon, Kabum, Dell) -->
+    <div class="modal-backdrop" id="linkImportModal" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div>
+            <span class="badge badge-accent">Novo • Puxar por Link</span>
+            <h3 class="modal-title">🔗 Importar Notebook por Link</h3>
+          </div>
+          <button class="btn-close" onclick="document.getElementById('linkImportModal').style.display='none'">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Cole o link do notebook que você viu na <strong>Best Buy, Amazon, Kabum, Dell ou Mercado Livre</strong>. O sistema vai extrair o modelo, placa de vídeo e processador automaticamente pelo link!
+          </p>
+          <div class="form-group">
+            <label for="linkInputUrl">URL da Loja:</label>
+            <input type="url" id="linkInputUrl" placeholder="https://www.bestbuy.com/site/... ou https://www.amazon.com/..." class="form-control" style="width:100%; padding: 10px; border-radius: 6px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: #fff;">
+          </div>
+          <div class="form-group" style="margin-top: 10px;">
+            <label for="linkInputPriceUs">Preço em Dólar visto no site (opcional se não estiver no link):</label>
+            <input type="number" id="linkInputPriceUs" placeholder="Ex: 1249" step="1" class="form-control" style="width:100%; padding: 10px; border-radius: 6px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: #fff;">
+          </div>
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem;">
+            <button class="btn btn-secondary" onclick="document.getElementById('linkImportModal').style.display='none'">Cancelar</button>
+            <button class="btn btn-primary" id="btnProcessLink" onclick="processPastedLink()" style="background: linear-gradient(135deg, #10b981, #059669); border:none; font-weight:700;">⚡ Analisar e Adicionar</button>
           </div>
         </div>
       </div>
@@ -790,6 +823,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=20261013_v9"></script>
+  <script src="app.js?v=20261013_v10"></script>
 </body>
 </html>

@@ -1195,6 +1195,132 @@ function renderStorageUpgradeBadge(laptop) {
   }
 }
 
+// Identifica a marca do notebook para os selos de topo
+function getBrandTag(name = '') {
+  const n = (name || '').toLowerCase();
+  if (n.includes('predator') || n.includes('helios')) return 'ACER PREDATOR';
+  if (n.includes('nitro')) return 'ACER NITRO';
+  if (n.includes('legion')) return 'LENOVO LEGION';
+  if (n.includes('zephyrus')) return 'ASUS ROG ZEPHYRUS';
+  if (n.includes('strix')) return 'ASUS ROG STRIX';
+  if (n.includes('tuf')) return 'ASUS TUF GAMING';
+  if (n.includes('alienware')) return 'DELL ALIENWARE';
+  if (n.includes('dell g') || n.includes('g16') || n.includes('g15')) return 'DELL GAMING';
+  if (n.includes('hp') || n.includes('victus') || n.includes('omen')) return 'HP GAMING';
+  if (n.includes('acer')) return 'ACER GAMER';
+  if (n.includes('asus')) return 'ASUS GAMER';
+  if (n.includes('lenovo')) return 'LENOVO GAMER';
+  return 'NOTEBOOK GAMER';
+}
+
+// Imagens de alta definição dedicadas para cada modelo
+function getLaptopImage(laptop) {
+  if (laptop && laptop.imageUrl) return laptop.imageUrl;
+  const n = (laptop && laptop.name ? laptop.name : '').toLowerCase();
+  const id = (laptop && laptop.id ? laptop.id : '').toLowerCase();
+
+  if (id.includes('helios') || n.includes('helios') || n.includes('predator')) {
+    return 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=700&q=80';
+  }
+  if (id.includes('g16') || n.includes('g16')) {
+    return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=700&q=80';
+  }
+  if (id.includes('slim-5') || n.includes('slim 5') || n.includes('slim-5')) {
+    return 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=700&q=80';
+  }
+  if (id.includes('tuf') || n.includes('tuf') || n.includes('a15')) {
+    return 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=700&q=80';
+  }
+  if (id.includes('pro-5i') || n.includes('pro 5') || n.includes('pro-5')) {
+    return 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=700&q=80';
+  }
+  if (id.includes('nitro') || n.includes('nitro 16')) {
+    return 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=700&q=80';
+  }
+  if (id.includes('zephyrus') || n.includes('zephyrus')) {
+    return 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=700&q=80';
+  }
+  if (id.includes('g15') || n.includes('g15')) {
+    return 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=700&q=80';
+  }
+  if (n.includes('lenovo')) {
+    return 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=700&q=80';
+  }
+  if (n.includes('asus')) {
+    return 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=700&q=80';
+  }
+  if (n.includes('dell')) {
+    return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=700&q=80';
+  }
+  return 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=700&q=80';
+}
+
+// Modal e Extração Inteligente por Link Direto
+function openLinkImportModal() {
+  const modal = document.getElementById('linkImportModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    const input = document.getElementById('linkInputUrl');
+    if (input) {
+      input.value = '';
+      setTimeout(() => input.focus(), 100);
+    }
+  }
+}
+
+function processPastedLink() {
+  const urlInput = document.getElementById('linkInputUrl');
+  const priceInput = document.getElementById('linkInputPriceUs');
+  const url = (urlInput ? urlInput.value : '').trim();
+  const manualUs = priceInput ? parseFloat(priceInput.value) : 0;
+
+  if (!url) {
+    alert('Por favor, cole um link de notebook válido!');
+    return;
+  }
+
+  let store = 'Best Buy';
+  if (url.includes('bestbuy.com')) store = 'Best Buy';
+  else if (url.includes('amazon.com')) store = 'Amazon';
+  else if (url.includes('kabum.com.br')) store = 'Kabum';
+  else if (url.includes('dell.com')) store = 'Dell';
+  else if (url.includes('mercadolivre.com')) store = 'Mercado Livre';
+  else if (url.includes('bhphotovideo.com')) store = 'B&H Photo';
+  else if (url.includes('microcenter.com')) store = 'Micro Center';
+
+  let cleanText = decodeURIComponent(url)
+    .replace(/^https?:\/\/[^\/]+\//i, ' ')
+    .replace(/[/?#&=_-]+/g, ' ')
+    .replace(/\b(site|dp|gp|product|item|skuId|ref|pdp)\b/gi, ' ');
+
+  if (manualUs > 0) cleanText += ` $ ${manualUs}`;
+
+  const parsed = parseSpecsFromText(cleanText);
+  parsed.store = store;
+  if (manualUs > 0) parsed.priceUs = manualUs;
+
+  openManualOcrForm();
+  document.getElementById('ocrParsedName').value = parsed.name;
+  document.getElementById('ocrParsedGpu').value = parsed.gpu;
+  document.getElementById('ocrParsedCpu').value = parsed.cpu;
+  document.getElementById('ocrParsedRam').value = parsed.ram;
+  document.getElementById('ocrParsedPriceUs').value = parsed.priceUs || (manualUs || 1199);
+  document.getElementById('ocrParsedStore').value = store;
+
+  if (parsed.isSolderedRam) {
+    const sel = document.getElementById('ocrParsedRamStatus');
+    if (sel) sel.value = 'none';
+  }
+
+  recalcOcrBrPrice(true);
+
+  document.getElementById('linkImportModal').style.display = 'none';
+  const ocrModal = document.getElementById('ocrModal');
+  if (ocrModal) ocrModal.style.display = 'flex';
+
+  showToastNotification(`✓ Dados extraídos do link da ${store}! Confira e clique em Confirmar e Salvar.`);
+}
+
 // Renderização Principal do Grid
 function render() {
   const grid = document.getElementById('notebookGrid');
@@ -1378,6 +1504,18 @@ function render() {
 
     return `
       <div class="laptop-card ${inBudget ? 'in-budget' : ''}">
+        <!-- Imagem do Produto no Topo (Identificação Visual Imediata) -->
+        <div class="card-image-hero">
+          <img src="${getLaptopImage(laptop)}" alt="${laptop.name}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=700&q=80';">
+          <div class="card-image-brand">${getBrandTag(laptop.name)}</div>
+          <div class="card-image-overlay-tgp">${laptop.gpu} • ${laptop.gpuTgp || '140W'}</div>
+          ${(laptop.score >= 93 || (laptop.bestFor && (laptop.bestFor.includes('Sweetspot') || laptop.bestFor.includes('Melhor')))) ? `
+            <div style="position:absolute; bottom:10px; left:12px; background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; font-size:0.7rem; font-weight:800; padding:3px 9px; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,0.6); display:flex; align-items:center; gap:4px;">
+              ⭐ NOSSA INDICAÇÃO
+            </div>
+          ` : ''}
+        </div>
+
         <div class="card-top">
           <div class="card-title-wrap">
             <h3 class="card-title">${laptop.name}</h3>
@@ -1604,8 +1742,13 @@ function renderTable(filteredLaptops) {
           return `
             <tr>
               <td>
-                <div class="table-model-title">${laptop.name}</div>
-                <div style="font-size:0.75rem; color:var(--text-dim);">${laptop.modelCode} • Score: <strong>${laptop.score}</strong></div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <img src="${getLaptopImage(laptop)}" alt="${laptop.name}" style="width:48px; height:36px; object-fit:cover; border-radius:4px; border:1px solid var(--border-subtle); flex-shrink:0;">
+                  <div>
+                    <div class="table-model-title">${laptop.name}</div>
+                    <div style="font-size:0.75rem; color:var(--text-dim);">${laptop.modelCode} • Score: <strong>${laptop.score}</strong></div>
+                  </div>
+                </div>
               </td>
               <td>
                 <div style="font-weight:700; color:#38bdf8;">${laptop.gpu}</div>
@@ -2456,6 +2599,8 @@ function showToastNotification(message) {
 
 window.saveOcrParsedLaptop = saveOcrParsedLaptop;
 window.openManualOcrForm = openManualOcrForm;
+window.openLinkImportModal = openLinkImportModal;
+window.processPastedLink = processPastedLink;
 window.switchViewMode = switchViewMode;
 window.toggleViewMode = toggleViewMode;
 window.showToastNotification = showToastNotification;
