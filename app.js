@@ -645,9 +645,16 @@ function bindEvents() {
   });
 
   // Busca e Filtros
-  document.getElementById('searchInput').addEventListener('input', () => {
-    render();
-  });
+  const searchInput = document.getElementById('searchInput');
+  const btnClearSearch = document.getElementById('btnClearSearch');
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      if (btnClearSearch) {
+        btnClearSearch.style.display = searchInput.value ? 'flex' : 'none';
+      }
+      render();
+    });
+  }
 
   document.getElementById('filterChips').addEventListener('click', (e) => {
     const chip = e.target.closest('.chip');

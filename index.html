@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261014_v16">
+  <link rel="stylesheet" href="styles.css?v=20261014_v19">
   <!-- Favicon Único na Aba do Navegador (Verde Esmeralda Radar Target) -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%2310b981'/><circle cx='50' cy='50' r='38' fill='none' stroke='%23064e3b' stroke-width='6'/><circle cx='50' cy='50' r='24' fill='none' stroke='%23ffffff' stroke-width='4'/><circle cx='50' cy='50' r='10' fill='%23ffffff'/><line x1='50' y1='8' x2='50' y2='92' stroke='%23064e3b' stroke-width='4'/><line x1='8' y1='50' x2='92' y2='50' stroke='%23064e3b' stroke-width='4'/></svg>">
   <link rel="alternate icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' x='50' font-size='75' text-anchor='middle'>🎯</text></svg>">
@@ -90,99 +90,125 @@
       </div>
     </section>
 
-    <!-- Central de Busca Direta nas Lojas com Filtros Anti-Pegadinha -->
+    <!-- Central de Busca Direta nas Lojas com Filtros Anti-Pegadinha (Painel Colapsável Limpo) -->
     <section class="store-search-section">
-      <div class="store-search-card">
-        <div class="store-search-header">
-          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <span class="badge badge-purple">Buscador Oficial</span>
-            <h3 style="font-size: 1.15rem; font-weight: 700;">🔍 Pesquisar Direto nas Lojas (EUA & Brasil)</h3>
+      <details class="store-search-details">
+        <summary class="store-search-summary">
+          <div class="summary-left">
+            <span class="badge badge-purple">🛒 Lojas Externas</span>
+            <strong>Pesquisar Ofertas Direto nas Lojas (EUA & Brasil)</strong>
+            <span class="badge badge-accent" style="font-size:0.7rem;">Estoque Oficial</span>
           </div>
-          <span style="font-size: 0.78rem; color: var(--accent);">
-            🛡️ Filtro Anti-Pegadinha Ativo: Exclui vendedores terceiros e foca só em estoque oficial
-          </span>
-        </div>
+          <span class="summary-toggle-hint">Abrir / Fechar Busca em Lojas ▾</span>
+        </summary>
 
-        <!-- Barra de Busca Multiloja -->
-        <div class="store-search-inputs">
-          <div class="search-input-wrap">
-            <span style="font-size: 1rem; margin-right: 0.4rem;">🔎</span>
-            <input type="text" id="storeCustomQuery" placeholder="Digite o que procura (ex: RTX 4070, OLED, Zephyrus G16, Legion Pro 5i)...">
+        <div class="store-search-card" style="margin-top: 1rem;">
+          <!-- Barra de Busca Multiloja -->
+          <div class="store-search-inputs">
+            <div class="search-input-wrap">
+              <span style="font-size: 1rem; margin-right: 0.4rem;">🔎</span>
+              <input type="text" id="storeCustomQuery" placeholder="Digite o que procura nas lojas (ex: RTX 4070, OLED, Zephyrus G16, Legion Pro 5i)...">
+            </div>
+            <select id="storeSelectTarget">
+              <option value="bestbuy">🇺🇸 Best Buy (Apenas Oficial Best Buy)</option>
+              <option value="microcenter">🇺🇸 Micro Center (Clearance & Promoções)</option>
+              <option value="bhphoto">🇺🇸 B&H Photo Video (DealZone)</option>
+              <option value="amazon_us">🇺🇸 Amazon EUA</option>
+              <option value="kabum">🇧🇷 Kabum (Brasil)</option>
+              <option value="all">🌐 Abrir Melhores Lojas Juntas</option>
+            </select>
+            <button class="btn btn-primary" id="btnExecuteStoreSearch">🚀 Buscar na Loja</button>
           </div>
-          <select id="storeSelectTarget">
-            <option value="bestbuy">🇺🇸 Best Buy (Apenas Oficial Best Buy)</option>
-            <option value="microcenter">🇺🇸 Micro Center (Clearance & Promoções)</option>
-            <option value="bhphoto">🇺🇸 B&H Photo Video (DealZone)</option>
-            <option value="amazon_us">🇺🇸 Amazon EUA</option>
-            <option value="kabum">🇧🇷 Kabum (Brasil)</option>
-            <option value="all">🌐 Abrir Melhores Lojas Juntas</option>
-          </select>
-          <button class="btn btn-primary" id="btnExecuteStoreSearch">🚀 Buscar na Loja</button>
-        </div>
 
-        <!-- Atalhos Rápidos Recomendados (1 Clique) -->
-        <div class="quick-store-shortcuts">
-          <span class="shortcuts-label">⚡ Atalhos Rápidos (Filtros já configurados):</span>
-          <div class="shortcuts-chips">
-            <button class="quick-chip" onclick="quickSearch('bestbuy_intel')">🔵 Best Buy: Só Intel Core i7 / i9</button>
-            <button class="quick-chip" onclick="quickSearch('bestbuy_rtx4070')">🔥 Best Buy: RTX 4070 até $1.450</button>
-            <button class="quick-chip" onclick="quickSearch('bestbuy_oled')">🌈 Best Buy: OLED Gamer</button>
-            <button class="quick-chip" onclick="quickSearch('bestbuy_openbox')">🏷️ Best Buy: Open-Box / Clearance</button>
-            <button class="quick-chip" onclick="quickSearch('microcenter_deals')">🏢 Micro Center: Gaming Deals</button>
-            <button class="quick-chip" onclick="quickSearch('bh_laptops')">📸 B&H: Deals</button>
-            <button class="quick-chip" onclick="quickSearch('kabum_rtx')">🇧🇷 Kabum: RTX 4060/4070 BR</button>
+          <!-- Atalhos Rápidos Recomendados (1 Clique) -->
+          <div class="quick-store-shortcuts">
+            <span class="shortcuts-label">⚡ Atalhos Rápidos Recomendados nas Lojas:</span>
+            <div class="shortcuts-chips">
+              <button class="quick-chip" onclick="quickSearch('bestbuy_intel')">🔵 Best Buy: Só Intel Core i7 / i9</button>
+              <button class="quick-chip" onclick="quickSearch('bestbuy_rtx4070')">🔥 Best Buy: RTX 4070 até $1.450</button>
+              <button class="quick-chip" onclick="quickSearch('bestbuy_oled')">🌈 Best Buy: OLED Gamer</button>
+              <button class="quick-chip" onclick="quickSearch('bestbuy_openbox')">🏷️ Best Buy: Open-Box / Clearance</button>
+              <button class="quick-chip" onclick="quickSearch('microcenter_deals')">🏢 Micro Center: Gaming Deals</button>
+              <button class="quick-chip" onclick="quickSearch('bh_laptops')">📸 B&H: Deals</button>
+              <button class="quick-chip" onclick="quickSearch('kabum_rtx')">🇧🇷 Kabum: RTX 4060/4070 BR</button>
+            </div>
           </div>
         </div>
-      </div>
+      </details>
     </section>
 
-    <!-- Navigation & Filters -->
+    <!-- Hub Central de Filtros & Controles (Alta Visibilidade e Organização) -->
     <section class="controls-section">
-      <div class="search-filter-bar">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="Buscar por modelo (ex: Legion, Predator, G16, RTX 4070, i7, i9)...">
+      <div class="control-hub-card">
+        <!-- 1. Linha Superior: Busca Textual Rápida + Ordenação & Ações Principais -->
+        <div class="search-top-bar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Filtrar por nome, processador, GPU ou loja (ex: Legion, TUF, RTX 4070, i7, i9)...">
+            <button type="button" id="btnClearSearch" class="btn-clear-search" onclick="document.getElementById('searchInput').value=''; render();" title="Limpar busca" style="display:none;">✕</button>
+          </div>
+
+          <div class="sort-action-wrap">
+            <div class="sort-select-box">
+              <span class="sort-label">Ordenar:</span>
+              <select id="sortSelect">
+                <option value="value_score">⭐ Melhor Custo-Benefício</option>
+                <option value="battery_desc">🔋 Maior Bateria (Uso Normal)</option>
+                <option value="ram_desc">🧠 Maior Memória RAM</option>
+                <option value="price_br_asc">🇧🇷 Menor Preço Brasil (R$)</option>
+                <option value="price_us_asc">🇺🇸 Menor Preço EUA (US$)</option>
+                <option value="diff_desc">⚡ Maior Economia nos EUA</option>
+                <option value="gpu_power">🎮 Maior Potência GPU</option>
+              </select>
+            </div>
+
+            <div class="quick-action-buttons">
+              <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border: none; box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);">⚡ Guia Técnico</button>
+              <button class="btn btn-primary" id="btnOpenDuel">🥊 Duelo</button>
+              <button class="btn btn-secondary" id="btnQuickTableToggle" onclick="window.toggleViewMode()" style="border: 1px solid var(--primary); color: var(--primary); font-weight: 700; background: rgba(56, 189, 248, 0.1);">📊 Tabela / Cards</button>
+              <button class="btn btn-secondary" id="btnOpenLinkModal" onclick="window.openLinkImportModal()" style="border: 1px solid #10b981; color: #34d399; font-weight: 700; background: rgba(16, 185, 129, 0.12);">🔗 Puxar Link</button>
+              <button class="btn btn-secondary" id="btnOpenOcrModal">📸 Print</button>
+              <button class="btn btn-secondary" id="btnOpenAddModal">➕ Novo</button>
+            </div>
+          </div>
         </div>
 
-        <div class="filter-chips" id="filterChips">
-          <button class="chip active" data-filter="all">Todos</button>
-          <button class="chip" data-filter="intel">🔵 Só Intel Core (Foco)</button>
-          <button class="chip" data-filter="amd">🔴 AMD Ryzen</button>
-          <button class="chip" data-filter="budget">Na Faixa (R$ 8k - 8.9k)</button>
-          <button class="chip" data-filter="gpu_upgrade">🚀 Upgrade Grátis de GPU nos EUA</button>
-          <button class="chip" data-filter="rtx4070">Com RTX 4070</button>
-          <button class="chip" data-filter="rtx4060">Com RTX 4060</button>
-          <button class="chip" data-filter="battery_long">🔋 Bateria Longa (6h+ Uso Normal)</button>
-          <button class="chip" data-filter="ram_upgrade">🔄 Aceita Upgrade de RAM (2x SODIMM)</button>
-          <button class="chip" data-filter="ram_soldered" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">🚫 Alerta: RAM Soldada (Não Troca)</button>
-          <button class="chip" data-filter="ddr5">⚡ RAM DDR5 (Mais Rápida)</button>
-          <button class="chip" data-filter="m2_extra">💾 Slot M.2 NVMe Extra Livre</button>
-          <button class="chip" data-filter="usbc_charging">🔌 Carrega por Type-C (USB-C PD)</button>
-          <button class="chip" data-filter="biometrics">🔐 Com Leitor de Digital / Facial</button>
-          <button class="chip" data-filter="rich_ports">⚡ Portas: USB-A + Type-C</button>
-          <button class="chip" data-filter="no_dongle">🔌 Sem Dongle (2+ USB-A)</button>
-          <button class="chip" data-filter="watchlist">⭐ Meus Monitorados</button>
-        </div>
-      </div>
+        <!-- 2. Linhas de Filtros Categorizados em Grupos Visuais Limpos -->
+        <div class="filter-chips-container" id="filterChips">
+          <!-- Linha A: Destaques & Decisão -->
+          <div class="filter-group-row">
+            <span class="filter-group-label">🎯 Destaques:</span>
+            <div class="filter-group-items">
+              <button class="chip active" data-filter="all">✨ Todos os Notebooks</button>
+              <button class="chip" data-filter="watchlist">⭐ Meus Monitorados</button>
+              <button class="chip" data-filter="budget">💰 Na Faixa (R$ 8k - 8.9k)</button>
+              <button class="chip" data-filter="gpu_upgrade">🚀 Melhor Negócio nos EUA</button>
+            </div>
+          </div>
 
-      <div class="sort-bar">
-        <span>Ordenar por:</span>
-        <select id="sortSelect">
-          <option value="value_score">Melhor Custo-Benefício (Score)</option>
-          <option value="battery_desc">🔋 Maior Autonomia de Bateria (Uso Normal)</option>
-          <option value="ram_desc">🧠 Maior Memória RAM (32GB / 16GB)</option>
-          <option value="price_br_asc">Menor Preço no Brasil (R$)</option>
-          <option value="price_us_asc">Menor Preço nos EUA (US$)</option>
-          <option value="diff_desc">Maior Economia trazendo dos EUA</option>
-          <option value="gpu_power">Potência da GPU (TGP / Tier)</option>
-        </select>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border: none; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);">⚡ Guia: Placas, Bateria, RAM & SSD</button>
-          <button class="btn btn-screenshot" id="btnOpenOcrModal">📸 Puxar por Print</button>
-          <button class="btn btn-secondary" id="btnOpenLinkModal" onclick="window.openLinkImportModal()" style="border: 1px solid #10b981; color: #34d399; font-weight: 700; background: rgba(16, 185, 129, 0.12);">🔗 Puxar por Link</button>
-          <button class="btn btn-primary" id="btnOpenDuel">🥊 Duelo: Qual Vale Mais a Pena?</button>
-          <button class="btn btn-secondary" id="btnQuickTableToggle" onclick="window.toggleViewMode()" style="border: 1px solid var(--primary); color: var(--primary); font-weight: 700; background: rgba(56, 189, 248, 0.1);">📊 Ver em Tabela / Lista</button>
-          <button class="btn btn-secondary" id="btnOpenAddModal">➕ Novo Modelo</button>
+          <!-- Linha B: Processador & Placa de Vídeo -->
+          <div class="filter-group-row">
+            <span class="filter-group-label">⚙️ Hardware:</span>
+            <div class="filter-group-items">
+              <button class="chip" data-filter="intel">🔵 Só Intel Core (Foco)</button>
+              <button class="chip" data-filter="amd">🔴 AMD Ryzen</button>
+              <button class="chip" data-filter="rtx4070">🎮 Com RTX 4070 (140W)</button>
+              <button class="chip" data-filter="rtx4060">🎮 Com RTX 4060 (140W)</button>
+            </div>
+          </div>
+
+          <!-- Linha C: Bateria, Memória & Conexões -->
+          <div class="filter-group-row">
+            <span class="filter-group-label">🔋 Recursos:</span>
+            <div class="filter-group-items">
+              <button class="chip" data-filter="battery_long">🔋 Bateria Longa (6h+ Uso Normal)</button>
+              <button class="chip" data-filter="ram_upgrade">🧠 Aceita Upgrade RAM (2x SODIMM)</button>
+              <button class="chip chip-alert" data-filter="ram_soldered">🚫 Alerta: RAM Soldada (Não Troca)</button>
+              <button class="chip" data-filter="usbc_charging">⚡ Carrega por USB-C PD</button>
+              <button class="chip" data-filter="m2_extra">💾 Slot M.2 Extra Livre</button>
+              <button class="chip" data-filter="no_dongle">🔌 Sem Dongle (2+ USB-A)</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -856,6 +882,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=20261014_v17"></script>
+  <script src="app.js?v=20261014_v19"></script>
 </body>
 </html>
