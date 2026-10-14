@@ -1046,10 +1046,32 @@
   <footer class="app-footer">
     <div class="footer-container">
       <p>⚡ <strong>GamerRadar</strong> - Calculadora de paridade de compra, paridade técnica e rastreador de preços.</p>
-      <p class="footer-tip">Dica técnica: Sempre confira o <strong>TGP (Watts)</strong> da GPU. Uma RTX 4060 de 140W supera uma RTX 4070 limitada a 75W/100W!</p>
+      <p class="footer-tip">
+        Dica técnica: Sempre confira o <strong>TGP (Watts)</strong> da GPU. Uma RTX 4060 de 140W supera uma RTX 4070 limitada a 75W/100W! 
+        • <span style="cursor:pointer; color:var(--primary); text-decoration:underline;" onclick="checkForNewAppVersion(true)" title="Clique para verificar se há uma nova versão online">v26 (Checar Atualizações ↻)</span>
+      </p>
     </div>
   </footer>
 
-  <script src="app.js?v=20261014_v25"></script>
+  <!-- Banner Flutuante de Notificação de Nova Versão (Auto-Update Inteligente) -->
+  <div id="newVersionBanner" class="new-version-banner">
+    <div class="version-banner-content">
+      <div class="version-banner-icon">⚡</div>
+      <div class="version-banner-text">
+        <strong>Nova Versão Disponível!</strong>
+        <p id="newVersionDesc">O GamerRadar foi atualizado no GitHub. Clique para carregar na hora sem cache antigo.</p>
+      </div>
+    </div>
+    <div class="version-banner-actions">
+      <button type="button" class="btn-update-now" onclick="applyAppUpdate()">
+        🔄 Atualizar Agora
+      </button>
+      <button type="button" class="btn-dismiss-update" onclick="dismissUpdateBanner()" title="Fechar aviso">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <script src="app.js?v=20261014_v26"></script>
 </body>
 </html>

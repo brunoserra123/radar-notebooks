@@ -4412,3 +4412,134 @@ window.closeVideoReviewsModal = closeVideoReviewsModal;
 window.executeCustomVideoSearch = executeCustomVideoSearch;
 window.searchVideoWithTerm = searchVideoWithTerm;
 
+// ==========================================
+// SISTEMA DE VERIFICAÇÃO DE NOVA VERSÃO VIA API & GITHUB
+// ==========================================
+const CURRENT_APP_VERSION = '20261014_v26';
+const GITHUB_REPO_API = 'https://api.github.com/repos/brunoserra123/radar-notebooks/commits/main';
+
+let isCheckingUpdate = false;
+
+async function checkForNewAppVersion(isManual = false) {
+  if (isCheckingUpdate) return;
+  isCheckingUpdate = true;
+
+  try {
+    let updateFound = false;
+    let newVersionLabel = '';
+    let commitMessage = '';
+
+    // Método 1: Checa version.json com no-store e timestamp para furar qualquer cache
+    try {
+      const res = await fetch(`version.json?_t=${Date.now()}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.version && data.version !== CURRENT_APP_VERSION) {
+          updateFound = true;
+          newVersionLabel = data.version;
+          commitMessage = data.releaseNotes || 'Novas melhorias e recursos disponíveis.';
+        }
+      }
+    } catch (e) {
+      console.warn('Checagem via version.json falhou, tentando API do GitHub...', e);
+    }
+
+    // Método 2: Consulta a API oficial do GitHub para detectar commits novos em tempo real
+    if (!updateFound) {
+      try {
+        const ghRes = await fetch(GITHUB_REPO_API, {
+          headers: { 'Accept': 'application/vnd.github.v3+json' },
+          cache: 'no-store'
+        });
+        if (ghRes.ok) {
+          const ghData = await ghRes.json();
+          const latestSha = ghData.sha ? ghData.sha.substring(0, 7) : null;
+          const savedSha = localStorage.getItem('gamer_radar_last_sha');
+          
+          if (latestSha) {
+            // Se já tínhamos um sha salvo e o novo sha é diferente, há versão nova!
+            if (savedSha && savedSha !== latestSha) {
+              updateFound = true;
+              newVersionLabel = `Commit ${latestSha}`;
+              commitMessage = ghData.commit?.message?.split('\n')[0] || 'Atualização recente no repositório.';
+            } else if (!savedSha) {
+              localStorage.setItem('gamer_radar_last_sha', latestSha);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Checagem via API do GitHub falhou:', err);
+      }
+    }
+
+    if (updateFound) {
+      showNewVersionBanner(newVersionLabel, commitMessage);
+    } else if (isManual) {
+      showToastNotification('✅ Você já está usando a versão mais recente do GamerRadar!');
+    }
+  } catch (err) {
+    console.error('Erro na checagem de atualizações:', err);
+    if (isManual) {
+      showToastNotification('⚠️ Não foi possível verificar novas versões no momento.');
+    }
+  } finally {
+    isCheckingUpdate = false;
+  }
+}
+
+function showNewVersionBanner(versionName, message) {
+  const banner = document.getElementById('newVersionBanner');
+  const descEl = document.getElementById('newVersionDesc');
+  if (!banner) return;
+
+  if (descEl && message) {
+    descEl.innerHTML = `<strong>${versionName ? versionName + ': ' : ''}</strong>${message}`;
+  }
+
+  banner.classList.add('show');
+}
+
+function dismissUpdateBanner() {
+  const banner = document.getElementById('newVersionBanner');
+  if (banner) banner.classList.remove('show');
+}
+
+function applyAppUpdate() {
+  // Limpa caches do navegador se suportado
+  if ('caches' in window) {
+    caches.keys().then(keys => {
+      keys.forEach(key => caches.delete(key));
+    });
+  }
+
+  showToastNotification('🔄 Atualizando página para a nova versão...');
+
+  setTimeout(() => {
+    // Força recarregamento com parâmetro timestamp único para furar qualquer cache de CDN/Navegador
+    const url = new URL(window.location.href);
+    url.searchParams.set('v', Date.now());
+    window.location.href = url.toString();
+  }, 250);
+}
+
+// Inicia verificação automática ao carregar a página (delay suave de 1.5s)
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => checkForNewAppVersion(false), 1500);
+});
+
+// Checa quando o usuário volta para a aba do navegador
+window.addEventListener('focus', () => {
+  checkForNewAppVersion(false);
+});
+
+// Checa periodicamente a cada 90 segundos enquanto a aba estiver aberta
+setInterval(() => {
+  checkForNewAppVersion(false);
+}, 90000);
+
+// Exportações Globais
+window.checkForNewAppVersion = checkForNewAppVersion;
+window.applyAppUpdate = applyAppUpdate;
+window.dismissUpdateBanner = dismissUpdateBanner;
+
+
