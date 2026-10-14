@@ -2100,6 +2100,363 @@ function resetLaptopToDefault(laptopId) {
   }
 }
 
+// ==========================================
+// MODAL DE VÍDEOS & REVIEWS DE ESPECIALISTAS
+// ==========================================
+function openVideoReviewsModal(laptopId) {
+  const laptop = laptops.find(l => l.id === laptopId) || DEFAULT_LAPTOPS.find(l => l.id === laptopId);
+  if (!laptop) return;
+
+  const modal = document.getElementById('videoReviewsModal');
+  const body = document.getElementById('videoReviewsModalBody');
+  const title = document.getElementById('videoReviewsModalTitle');
+  if (!modal || !body) return;
+
+  if (title) {
+    title.innerHTML = `🎬 Reviews & Benchmarks: <span style="color:#f87171;">${laptop.name}</span>`;
+  }
+
+  // Prepara termos de busca limpos
+  const rawName = laptop.name;
+  const cleanName = rawName.replace(/notebook\s*gamer/gi, '').trim();
+  const gpuTerm = (laptop.gpu || '').replace(/NVIDIA\s*/gi, '').trim();
+  const cpuTerm = (laptop.cpu || '').split('(')[0].trim();
+
+  // URLs de busca rápida no YouTube
+  // 1. Reviews Brasil nos canais top (Dan Ferreira, Adrenaline, Lucas Ishii, TecMundo)
+  const queryBr = `"${cleanName}" review (Dan Ferreira OR Adrenaline OR "Lucas Ishii" OR TecMundo)`;
+  const urlBr = `https://www.youtube.com/results?search_query=${encodeURIComponent(queryBr)}`;
+
+  // 2. Reviews Mundiais nos canais #1 (Jarrod's Tech, Dave2D, Just Josh, Hardware Canucks)
+  const queryUs = `"${cleanName}" "${gpuTerm}" review ("Jarrod's Tech" OR Dave2D OR "Just Josh" OR "Hardware Canucks")`;
+  const urlUs = `https://www.youtube.com/results?search_query=${encodeURIComponent(queryUs)}`;
+
+  // 3. Testes reais de FPS e Jogos com a mesma GPU
+  const queryFps = `"${gpuTerm}" laptop gaming benchmark fps tests`;
+  const urlFps = `https://www.youtube.com/results?search_query=${encodeURIComponent(queryFps)}`;
+
+  // 4. Teste Térmico, Aquecimento & Barulho de Ventoinhas
+  const queryThermals = `"${cleanName}" thermal test fan noise temperature`;
+  const urlThermals = `https://www.youtube.com/results?search_query=${encodeURIComponent(queryThermals)}`;
+
+  // Canais específicos BR
+  const urlDan = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanName + ' Dan Ferreira')}`;
+  const urlAdrenaline = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanName + ' Adrenaline review')}`;
+  const urlLucasIshii = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanName + ' Lucas Ishii')}`;
+  const urlTecmundo = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanName + ' TecMundo review')}`;
+
+  // Canais específicos Mundiais
+  const urlJarrods = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanName + " Jarrod's Tech")}`;
+  const urlDave2D = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanName + ' Dave2D')}`;
+  const urlJustJosh = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanName + ' Just Josh review')}`;
+  const urlLtt = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanName + ' Linus Tech Tips')}`;
+
+  body.innerHTML = `
+    <!-- Top Hero com Foto e Specs Reais -->
+    <div class="video-hero-card">
+      <img src="${getLaptopImage(laptop)}" alt="${laptop.name}" class="video-hero-thumb">
+      <div class="video-hero-info">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span class="badge" style="background:rgba(239, 68, 68, 0.2); color:#f87171; border:1px solid rgba(239, 68, 68, 0.4);">
+            🎯 Configuração Exata
+          </span>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">
+            ${laptop.modelCode || 'Modelo Oficial'}
+          </span>
+        </div>
+        <h3 style="margin:4px 0 6px 0; font-size:1.15rem; color:#fff;">${laptop.name}</h3>
+        
+        <div class="video-specs-pill-bar">
+          <span class="video-spec-pill gpu">🎮 ${laptop.gpu} (${laptop.gpuTgp || 'TGP Máximo'})</span>
+          <span class="video-spec-pill cpu">⚙️ ${cpuTerm}</span>
+          <span class="video-spec-pill">⚡ ${laptop.ram}</span>
+          <span class="video-spec-pill">🖥️ ${laptop.screen}</span>
+        </div>
+        
+        <div style="font-size:0.78rem; color:var(--text-muted); line-height:1.4; margin-top:6px; background:rgba(0,0,0,0.25); padding:6px 10px; border-radius:6px; border-left:3px solid #ef4444;">
+          💡 <strong>Dica de Ouro GamerRadar:</strong> Ao assistir ao review, repare se o vídeo testa exatamente a <strong>${gpuTerm}</strong> e o mesmo TGP (${laptop.gpuTgp || '140W'}), pois fabricantes muitas vezes lançam o mesmo modelo com telas de 45% NTSC ou placas com menos Watts!
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção de Acesso Rápido em 1 Clique -->
+    <div class="video-section-header">
+      <h4>⚡ Acesso Rápido em 1 Clique (Buscas Cirúrgicas no YouTube)</h4>
+      <span style="font-size:0.75rem; color:var(--text-muted);">Abre nova aba com filtros precisos</span>
+    </div>
+
+    <div class="video-quick-grid">
+      <a href="${urlBr}" target="_blank" class="video-quick-card br">
+        <div class="video-quick-card-title">
+          <span>🇧🇷 Reviews no YouTube Brasil</span>
+          <span>▶️</span>
+        </div>
+        <div class="video-quick-card-desc">
+          Filtra automaticamente os vídeos mais conceituados do Brasil (Dan Ferreira, Adrenaline, Lucas Ishii e TecMundo).
+        </div>
+        <div class="video-quick-card-btn">
+          <span>Abrir Reviews BR no YouTube ↗</span>
+        </div>
+      </a>
+
+      <a href="${urlUs}" target="_blank" class="video-quick-card usa">
+        <div class="video-quick-card-title">
+          <span>🇺🇸 Reviews Mundiais (EUA/Global)</span>
+          <span>🌐</span>
+        </div>
+        <div class="video-quick-card-desc">
+          Filtra os maiores laboratórios do mundo: Jarrod's Tech, Dave2D, Just Josh e Hardware Canucks.
+        </div>
+        <div class="video-quick-card-btn">
+          <span>Abrir Reviews Mundiais ↗</span>
+        </div>
+      </a>
+
+      <a href="${urlFps}" target="_blank" class="video-quick-card">
+        <div class="video-quick-card-title">
+          <span>🎮 Testes de FPS em Jogos (${gpuTerm})</span>
+          <span>🔥</span>
+        </div>
+        <div class="video-quick-card-desc">
+          Gameplays reais com contador de FPS em Cyberpunk, Warzone, GTA V e CS2 nesta mesma placa.
+        </div>
+        <div class="video-quick-card-btn">
+          <span>Ver FPS em Jogos ↗</span>
+        </div>
+      </a>
+
+      <a href="${urlThermals}" target="_blank" class="video-quick-card">
+        <div class="video-quick-card-title">
+          <span>❄️ Aquecimento & Barulho das Ventoinhas</span>
+          <span>🌡️</span>
+        </div>
+        <div class="video-quick-card-desc">
+          Testes de estresse com câmeras térmicas, thermal throttling e decibéis de ruído das ventoinhas.
+        </div>
+        <div class="video-quick-card-btn">
+          <span>Ver Testes Térmicos ↗</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Grade de Canais Top: Brasil -->
+    <div class="video-section-header">
+      <h4>🇧🇷 Canais Especialistas do Brasil em Notebooks Gamers</h4>
+      <span style="font-size:0.75rem; color:var(--text-muted);">Clique para pesquisar direto no canal</span>
+    </div>
+
+    <div class="video-channels-grid">
+      <div class="video-channel-item">
+        <div class="video-channel-avatar" style="background:rgba(16, 185, 129, 0.15); border-color:rgba(16, 185, 129, 0.4); color:#34d399;">
+          🔬
+        </div>
+        <div class="video-channel-info">
+          <div class="video-channel-name-bar">
+            <span class="video-channel-name">Dan Ferreira</span>
+            <span class="video-channel-badge">#1 Brasil em Laptops</span>
+          </div>
+          <div class="video-channel-desc">
+            A maior autoridade técnica do Brasil em desmontagem interna, testes térmicos, undervolt, TGP real e upgrades de memória/SSD.
+          </div>
+          <a href="${urlDan}" target="_blank" class="video-channel-btn">
+            ▶️ Ver Reviews de Dan Ferreira ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="video-channel-item">
+        <div class="video-channel-avatar" style="background:rgba(239, 68, 68, 0.15); border-color:rgba(239, 68, 68, 0.4); color:#f87171;">
+          📊
+        </div>
+        <div class="video-channel-info">
+          <div class="video-channel-name-bar">
+            <span class="video-channel-name">Adrenaline</span>
+            <span class="video-channel-badge">Diego Kerber & Equipe</span>
+          </div>
+          <div class="video-channel-desc">
+            Bateria completa de benchmarks gráficos, testes de tempo de resposta da tela, teclado e análise de preço no Brasil.
+          </div>
+          <a href="${urlAdrenaline}" target="_blank" class="video-channel-btn">
+            ▶️ Ver Reviews no Adrenaline ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="video-channel-item">
+        <div class="video-channel-avatar" style="background:rgba(56, 189, 248, 0.15); border-color:rgba(56, 189, 248, 0.4); color:#38bdf8;">
+          🎯
+        </div>
+        <div class="video-channel-info">
+          <div class="video-channel-name-bar">
+            <span class="video-channel-name">Lucas Ishii</span>
+            <span class="video-channel-badge">Custo-Benefício & Prática</span>
+          </div>
+          <div class="video-channel-desc">
+            Reviews minuciosos do dia a dia, durabilidade, som dos alto-falantes, unboxing e opiniões sinceras para estudantes e gamers.
+          </div>
+          <a href="${urlLucasIshii}" target="_blank" class="video-channel-btn">
+            ▶️ Ver Reviews de Lucas Ishii ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="video-channel-item">
+        <div class="video-channel-avatar" style="background:rgba(168, 85, 247, 0.15); border-color:rgba(168, 85, 247, 0.4); color:#c084fc;">
+          📰
+        </div>
+        <div class="video-channel-info">
+          <div class="video-channel-name-bar">
+            <span class="video-channel-name">TecMundo</span>
+            <span class="video-channel-badge">Grande Portal Tech</span>
+          </div>
+          <div class="video-channel-desc">
+            Primeiras impressões e análises de ecossistema, design, acabamento e comparações de mercado geral.
+          </div>
+          <a href="${urlTecmundo}" target="_blank" class="video-channel-btn">
+            ▶️ Ver Reviews no TecMundo ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grade de Canais Top: Internacionais -->
+    <div class="video-section-header">
+      <h4>🇺🇸 Canais Internacionais de Elite (Padrão Ouro Mundial de Testes)</h4>
+      <span style="font-size:0.75rem; color:var(--text-muted);">Testes de laboratório avançados</span>
+    </div>
+
+    <div class="video-channels-grid">
+      <div class="video-channel-item">
+        <div class="video-channel-avatar" style="background:rgba(239, 68, 68, 0.2); border-color:#ef4444; color:#ef4444;">
+          👑
+        </div>
+        <div class="video-channel-info">
+          <div class="video-channel-name-bar">
+            <span class="video-channel-name">Jarrod's Tech</span>
+            <span class="video-channel-badge" style="background:rgba(239, 68, 68, 0.2); color:#fca5a5;">#1 Mundial Absoluto</span>
+          </div>
+          <div class="video-channel-desc">
+            A referência global em notebooks. Mede gama de cores sRGB/DCI-P3, tempo de resposta em ms da tela, ruído com decibelímetro e compara 25+ jogos lado a lado.
+          </div>
+          <a href="${urlJarrods}" target="_blank" class="video-channel-btn">
+            ▶️ Ver Reviews no Jarrod's Tech ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="video-channel-item">
+        <div class="video-channel-avatar" style="background:rgba(56, 189, 248, 0.15); border-color:rgba(56, 189, 248, 0.4); color:#38bdf8;">
+          ✨
+        </div>
+        <div class="video-channel-info">
+          <div class="video-channel-name-bar">
+            <span class="video-channel-name">Dave2D (Dave Lee)</span>
+            <span class="video-channel-badge">Design & Engenharia</span>
+          </div>
+          <div class="video-channel-desc">
+            Reviews estéticos e diretos ao ponto, ergonomia, sensação tátil do teclado, qualidade da dobradiça da tela e ruído térmico.
+          </div>
+          <a href="${urlDave2D}" target="_blank" class="video-channel-btn">
+            ▶️ Ver Reviews no Dave2D ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="video-channel-item">
+        <div class="video-channel-avatar" style="background:rgba(16, 185, 129, 0.15); border-color:rgba(16, 185, 129, 0.4); color:#34d399;">
+          ⚖️
+        </div>
+        <div class="video-channel-info">
+          <div class="video-channel-name-bar">
+            <span class="video-channel-name">Just Josh</span>
+            <span class="video-channel-badge">Comparativos & Bateria</span>
+          </div>
+          <div class="video-channel-desc">
+            Gráficos comparativos de bateria no dia a dia, fidelidade de tela para produtividade e custo-benefício em dólares.
+          </div>
+          <a href="${urlJustJosh}" target="_blank" class="video-channel-btn">
+            ▶️ Ver Reviews no Just Josh ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="video-channel-item">
+        <div class="video-channel-avatar" style="background:rgba(245, 158, 11, 0.15); border-color:rgba(245, 158, 11, 0.4); color:#fbbf24;">
+          ⚡
+        </div>
+        <div class="video-channel-info">
+          <div class="video-channel-name-bar">
+            <span class="video-channel-name">Linus Tech Tips / ShortCircuit</span>
+            <span class="video-channel-badge">Unboxing & Disrupção</span>
+          </div>
+          <div class="video-channel-desc">
+            Primeiras impressões sem filtro, detalhes de portas, carregador, peso e arquitetura geral.
+          </div>
+          <a href="${urlLtt}" target="_blank" class="video-channel-btn">
+            ▶️ Ver no LTT / ShortCircuit ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de Pesquisa Rápida Personalizada com Chips -->
+    <div class="video-custom-search-box">
+      <div style="font-size:0.88rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:6px;">
+        <span>🔍 Pesquisa Personalizada no YouTube para este Notebook</span>
+      </div>
+      <p style="font-size:0.78rem; color:var(--text-muted); margin:4px 0 10px 0;">
+        Clique em um tema rápido ou digite o jogo específico que deseja ver rodando:
+      </p>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <input type="text" id="customVideoSearchInput_${laptop.id}" placeholder="Ex: Cyberpunk 2077, GTA V, Valorant, tela 165Hz..." 
+          style="flex:1; min-width:240px; background:var(--bg-card); border:1px solid rgba(255,255,255,0.15); border-radius:6px; padding:8px 12px; color:#fff; font-size:0.85rem;"
+          onkeydown="if(event.key === 'Enter') executeCustomVideoSearch('${laptop.id}')">
+        <button type="button" class="btn btn-primary" onclick="executeCustomVideoSearch('${laptop.id}')" style="background:#ef4444; border-color:#ef4444; font-size:0.82rem; padding:8px 16px;">
+          ▶️ Buscar no YouTube
+        </button>
+      </div>
+
+      <div class="video-chips-list">
+        <span style="font-size:0.73rem; color:var(--text-muted); align-self:center;">Atalhos de 1 toque:</span>
+        <button type="button" class="video-quick-chip" onclick="searchVideoWithTerm('${laptop.id}', 'Cyberpunk 2077 Ray Tracing DLSS 3')">🎮 Cyberpunk 2077</button>
+        <button type="button" class="video-quick-chip" onclick="searchVideoWithTerm('${laptop.id}', 'Warzone FPS test benchmark')">🔫 Warzone</button>
+        <button type="button" class="video-quick-chip" onclick="searchVideoWithTerm('${laptop.id}', 'CS2 Counter-Strike 2 competitive fps')">💣 CS2</button>
+        <button type="button" class="video-quick-chip" onclick="searchVideoWithTerm('${laptop.id}', 'battery life test web browsing')">🔋 Teste de Bateria</button>
+        <button type="button" class="video-quick-chip" onclick="searchVideoWithTerm('${laptop.id}', 'thermal throttle stress test cooling pad')">🌡️ Estresse Térmico</button>
+        <button type="button" class="video-quick-chip" onclick="searchVideoWithTerm('${laptop.id}', 'teardown upgrade ram ssd opening inside')">🛠️ Como Abrir & Upgrades</button>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; margin-top:1.25rem;">
+      <button type="button" class="btn btn-secondary" onclick="closeVideoReviewsModal()">
+        Fechar Janela
+      </button>
+    </div>
+  `;
+
+  modal.style.display = 'flex';
+}
+
+function closeVideoReviewsModal() {
+  const modal = document.getElementById('videoReviewsModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function executeCustomVideoSearch(laptopId) {
+  const input = document.getElementById(`customVideoSearchInput_${laptopId}`);
+  const term = input ? input.value.trim() : '';
+  searchVideoWithTerm(laptopId, term);
+}
+
+function searchVideoWithTerm(laptopId, customTerm) {
+  const laptop = laptops.find(l => l.id === laptopId) || DEFAULT_LAPTOPS.find(l => l.id === laptopId);
+  const laptopName = laptop ? laptop.name.replace(/notebook\s*gamer/gi, '').trim() : '';
+  const query = `${laptopName} ${customTerm}`.trim();
+  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+  window.open(url, '_blank');
+}
+
 // Modal e Extração Inteligente por Link Direto
 function openLinkImportModal() {
   const modal = document.getElementById('linkImportModal');
@@ -2734,6 +3091,9 @@ function render() {
           <button class="btn btn-robot" onclick="openSpecsAuditModal('${laptop.id}')" title="Robô GamerRadar: Conferir e Validar Especificações">
             🤖 Conferir Specs
           </button>
+          <button class="btn btn-video" onclick="openVideoReviewsModal('${laptop.id}')" title="Ver vídeos, análises e testes dos principais canais de tecnologia">
+            ▶️ Vídeos
+          </button>
           <button class="btn btn-secondary" onclick="openDirectEditModal('${laptop.id}')" title="Corrigir foto, modelo ou preços">
             ✏️ Corrigir
           </button>
@@ -2867,9 +3227,14 @@ function renderTable(filteredLaptops) {
                 </div>
               </td>
               <td>
-                <button class="btn btn-primary" onclick="openDuelModal('${laptop.id}')" style="font-size:0.75rem; padding:4px 8px; white-space:nowrap;">
-                  🥊 Duelo
-                </button>
+                <div style="display:flex; gap:4px; flex-direction:column;">
+                  <button class="btn btn-primary" onclick="openDuelModal('${laptop.id}')" style="font-size:0.75rem; padding:4px 8px; white-space:nowrap;">
+                    🥊 Duelo
+                  </button>
+                  <button class="btn btn-video" onclick="openVideoReviewsModal('${laptop.id}')" style="font-size:0.75rem; padding:4px 8px; white-space:nowrap;">
+                    ▶️ Vídeos
+                  </button>
+                </div>
               </td>
             </tr>
           `;
@@ -4040,3 +4405,10 @@ window.toggleChecklist = function(forceOpen = false) {
   grid.style.display = isHidden ? 'grid' : 'none';
   if (btn) btn.innerText = isHidden ? '▾ Recolher' : '▸ Expandir';
 };
+
+// Exportações Globais do Hub de Vídeos
+window.openVideoReviewsModal = openVideoReviewsModal;
+window.closeVideoReviewsModal = closeVideoReviewsModal;
+window.executeCustomVideoSearch = executeCustomVideoSearch;
+window.searchVideoWithTerm = searchVideoWithTerm;
+

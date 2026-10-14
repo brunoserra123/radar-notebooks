@@ -1023,6 +1023,24 @@
       </div>
     </div>
 
+    <!-- Modal de Vídeos, Reviews & Benchmarks dos Melhores Canais de Tecnologia -->
+    <div class="modal-backdrop" id="videoReviewsModal" style="display: none;" onclick="if(event.target === this) closeVideoReviewsModal()">
+      <div class="modal-dialog modal-large">
+        <div class="modal-header">
+          <div>
+            <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.45);">
+              ▶️ YouTube Hub • Reviews & Testes de FPS
+            </span>
+            <h3 class="modal-title" id="videoReviewsModalTitle">🎬 Vídeos dos Melhores Canais de Tecnologia</h3>
+          </div>
+          <button class="btn-close" id="btnCloseVideoReviewsModal" onclick="closeVideoReviewsModal()">✕</button>
+        </div>
+        <div class="modal-body" id="videoReviewsModalBody">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <footer class="app-footer">
@@ -1032,6 +1050,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=20261014_v24"></script>
+  <script src="app.js?v=20261014_v25"></script>
 </body>
 </html>
