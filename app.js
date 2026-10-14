@@ -369,45 +369,123 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
 });
 
+// Motor Inteligente Anti-Duplicação: impede cadastrar o mesmo notebook duas vezes
+function findDuplicateLaptop(target, list = laptops) {
+  if (!target || !Array.isArray(list)) return null;
+  const clean = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  const tId = target.id;
+  const tName = clean(target.name);
+  const tGpu = clean(target.gpu);
+  const tCpu = clean(target.cpu);
+
+  for (const existing of list) {
+    if (!existing) continue;
+
+    // 1. Mesmo ID exato
+    if (tId && existing.id && tId === existing.id) return existing;
+
+    const eName = clean(existing.name);
+    const eGpu = clean(existing.gpu);
+    const eCpu = clean(existing.cpu);
+
+    // 2. Mesma GPU (ex: 4060 com 4060, 4070 com 4070)
+    const gpuMatch = 
+      (tGpu === eGpu) ||
+      (tGpu.includes('4060') && eGpu.includes('4060')) ||
+      (tGpu.includes('4070') && eGpu.includes('4070')) ||
+      (tGpu.includes('4080') && eGpu.includes('4080')) ||
+      (tGpu.includes('4090') && eGpu.includes('4090')) ||
+      (tGpu.includes('4050') && eGpu.includes('4050'));
+
+    if (!gpuMatch) continue;
+
+    // 3. Nome do modelo muito parecido (ex: "Helios Neo 16", "Legion Slim 5", "Dell G16", "Zephyrus G16")
+    const nameMatch = 
+      (tName === eName) ||
+      (tName.length >= 6 && eName.length >= 6 && (tName.includes(eName) || eName.includes(tName))) ||
+      ((tName.includes('helios') || tName.includes('predator')) && (eName.includes('helios') || eName.includes('predator'))) ||
+      ((tName.includes('slim5') || tName.includes('legionslim')) && (eName.includes('slim5') || eName.includes('legionslim'))) ||
+      ((tName.includes('pro5') || tName.includes('legionpro')) && (eName.includes('pro5') || eName.includes('legionpro'))) ||
+      (tName.includes('dellg16') && eName.includes('dellg16')) ||
+      (tName.includes('dellg15') && eName.includes('dellg15')) ||
+      (tName.includes('zephyrus') && eName.includes('zephyrus')) ||
+      (tName.includes('tufa15') && eName.includes('tufa15')) ||
+      (tName.includes('nitro16') && eName.includes('nitro16'));
+
+    if (nameMatch) {
+      // 4. Se tiver CPU definida em ambos, diferencia família Intel vs AMD
+      if (tCpu && eCpu) {
+        const isIntelT = tCpu.includes('intel') || tCpu.includes('i7') || tCpu.includes('i9') || tCpu.includes('ultra');
+        const isAmdT = tCpu.includes('amd') || tCpu.includes('ryzen');
+        const isIntelE = eCpu.includes('intel') || eCpu.includes('i7') || eCpu.includes('i9') || eCpu.includes('ultra');
+        const isAmdE = eCpu.includes('amd') || eCpu.includes('ryzen');
+
+        if ((isIntelT && isAmdE) || (isAmdT && isIntelE)) {
+          // Processadores de fabricantes diferentes: não é duplicado (são variações diferentes do mesmo notebook)
+          continue;
+        }
+      }
+      return existing;
+    }
+  }
+  return null;
+}
+
 function loadData() {
   const savedLaptops = localStorage.getItem(STORAGE_KEY);
   if (savedLaptops) {
     try {
       const parsed = JSON.parse(savedLaptops);
-      // Mesclar propriedades novas (battery, ports, biometrics, hasUsbCCharging, ramUpgrade, storage) caso venham do DEFAULT_LAPTOPS
-      laptops = parsed.map(item => {
-        const def = DEFAULT_LAPTOPS.find(d => d.id === item.id);
-        if (def) {
-          return {
-            ...def,
-            ...item,
-            battery: item.battery || def.battery,
-            batteryHoursNormal: item.batteryHoursNormal !== undefined ? item.batteryHoursNormal : def.batteryHoursNormal,
-            hasUsbCCharging: item.hasUsbCCharging !== undefined ? item.hasUsbCCharging : def.hasUsbCCharging,
-            chargingInfo: item.chargingInfo || def.chargingInfo,
-            hasBiometrics: item.hasBiometrics !== undefined ? item.hasBiometrics : def.hasBiometrics,
-            biometrics: item.biometrics || def.biometrics,
-            ports: item.ports || def.ports,
-            ramType: item.ramType || def.ramType,
-            ramSpeed: item.ramSpeed || def.ramSpeed,
-            ramUpgradeStatus: item.ramUpgradeStatus || def.ramUpgradeStatus,
-            ramUpgradeLabel: item.ramUpgradeLabel || def.ramUpgradeLabel,
-            storageType: item.storageType || def.storageType,
-            storageUpgradeStatus: item.storageUpgradeStatus || def.storageUpgradeStatus,
-            storageUpgradeLabel: item.storageUpgradeLabel || def.storageUpgradeLabel,
-            storageSlots: item.storageSlots || def.storageSlots,
-            hasExtraM2Slot: item.hasExtraM2Slot !== undefined ? item.hasExtraM2Slot : def.hasExtraM2Slot,
-            hasSataBay: item.hasSataBay !== undefined ? item.hasSataBay : def.hasSataBay
-          };
-        }
-        return item;
-      });
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Preserva todos os notebooks salvos pelo usuário (inclusive customizados e prints)
+        laptops = parsed.map(item => {
+          const def = DEFAULT_LAPTOPS.find(d => d.id === item.id);
+          if (def) {
+            return {
+              ...def,
+              ...item,
+              battery: item.battery || def.battery,
+              batteryHoursNormal: item.batteryHoursNormal !== undefined ? item.batteryHoursNormal : def.batteryHoursNormal,
+              hasUsbCCharging: item.hasUsbCCharging !== undefined ? item.hasUsbCCharging : def.hasUsbCCharging,
+              chargingInfo: item.chargingInfo || def.chargingInfo,
+              hasBiometrics: item.hasBiometrics !== undefined ? item.hasBiometrics : def.hasBiometrics,
+              biometrics: item.biometrics || def.biometrics,
+              ports: item.ports || def.ports,
+              ramType: item.ramType || def.ramType,
+              ramSpeed: item.ramSpeed || def.ramSpeed,
+              ramUpgradeStatus: item.ramUpgradeStatus || def.ramUpgradeStatus,
+              ramUpgradeLabel: item.ramUpgradeLabel || def.ramUpgradeLabel,
+              storageType: item.storageType || def.storageType,
+              storageUpgradeStatus: item.storageUpgradeStatus || def.storageUpgradeStatus,
+              storageUpgradeLabel: item.storageUpgradeLabel || def.storageUpgradeLabel,
+              storageSlots: item.storageSlots || def.storageSlots,
+              hasExtraM2Slot: item.hasExtraM2Slot !== undefined ? item.hasExtraM2Slot : def.hasExtraM2Slot,
+              hasSataBay: item.hasSataBay !== undefined ? item.hasSataBay : def.hasSataBay
+            };
+          }
+          return item;
+        });
+
+        // Garante que nenhum notebook base novo do sistema fique de fora, sem duplicar
+        DEFAULT_LAPTOPS.forEach(def => {
+          if (!findDuplicateLaptop(def, laptops)) {
+            laptops.push({ ...def });
+          }
+        });
+      } else {
+        laptops = JSON.parse(JSON.stringify(DEFAULT_LAPTOPS));
+      }
     } catch(e) {
-      laptops = DEFAULT_LAPTOPS;
+      console.error('Erro ao ler localStorage de laptops:', e);
+      laptops = JSON.parse(JSON.stringify(DEFAULT_LAPTOPS));
     }
   } else {
-    laptops = DEFAULT_LAPTOPS;
+    laptops = JSON.parse(JSON.stringify(DEFAULT_LAPTOPS));
   }
+
+  // Persistir estado consistente garantindo que o Ctrl+F5 mantenha tudo
+  saveData();
 
   const savedWatch = localStorage.getItem(WATCHLIST_KEY);
   watchlist = savedWatch ? JSON.parse(savedWatch) : ['predator-helios-neo-16', 'dell-g16-7630', 'lenovo-legion-pro-5i'];
@@ -425,14 +503,18 @@ function loadData() {
   const gasInput = document.getElementById('gasApiUrl');
   if (gasInput && savedGasUrl) {
     gasInput.value = savedGasUrl;
-    // Tenta sincronizar silenciosamente com o Google Sheets na inicialização
+    // Sincroniza sem apagar os notebooks do usuário
     fetchFromGAS(savedGasUrl, true);
   }
 }
 
 function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(laptops));
-  localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(laptops));
+    localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
+  } catch (err) {
+    console.error('Falha ao salvar no localStorage:', err);
+  }
 }
 
 // Detalhamento Completo de Impostos e Conversão
@@ -703,7 +785,7 @@ function showGasMessage(msg, type) {
   setTimeout(() => { el.style.display = 'none'; }, 4000);
 }
 
-// Sincronização direta com a API do Google Apps Script
+// Sincronização inteligente com a API do Google Apps Script (sem apagar nem duplicar)
 async function fetchFromGAS(url, silent = false) {
   try {
     if (!silent) showGasMessage('Conectando ao Google Sheets...', 'info');
@@ -712,35 +794,78 @@ async function fetchFromGAS(url, silent = false) {
     const data = await response.json();
     
     if (Array.isArray(data) && data.length > 0) {
-      // Normalizar campos vindos da planilha
-      laptops = data.map(item => ({
-        id: item.id || ('gas-' + Math.random().toString(36).substr(2, 9)),
-        name: item.name || 'Notebook Gamer',
-        modelCode: item.modelCode || 'Google Sheets',
-        gpu: item.gpu || 'RTX 4060',
-        gpuTgp: item.gpuTgp || '140W',
-        gpuTier: (item.gpu && item.gpu.includes('4070')) ? 'high' : 'mid-high',
-        cpu: item.cpu || 'Processador Gamer',
-        ram: item.ram || '16GB DDR5',
-        storage: item.storage || '1TB SSD NVMe',
-        screen: item.screen || '16" 165Hz',
-        cooling: 'Refrigeração de Alta Eficiência',
-        priceBr: Number(item.priceBr) || 0,
-        priceUs: Number(item.priceUs) || 0,
-        storeBr: item.storeBr || 'Brasil',
-        storeUs: item.storeUs || 'EUA',
-        urlBr: item.urlBr || '#',
-        urlUs: item.urlUs || '#',
-        score: item.score || (item.gpu && item.gpu.includes('4070') ? 94 : 91),
-        bestFor: item.bestFor || 'Sincronizado da Nuvem Google',
-        history: item.history || [
-          { date: 'Atual', br: Number(item.priceBr) || 0, us: Number(item.priceUs) || 0 }
-        ]
-      }));
+      let updatedCount = 0;
+      let addedCount = 0;
 
+      data.forEach((item, index) => {
+        const gasItem = {
+          id: item.id || ('gas-' + (item.name || 'item').toLowerCase().replace(/[^a-z0-9]/g, '') + '-' + index),
+          name: item.name || 'Notebook Gamer',
+          modelCode: item.modelCode || 'Google Sheets',
+          gpu: item.gpu || 'RTX 4060',
+          gpuTgp: item.gpuTgp || '140W',
+          gpuTier: (item.gpu && item.gpu.includes('4070')) ? 'high' : 'mid-high',
+          cpu: item.cpu || 'Processador Gamer',
+          ram: item.ram || '16GB DDR5',
+          storage: item.storage || '1TB SSD NVMe',
+          screen: item.screen || '16" 165Hz',
+          cooling: 'Refrigeração de Alta Eficiência',
+          priceBr: Number(item.priceBr) || 0,
+          priceUs: Number(item.priceUs) || 0,
+          storeBr: item.storeBr || 'Brasil',
+          storeUs: item.storeUs || 'EUA',
+          urlBr: item.urlBr || '#',
+          urlUs: item.urlUs || '#',
+          targetAlertBr: Number(item.targetAlertBr) || 0,
+          score: item.score || (item.gpu && item.gpu.includes('4070') ? 94 : 91),
+          bestFor: item.bestFor || 'Sincronizado da Nuvem Google',
+          history: item.history || [
+            { date: item.lastUpdated || 'Planilha', br: Number(item.priceBr) || 0, us: Number(item.priceUs) || 0 }
+          ]
+        };
+
+        const existing = findDuplicateLaptop(gasItem, laptops);
+        if (existing) {
+          // Atualiza apenas os preços e lojas mantendo os atributos ricos e IDs
+          if (gasItem.priceBr > 0) existing.priceBr = gasItem.priceBr;
+          if (gasItem.priceUs > 0) existing.priceUs = gasItem.priceUs;
+          if (gasItem.storeBr) existing.storeBr = gasItem.storeBr;
+          if (gasItem.storeUs) existing.storeUs = gasItem.storeUs;
+          if (gasItem.targetAlertBr) existing.targetAlertBr = gasItem.targetAlertBr;
+          updatedCount++;
+        } else {
+          // Modelo novo vindo da planilha que ainda não existe no catálogo local
+          laptops.push({
+            ...gasItem,
+            battery: '80Wh (~4.5h uso normal / 1h game)',
+            batteryHoursNormal: 4.5,
+            hasUsbCCharging: true,
+            chargingInfo: '⚡ Suporta recarga USB-C PD',
+            hasBiometrics: false,
+            biometrics: '❌ Sem Leitor de Digital',
+            ports: '1x USB-C + 2x USB-A + HDMI 2.1',
+            ramType: 'DDR5',
+            ramSpeed: '5600MHz',
+            ramUpgradeStatus: 'full',
+            ramUpgradeLabel: '✅ Aceita Troca (2x SODIMM até 64GB)',
+            storageType: 'M.2 NVMe',
+            storageUpgradeStatus: 'full',
+            storageUpgradeLabel: '✅ +1 Slot M.2 Gen4 Livre',
+            storageSlots: '2x Slots M.2 NVMe (1 livre)',
+            hasExtraM2Slot: true,
+            hasSataBay: false
+          });
+          addedCount++;
+        }
+      });
+
+      // Salva de forma permanente sem perder notebooks adicionados por OCR ou form
       saveData();
       render();
-      if (!silent) showGasMessage(`✓ ${laptops.length} notebooks carregados da Planilha Google!`, 'success');
+      if (!silent) {
+        showGasMessage(`✓ Planilha conectada! ${updatedCount} atualizados, ${addedCount} novos (Total: ${laptops.length})`, 'success');
+        showToastNotification(`✓ Google Sheets sincronizado com sucesso (${laptops.length} modelos no radar)`);
+      }
     }
   } catch (err) {
     console.warn('Erro ao conectar com Google Apps Script:', err);
@@ -785,6 +910,23 @@ function handleAddLaptop(e) {
     ]
   };
 
+  // Trava anti-duplicidade: se já existe modelo com mesmas configurações, atualiza preços e histórico
+  const duplicate = findDuplicateLaptop(newLaptop, laptops);
+  if (duplicate) {
+    duplicate.priceBr = priceBr || duplicate.priceBr;
+    duplicate.priceUs = priceUs || duplicate.priceUs;
+    duplicate.storeBr = storeBr || duplicate.storeBr;
+    duplicate.storeUs = storeUs || duplicate.storeUs;
+    if (!duplicate.history) duplicate.history = [];
+    duplicate.history.push({ date: 'Hoje (Atualizado)', br: duplicate.priceBr, us: duplicate.priceUs });
+    saveData();
+    render();
+    document.getElementById('addLaptopForm').reset();
+    document.getElementById('addModal').style.display = 'none';
+    showToastNotification(`ℹ️ "${duplicate.name}" já constava no Radar! Os preços foram atualizados no modelo existente sem duplicar.`);
+    return;
+  }
+
   laptops.unshift(newLaptop);
   watchlist.push(newLaptop.id);
   saveData();
@@ -792,6 +934,7 @@ function handleAddLaptop(e) {
   document.getElementById('addLaptopForm').reset();
   document.getElementById('addModal').style.display = 'none';
   render();
+  showToastNotification(`✓ "${newLaptop.name}" adicionado com sucesso ao Radar!`);
 }
 
 function toggleWatch(id) {
@@ -2163,6 +2306,31 @@ function saveOcrParsedLaptop() {
         { date: 'Hoje (Scan de Print)', br: Math.round(priceBr), us: Math.round(priceUs) }
       ]
     };
+
+    // Trava anti-duplicidade para print/OCR
+    const duplicate = findDuplicateLaptop(newLaptop, laptops);
+    if (duplicate) {
+      duplicate.priceBr = newLaptop.priceBr || duplicate.priceBr;
+      duplicate.priceUs = newLaptop.priceUs || duplicate.priceUs;
+      if (newLaptop.storeUs) duplicate.storeUs = newLaptop.storeUs;
+      if (newLaptop.ram && newLaptop.ram !== duplicate.ram) duplicate.ram = newLaptop.ram;
+      if (newLaptop.ramUpgradeStatus) duplicate.ramUpgradeStatus = newLaptop.ramUpgradeStatus;
+      if (!duplicate.history) duplicate.history = [];
+      duplicate.history.push({
+        date: 'Hoje (Scan Atualizado)',
+        br: duplicate.priceBr,
+        us: duplicate.priceUs
+      });
+      saveData();
+      render();
+
+      const modal = document.getElementById('ocrModal');
+      if (modal) modal.style.display = 'none';
+      resetOcr();
+
+      showToastNotification(`⚡ "${duplicate.name}" já existia no Radar! Atualizamos os preços e histórico sem duplicar.`);
+      return;
+    }
 
     laptops.unshift(newLaptop);
     if (!watchlist.includes(newLaptop.id)) watchlist.push(newLaptop.id);
