@@ -645,10 +645,7 @@ function bindEvents() {
     }
   });
 
-  const btnSaveOcr = document.getElementById('btnSaveOcrLaptop');
-  if (btnSaveOcr) {
-    btnSaveOcr.addEventListener('click', saveOcrParsedLaptop);
-  }
+
 
   const btnRecalcBr = document.getElementById('btnRecalcOcrBr');
   if (btnRecalcBr) {
@@ -1004,24 +1001,28 @@ window.savePriceAlert = function(laptopId) {
 
 // Badges Visuais de Troca & Upgrade: Verde (✅), Amarelo (⚠️), Vermelho (❌)
 function renderRamUpgradeBadge(laptop) {
-  const status = laptop.ramUpgradeStatus || (laptop.ram && laptop.ram.toLowerCase().includes('soldada') ? 'none' : 'full');
-  if (status === 'full') {
-    return `<span class="badge" style="background:rgba(16, 185, 129, 0.15); color:#34d399; border:1px solid rgba(16, 185, 129, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">✅ Aceita Troca (2x SODIMM)</span>`;
-  } else if (status === 'partial') {
-    return `<span class="badge" style="background:rgba(245, 158, 11, 0.15); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">⚠️ Troca Parcial (Híbrido)</span>`;
+  const isSoldered = (laptop.ramUpgradeStatus === 'none') || 
+                     (laptop.ramType === 'LPDDR5X' || laptop.ramType === 'LPDDR5') ||
+                     (laptop.ram && (laptop.ram.toLowerCase().includes('soldada') || laptop.ram.toLowerCase().includes('soldered') || laptop.ram.toLowerCase().includes('onboard')));
+  const isPartial = (laptop.ramUpgradeStatus === 'partial') || (laptop.ram && laptop.ram.toLowerCase().includes('parcial'));
+
+  if (isSoldered) {
+    return `<span class="badge" style="background:rgba(239, 68, 68, 0.22); color:#f87171; border:1px solid rgba(239, 68, 68, 0.55); font-size:0.74rem; padding:3px 8px; font-weight:800; border-radius:4px; display:inline-flex; align-items:center; gap:4px;">❌ RAM 100% SOLDADA (Não Aceita Troca)</span>`;
+  } else if (isPartial) {
+    return `<span class="badge" style="background:rgba(245, 158, 11, 0.22); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.55); font-size:0.74rem; padding:3px 8px; font-weight:800; border-radius:4px; display:inline-flex; align-items:center; gap:4px;">⚠️ Troca Parcial (1 Soldada + 1 Slot Livre)</span>`;
   } else {
-    return `<span class="badge" style="background:rgba(239, 68, 68, 0.15); color:#f87171; border:1px solid rgba(239, 68, 68, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">❌ Não Aceita Troca (Soldada)</span>`;
+    return `<span class="badge" style="background:rgba(16, 185, 129, 0.22); color:#34d399; border:1px solid rgba(16, 185, 129, 0.55); font-size:0.74rem; padding:3px 8px; font-weight:800; border-radius:4px; display:inline-flex; align-items:center; gap:4px;">✅ RAM Removível (2x SODIMM até 64GB)</span>`;
   }
 }
 
 function renderStorageUpgradeBadge(laptop) {
   const status = laptop.storageUpgradeStatus || (laptop.storageSlots && laptop.storageSlots.includes('suporte') ? 'partial' : 'full');
   if (status === 'full') {
-    return `<span class="badge" style="background:rgba(16, 185, 129, 0.15); color:#34d399; border:1px solid rgba(16, 185, 129, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">✅ +1 Slot M.2 Livre</span>`;
+    return `<span class="badge" style="background:rgba(16, 185, 129, 0.18); color:#34d399; border:1px solid rgba(16, 185, 129, 0.45); font-size:0.72rem; padding:3px 8px; font-weight:700;">✅ +1 Slot M.2 Gen4 Livre</span>`;
   } else if (status === 'partial') {
-    return `<span class="badge" style="background:rgba(245, 158, 11, 0.15); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">⚠️ 2º Slot M.2 c/ Suporte</span>`;
+    return `<span class="badge" style="background:rgba(245, 158, 11, 0.18); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.45); font-size:0.72rem; padding:3px 8px; font-weight:700;">⚠️ 2º Slot M.2 c/ Suporte Dell</span>`;
   } else {
-    return `<span class="badge" style="background:rgba(239, 68, 68, 0.15); color:#f87171; border:1px solid rgba(239, 68, 68, 0.4); font-size:0.68rem; padding:2px 6px; font-weight:700;">❌ Apenas 1 Slot M.2</span>`;
+    return `<span class="badge" style="background:rgba(239, 68, 68, 0.18); color:#f87171; border:1px solid rgba(239, 68, 68, 0.45); font-size:0.72rem; padding:3px 8px; font-weight:700;">❌ Apenas 1 Slot M.2</span>`;
   }
 }
 
@@ -1077,6 +1078,9 @@ function render() {
     }
     if (currentFilter === 'ram_upgrade') {
       return (laptop.ramUpgradeStatus === 'full');
+    }
+    if (currentFilter === 'ram_soldered') {
+      return (laptop.ramUpgradeStatus === 'none' || laptop.ramType === 'LPDDR5X' || (laptop.ram && laptop.ram.toLowerCase().includes('soldada')));
     }
     if (currentFilter === 'ddr5') {
       return (laptop.ramType === 'DDR5' || (laptop.ram && laptop.ram.includes('DDR5')));
@@ -1147,6 +1151,19 @@ function render() {
     return;
   }
 
+  // Se estiver no modo Tabela Comparativa, renderiza a tabela completa
+  if (currentViewMode === 'table') {
+    if (grid) grid.style.display = 'none';
+    const tableContainer = document.getElementById('notebookTableContainer');
+    if (tableContainer) tableContainer.style.display = 'block';
+    renderTable(filtered);
+    return;
+  } else {
+    if (grid) grid.style.display = 'grid';
+    const tableContainer = document.getElementById('notebookTableContainer');
+    if (tableContainer) tableContainer.style.display = 'none';
+  }
+
   grid.innerHTML = filtered.map(laptop => {
     const isWatched = watchlist.includes(laptop.id);
     const inBudget = laptop.priceBr >= 8000 && laptop.priceBr <= 8900;
@@ -1161,6 +1178,13 @@ function render() {
     const lowestUs = Math.min(...historyUs);
     const isCurrentLowest = laptop.priceBr <= lowestBr;
 
+    // Formatação limpa de RAM para evitar duplicação (ex: '32GB DDR5 5600MHz (DDR5 5600MHz)')
+    const rawRamCapacity = (laptop.ram || '16GB').match(/\d+\s*GB/i) ? (laptop.ram.match(/\d+\s*GB/i)[0]) : '16GB';
+    const ramSpeed = laptop.ramSpeed || (laptop.ram.match(/\d{4}\s*MHz/i) ? laptop.ram.match(/\d{4}\s*MHz/i)[0] : '5600MHz');
+    const ramType = laptop.ramType || (laptop.ram.includes('LPDDR5X') ? 'LPDDR5X' : (laptop.ram.includes('DDR4') ? 'DDR4' : 'DDR5'));
+    const cleanRamTitle = `${rawRamCapacity} ${ramType} • ${ramSpeed}`;
+    const cleanStorageTitle = laptop.storage ? laptop.storage.split('•')[0].trim() : '1TB SSD NVMe Gen4';
+
     // Decisão Inteligente: Vale a pena lá ou aqui?
     let decisionBadge = '';
     const hasSuperiorGpuInUsa = (laptop.gpu.includes('4070') || laptop.gpu.includes('4080')) && convertedUs <= 9400;
@@ -1168,13 +1192,13 @@ function render() {
 
     if (hasSuperiorGpuInUsa) {
       decisionBadge = `
-        <div class="badge badge-recommend-usa" style="width:100%; text-align:center; padding:5px 8px; font-size:0.75rem;">
+        <div class="badge badge-recommend-usa" style="width:100%; text-align:center; padding:7px 10px; font-size:0.78rem; font-weight:700;">
           🚀 VALE MUITO NOS EUA: Leva ${laptop.gpu} pelo preço de 4060 no Brasil!
         </div>
       `;
     } else if (hasGreatDealInBr) {
       decisionBadge = `
-        <div class="badge badge-recommend-br" style="width:100%; text-align:center; padding:5px 8px; font-size:0.75rem;">
+        <div class="badge badge-recommend-br" style="width:100%; text-align:center; padding:7px 10px; font-size:0.78rem; font-weight:700;">
           🛡️ VALE A PENA NO BRASIL: Mesma placa + Garantia nacional de 1 ano e Teclado ABNT2
         </div>
       `;
@@ -1195,63 +1219,77 @@ function render() {
 
         ${decisionBadge}
 
-        <!-- Bloco de Especificações Técnicas -->
+        <!-- Bloco de Especificações Técnicas Espaçoso e Legível -->
         <div class="specs-block">
-          <div class="spec-item">
-            <span class="spec-label">Placa de Vídeo (GPU)</span>
-            <span class="spec-value spec-gpu-tgp">${laptop.gpu} <small>(${laptop.gpuTgp})</small></span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">Processador (CPU)</span>
-            <span class="spec-value">${laptop.cpu.split('(')[0]}</span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">Memória RAM & Tecnologia</span>
-            <span class="spec-value">
-              <div>${laptop.ram.split('(')[0]} <small style="color:var(--accent); font-weight:700;">(${laptop.ramType || 'DDR5'} ${laptop.ramSpeed || ''})</small></div>
-              <div style="margin-top: 4px;">
-                ${renderRamUpgradeBadge(laptop)}
-              </div>
-            </span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">Armazenamento (SSD / HD)</span>
-            <span class="spec-value">
-              <div>${laptop.storage}</div>
-              <div style="margin-top: 4px;">
-                ${renderStorageUpgradeBadge(laptop)}
-              </div>
-            </span>
-          </div>
-          <div class="screen-highlight">
-            🖥️ <strong>Tela:</strong> ${laptop.screen}
-          </div>
-          <div class="card-extra-row" style="grid-column: span 2; display: flex; flex-direction: column; gap: 5px; font-size: 0.76rem; background: rgba(0, 0, 0, 0.25); padding: 7px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.04);">
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
-              <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">🔌 <strong>Portas:</strong> ${laptop.ports || 'USB-C + USB-A'}</span>
-              <span class="badge ${laptop.hasUsbCCharging ? 'badge-accent' : 'badge-purple'}" style="font-size:0.68rem; padding: 1px 6px; white-space: nowrap;">
-                ${laptop.hasUsbCCharging ? '⚡ Aceita Type-C' : '🔌 Só Pino Redondo'}
+          <div class="specs-hardware-grid">
+            <div class="spec-item">
+              <span class="spec-label">🎮 Placa de Vídeo (GPU)</span>
+              <span class="spec-value spec-gpu-tgp">${laptop.gpu} <small style="color:var(--text-muted); font-weight:700;">(${laptop.gpuTgp})</small></span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">⚡ Processador (CPU)</span>
+              <span class="spec-value">${laptop.cpu.split('(')[0].trim()}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">🧠 Memória RAM & Tecnologia</span>
+              <span class="spec-value">
+                <div><strong>${cleanRamTitle}</strong></div>
+                <div style="margin-top: 5px;">
+                  ${renderRamUpgradeBadge(laptop)}
+                </div>
+                ${(laptop.ramUpgradeStatus === 'none' || laptop.ramType === 'LPDDR5X' || (laptop.ram && laptop.ram.toLowerCase().includes('soldada'))) ? `
+                  <div style="margin-top: 6px; font-size: 0.74rem; background: rgba(239, 68, 68, 0.14); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 8px; border-radius: 4px; font-weight: 700; line-height: 1.35;">
+                    🚫 CUIDADO: Memória 100% soldada na placa-mãe. Não é possível trocar nem aumentar no futuro!
+                  </div>
+                ` : `
+                  <div style="margin-top: 6px; font-size: 0.74rem; background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 8px; border-radius: 4px; font-weight: 600; line-height: 1.35;">
+                    💡 Upgrade livre: 2 slots SODIMM removíveis (pode trocar por 32GB ou 64GB quando quiser)!
+                  </div>
+                `}
               </span>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+            <div class="spec-item">
+              <span class="spec-label">💾 Armazenamento (SSD)</span>
+              <span class="spec-value">
+                <div><strong>${cleanStorageTitle}</strong></div>
+                <div style="margin-top: 5px;">
+                  ${renderStorageUpgradeBadge(laptop)}
+                </div>
+              </span>
+            </div>
+          </div>
+
+          <div class="screen-highlight" style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.15rem;">🖥️</span>
+            <div><strong>Tela:</strong> ${laptop.screen}</div>
+          </div>
+
+          <div class="card-extra-row">
+            <div class="extra-row-item">
+              <span>🔌 <strong>Portas:</strong> ${laptop.ports || 'USB-C + USB-A + HDMI 2.1'}</span>
+              <span class="badge ${laptop.hasUsbCCharging ? 'badge-accent' : 'badge-purple'}" style="font-size:0.72rem; padding: 2px 8px; white-space: nowrap;">
+                ${laptop.hasUsbCCharging ? '⚡ Suporta Carregador USB-C PD' : '🔌 Apenas Pino Redondo'}
+              </span>
+            </div>
+            <div class="extra-row-item">
               <span>
                 ${(laptop.batteryHoursNormal >= 6) ? '✅' : ((laptop.batteryHoursNormal >= 4) ? '⚠️' : '❌')} 
-                <strong>Uso Normal:</strong> ~${laptop.batteryHoursNormal || 4}h <small style="color:var(--text-muted);">(Chrome/Estudo)</small> • <small style="color:var(--text-dim);">🎮 ~1h game</small>
+                <strong>Autonomia Uso Normal:</strong> ~${laptop.batteryHoursNormal || 4}h <small style="color:var(--text-muted);">(Chrome/Office)</small> • <small style="color:var(--text-dim);">🎮 ~1h game</small>
               </span>
-              <span class="badge ${(laptop.batteryHoursNormal >= 6) ? 'badge-accent' : ((laptop.batteryHoursNormal >= 4) ? 'badge-cyan' : 'badge-purple')}" style="font-size:0.68rem; padding: 1px 6px; white-space: nowrap;">
-                ${(laptop.batteryHoursNormal >= 6) ? '🔋 Autonomia Top' : ((laptop.batteryHoursNormal >= 4) ? '⚠️ Moderada' : '❌ Foco Tomada')}
+              <span class="badge ${(laptop.batteryHoursNormal >= 6) ? 'badge-accent' : ((laptop.batteryHoursNormal >= 4) ? 'badge-cyan' : 'badge-purple')}" style="font-size:0.72rem; padding: 2px 8px; white-space: nowrap;">
+                ${(laptop.batteryHoursNormal >= 6) ? '🔋 Autonomia Alta' : ((laptop.batteryHoursNormal >= 4) ? '⚠️ Autonomia Média' : '❌ Foco na Tomada')}
               </span>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 3px;">
+            <div class="extra-row-item" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 5px;">
               <span style="color:var(--text-muted);">🔐 <strong>Biometria:</strong> ${laptop.biometrics ? laptop.biometrics.split('(')[0] : '❌ Sem Digital'}</span>
-              <span style="color:var(--text-dim); font-size:0.7rem;">💾 Sem baia interna SATA</span>
+              <span style="color:var(--text-dim); font-size:0.72rem;">💾 Sem baia interna SATA 2.5"</span>
             </div>
           </div>
         </div>
 
         <!-- Caixa de Comparação de Preços Brasil vs EUA -->
         <div class="price-comparison-box">
-          <div class="price-row">
+          <div class="price-row" style="background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.04);">
             <div class="price-country">
               <span>🇧🇷 Loja no Brasil</span>
               <small style="color:var(--text-dim); font-size:0.75rem;">(${laptop.storeBr})</small>
@@ -1261,7 +1299,7 @@ function render() {
             </div>
           </div>
 
-          <div class="price-row">
+          <div class="price-row" style="background: rgba(16, 185, 129, 0.03); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.15);">
             <div class="price-country">
               <span>🇺🇸 Seu Irmão compra nos EUA</span>
               <small style="color:var(--text-dim); font-size:0.75rem;">(${laptop.storeUs})</small>
@@ -1272,25 +1310,25 @@ function render() {
                 ${tax.salesTaxUsd > 0 ? `<span>+ $${tax.salesTaxUsd.toFixed(0)} Tax (${(salesTaxRate * 100).toFixed(1)}%)</span>` : `<span>0% Tax EUA</span>`}
                 ${tax.iofBrl > 0 ? `<span>+ R$ ${Math.round(tax.iofBrl)} IOF (${(tax.iofRate * 100).toFixed(1)}%)</span>` : `<span>0% IOF</span>`}
               </div>
-              <div class="price-converted-sub" style="font-weight:700; color:var(--accent); font-size:0.92rem; margin-top:3px;">
-                Total: ~ R$ ${Math.round(convertedUs).toLocaleString('pt-BR')}
+              <div class="price-converted-sub" style="font-weight:700; color:var(--accent); font-size:0.95rem; margin-top:3px;">
+                Total Convertido: ~ R$ ${Math.round(convertedUs).toLocaleString('pt-BR')}
               </div>
             </div>
           </div>
 
           <!-- Melhor Valor Já Consultado / Histórico -->
-          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); padding: 5px 8px; border-radius: 6px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; margin-top: 0.35rem;">
-            <span style="color: var(--text-muted); display:flex; align-items:center; gap:4px;">
+          <div style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-subtle); padding: 6px 10px; border-radius: 6px; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: var(--text-muted); display:flex; align-items:center; gap:5px;">
               🏷️ <strong>Melhor já visto:</strong>
             </span>
             <span style="font-family: var(--font-mono); color: var(--accent); font-weight: 700;">
               R$ ${lowestBr.toLocaleString('pt-BR')} (BR) | $ ${lowestUs.toLocaleString('en-US')} (EUA)
             </span>
-            ${isCurrentLowest ? `<span class="badge badge-accent" style="font-size:0.65rem; padding:1px 6px;">🔥 Menor Preço!</span>` : ''}
+            ${isCurrentLowest ? `<span class="badge badge-accent" style="font-size:0.68rem; padding:1px 6px;">🔥 Menor Preço!</span>` : ''}
           </div>
 
           <div class="price-delta-bar">
-            <span class="delta-label">Resultado:</span>
+            <span class="delta-label">Veredito Financeiro:</span>
             ${isUsCheaper ? `
               <span class="delta-value save-usa">
                 ⚡ Economia de R$ ${Math.round(diff).toLocaleString('pt-BR')} trazendo com ele!
@@ -1303,22 +1341,22 @@ function render() {
           </div>
 
           <!-- Comparador de Lojas: Onde Está Mais Barato? -->
-          <div style="background: rgba(0, 0, 0, 0.25); border-radius: 6px; padding: 7px 10px; margin-top: 0.6rem; border: 1px solid rgba(255, 255, 255, 0.04); display: flex; flex-direction: column; gap: 5px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.74rem;">
+          <div class="price-stores-bar">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem;">
               <span style="color: var(--accent); font-weight: 700;">🛒 Onde está mais barato?</span>
-              <span style="color: var(--text-muted); font-size: 0.68rem;">Checar lojas ao vivo:</span>
+              <span style="color: var(--text-muted); font-size: 0.72rem;">Checar lojas ao vivo:</span>
             </div>
-            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-              <a href="https://www.amazon.com/s?k=${encodeURIComponent(laptop.name)}" target="_blank" style="font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(255, 153, 0, 0.15); color: #ff9900; border: 1px solid rgba(255, 153, 0, 0.35); text-decoration: none; font-weight: 600;">
+            <div class="store-links-grid">
+              <a href="https://www.amazon.com/s?k=${encodeURIComponent(laptop.name)}" target="_blank" class="store-link-btn" style="background: rgba(255, 153, 0, 0.15); color: #ff9900; border: 1px solid rgba(255, 153, 0, 0.35);">
                 🇺🇸 Amazon EUA ↗
               </a>
-              <a href="https://www.bestbuy.com/site/searchpage.jsp?st=${encodeURIComponent(laptop.name)}&qp=seller_facet%3DSeller~Best+Buy" target="_blank" style="font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); text-decoration: none; font-weight: 600;">
+              <a href="https://www.bestbuy.com/site/searchpage.jsp?st=${encodeURIComponent(laptop.name)}&qp=seller_facet%3DSeller~Best+Buy" target="_blank" class="store-link-btn" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);">
                 🇺🇸 Best Buy ↗
               </a>
-              <a href="https://www.kabum.com.br/busca/${encodeURIComponent(laptop.name)}" target="_blank" style="font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.35); text-decoration: none; font-weight: 600;">
+              <a href="https://www.kabum.com.br/busca/${encodeURIComponent(laptop.name)}" target="_blank" class="store-link-btn" style="background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.35);">
                 🇧🇷 Kabum BR ↗
               </a>
-              <a href="https://lista.mercadolivre.com.br/${encodeURIComponent(laptop.name)}" target="_blank" style="font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.35); text-decoration: none; font-weight: 600;">
+              <a href="https://lista.mercadolivre.com.br/${encodeURIComponent(laptop.name)}" target="_blank" class="store-link-btn" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.35);">
                 🇧🇷 Mercado Livre ↗
               </a>
             </div>
@@ -1343,6 +1381,122 @@ function render() {
       </div>
     `;
   }).join('');
+}
+
+// Renderização em Tabela Comparativa Lado a Lado (Modo Alta Leitura)
+function renderTable(filteredLaptops) {
+  const container = document.getElementById('notebookTableContainer');
+  if (!container) return;
+
+  if (filteredLaptops.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:3rem; color:var(--text-muted);">
+        <p style="font-size:1.1rem; margin-bottom:0.5rem;">Nenhum notebook encontrado para esse filtro.</p>
+        <button class="btn btn-secondary" onclick="document.getElementById('searchInput').value=''; document.querySelector('.chip[data-filter=all]').click();">Limpar Filtros</button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Notebook</th>
+          <th>GPU (Placa)</th>
+          <th>CPU (Processador)</th>
+          <th>RAM (Soldada ou Removível?)</th>
+          <th>Armazenamento SSD</th>
+          <th>Tela</th>
+          <th>Autonomia (Normal)</th>
+          <th>Preço BR</th>
+          <th>Preço EUA (Total)</th>
+          <th>Veredito</th>
+          <th>Lojas</th>
+          <th>Comparar</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filteredLaptops.map(laptop => {
+          const convertedUs = calculateConvertedUsPrice(laptop.priceUs);
+          const diff = laptop.priceBr - convertedUs;
+          const isUsCheaper = diff > 0;
+          const rawRamCapacity = (laptop.ram || '16GB').match(/\d+\s*GB/i) ? (laptop.ram.match(/\d+\s*GB/i)[0]) : '16GB';
+          const ramSpeed = laptop.ramSpeed || (laptop.ram.match(/\d{4}\s*MHz/i) ? laptop.ram.match(/\d{4}\s*MHz/i)[0] : '5600MHz');
+          const ramType = laptop.ramType || (laptop.ram.includes('LPDDR5X') ? 'LPDDR5X' : (laptop.ram.includes('DDR4') ? 'DDR4' : 'DDR5'));
+          const isSoldered = (laptop.ramUpgradeStatus === 'none' || laptop.ramType === 'LPDDR5X' || (laptop.ram && laptop.ram.toLowerCase().includes('soldada')));
+
+          return `
+            <tr>
+              <td>
+                <div class="table-model-title">${laptop.name}</div>
+                <div style="font-size:0.75rem; color:var(--text-dim);">${laptop.modelCode} • Score: <strong>${laptop.score}</strong></div>
+              </td>
+              <td>
+                <div style="font-weight:700; color:#38bdf8;">${laptop.gpu}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">${laptop.gpuTgp}</div>
+              </td>
+              <td>
+                <div style="font-size:0.84rem; font-weight:600;">${laptop.cpu.split('(')[0].trim()}</div>
+              </td>
+              <td>
+                <div style="font-weight:700;">${rawRamCapacity} ${ramType} • ${ramSpeed}</div>
+                <div style="margin-top:4px;">${renderRamUpgradeBadge(laptop)}</div>
+                ${isSoldered ? `
+                  <div style="font-size:0.72rem; color:#f87171; margin-top:2px; font-weight:600;">🚫 Não aceita troca</div>
+                ` : `
+                  <div style="font-size:0.72rem; color:#34d399; margin-top:2px;">💡 2x SODIMM livres</div>
+                `}
+              </td>
+              <td>
+                <div style="font-weight:600;">${laptop.storage ? laptop.storage.split('•')[0].trim() : '1TB SSD NVMe'}</div>
+                <div style="margin-top:4px;">${renderStorageUpgradeBadge(laptop)}</div>
+              </td>
+              <td style="font-size:0.8rem; max-width:180px;">
+                ${laptop.screen}
+              </td>
+              <td>
+                <div style="font-weight:700; color:${laptop.batteryHoursNormal >= 6 ? 'var(--accent)' : 'var(--text-main)'};">
+                  ~${laptop.batteryHoursNormal || 4}h
+                </div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">${laptop.hasUsbCCharging ? '⚡ USB-C PD' : '🔌 Pino'}</div>
+              </td>
+              <td>
+                <div class="table-price-br">R$ ${laptop.priceBr.toLocaleString('pt-BR')}</div>
+                <div style="font-size:0.72rem; color:var(--text-dim);">${laptop.storeBr}</div>
+              </td>
+              <td>
+                <div class="table-price-us">$ ${laptop.priceUs.toLocaleString('en-US')}</div>
+                <div style="font-size:0.8rem; font-weight:700; color:var(--accent);">~ R$ ${Math.round(convertedUs).toLocaleString('pt-BR')}</div>
+              </td>
+              <td>
+                ${isUsCheaper ? `
+                  <span class="badge" style="background:rgba(16,185,129,0.15); color:var(--accent); font-weight:700; border:1px solid rgba(16,185,129,0.3); font-size:0.74rem; padding:3px 8px; white-space:nowrap;">
+                    ⚡ Economiza R$ ${Math.round(diff).toLocaleString('pt-BR')} nos EUA
+                  </span>
+                ` : `
+                  <span class="badge" style="background:rgba(56,189,248,0.15); color:var(--primary); font-weight:700; border:1px solid rgba(56,189,248,0.3); font-size:0.74rem; padding:3px 8px; white-space:nowrap;">
+                    🇧🇷 Melhor no BR (R$ ${Math.round(Math.abs(diff)).toLocaleString('pt-BR')} menor)
+                  </span>
+                `}
+              </td>
+              <td>
+                <div style="display:flex; gap:4px; flex-direction:column;">
+                  <a href="https://www.bestbuy.com/site/searchpage.jsp?st=${encodeURIComponent(laptop.name)}&qp=seller_facet%3DSeller~Best+Buy" target="_blank" style="font-size:0.72rem; padding:3px 6px; border-radius:3px; background:rgba(56,189,248,0.15); color:#38bdf8; text-decoration:none; text-align:center; font-weight:600; white-space:nowrap;">🇺🇸 Best Buy ↗</a>
+                  <a href="https://www.kabum.com.br/busca/${encodeURIComponent(laptop.name)}" target="_blank" style="font-size:0.72rem; padding:3px 6px; border-radius:3px; background:rgba(249,115,22,0.15); color:#fb923c; text-decoration:none; text-align:center; font-weight:600; white-space:nowrap;">🇧🇷 Kabum ↗</a>
+                </div>
+              </td>
+              <td>
+                <button class="btn btn-primary" onclick="openDuelModal('${laptop.id}')" style="font-size:0.75rem; padding:4px 8px; white-space:nowrap;">
+                  🥊 Duelo
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
 }
 
 // ==========================================
@@ -1642,6 +1796,8 @@ async function processOcrImage(imageSrc) {
     document.getElementById('ocrParsedGpu').value = parsed.gpu || 'NVIDIA RTX 4060';
     document.getElementById('ocrParsedCpu').value = parsed.cpu || 'Intel Core i7 / Ryzen 7';
     document.getElementById('ocrParsedRam').value = parsed.ram || '16GB DDR5';
+    const ramStatusSelect = document.getElementById('ocrParsedRamStatus');
+    if (ramStatusSelect) ramStatusSelect.value = parsed.ramStatus || (parsed.isSolderedRam ? 'none' : 'full');
     document.getElementById('ocrParsedPriceUs').value = parsed.priceUs || 1199;
     
     // O Preço no Brasil SEMPRE é preenchido automaticamente (nunca fica em branco!)
@@ -1833,10 +1989,18 @@ function parseSpecsFromText(rawText) {
   else if (/i7/i.test(text)) cpu = 'Intel Core i7';
   else cpu = 'Intel Core i7 / AMD Ryzen 7';
 
-  // 3. RAM
+  // 3. RAM e detecção se é SOLDADA ou REMOVÍVEL
   let ram = '16GB DDR5';
   const ramMatch = text.match(/(\b(16|32|64)\s*GB\b)/i);
   if (ramMatch) ram = ramMatch[0].toUpperCase() + ' DDR5';
+
+  // Detecção Inteligente de RAM Soldada vs Removível
+  const isLpddr = /lpddr/i.test(text);
+  const isSolderedText = /soldered|soldada|onboard|on-board|non-removable|não aceita troca|sem slot/i.test(text);
+  const isZephyrus = /zephyrus/i.test(text);
+  const isSolderedRam = isLpddr || isSolderedText || isZephyrus;
+  const isPartial = /parcial|1x slot|onboard \+/i.test(text);
+  const ramStatus = isSolderedRam ? 'none' : (isPartial ? 'partial' : 'full');
 
   // 4. Preço em Dólar inteligente (resistente a quebras de formatação da Best Buy)
   const priceUs = extractUsdPrice(text);
@@ -1866,7 +2030,7 @@ function parseSpecsFromText(rawText) {
   else if (/Kabum/i.test(text)) store = 'Kabum';
   else if (/Dell/i.test(text)) store = 'Dell';
 
-  return { name, gpu, cpu, ram, priceUs, priceBr, store };
+  return { name, gpu, cpu, ram, ramStatus, isSolderedRam, priceUs, priceBr, store };
 }
 
 function resetOcr() {
@@ -1879,7 +2043,15 @@ function resetOcr() {
 }
 
 function saveOcrParsedLaptop() {
+  const statusEl = document.getElementById('ocrSaveStatusText');
+  const btn = document.getElementById('btnSaveOcrLaptop');
   try {
+    if (btn) btn.disabled = true;
+    if (statusEl) {
+      statusEl.style.display = 'inline';
+      statusEl.innerText = '💾 Salvando no Radar...';
+    }
+
     const name = (document.getElementById('ocrParsedName').value || '').trim() || 'Notebook Gamer Importado';
     const gpu = (document.getElementById('ocrParsedGpu').value || '').trim() || 'NVIDIA RTX 4060';
     const cpu = (document.getElementById('ocrParsedCpu').value || '').trim() || 'Intel Core i7 / Ryzen 7';
@@ -1900,24 +2072,37 @@ function saveOcrParsedLaptop() {
 
     const store = (document.getElementById('ocrParsedStore').value || '').trim() || 'Best Buy';
 
-    // Detecção inteligente de características para os novos filtros e badges
+    // Detecção inteligente de características
+    const ramStatusSelect = document.getElementById('ocrParsedRamStatus');
+    const selectedRamStatus = ramStatusSelect ? ramStatusSelect.value : '';
     const isZephyrus = name.toLowerCase().includes('zephyrus');
     const isRyzenOrUltra = cpu.toLowerCase().includes('ryzen') || cpu.toLowerCase().includes('ultra');
+
+    // Determinar se a RAM é soldada com base no dropdown ou no modelo
+    const isSoldered = selectedRamStatus === 'none' || (selectedRamStatus === '' && (isZephyrus || ram.includes('LPDDR') || ram.toLowerCase().includes('soldada')));
+    const isPartial = selectedRamStatus === 'partial';
+
+    const ramUpgradeStatus = isSoldered ? 'none' : (isPartial ? 'partial' : 'full');
+    const ramUpgradeLabel = isSoldered 
+      ? '❌ Não Aceita Troca (100% Soldada na Placa)' 
+      : (isPartial ? '⚠️ Troca Parcial (1 Soldada + 1 Slot Livre)' : '✅ Aceita Troca (2x SODIMM até 64GB)');
+    const ramType = isSoldered ? (isZephyrus || ram.includes('LPDDR') ? 'LPDDR5X' : 'DDR5 (Soldada)') : 'DDR5';
+    const ramSpeed = isSoldered ? '7467MHz' : '5600MHz';
 
     const newLaptop = {
       id: 'ocr-' + Date.now(),
       name: name,
       modelCode: 'Print OCR',
       gpu: gpu,
-      gpuTgp: '140W',
+      gpuTgp: '140W (Potência Máxima)',
       gpuTier: gpu.includes('4070') ? 'high' : (gpu.includes('4080') ? 'ultra' : 'mid-high'),
       cpu: cpu,
       ram: ram,
-      ramType: isZephyrus ? 'LPDDR5X' : 'DDR5',
-      ramSpeed: isZephyrus ? '7467MHz' : '5600MHz',
-      ramUpgradeStatus: isZephyrus ? 'none' : 'full',
-      ramUpgradeLabel: isZephyrus ? '❌ Não Aceita Troca (Soldada)' : '✅ Aceita Troca (2x SODIMM)',
-      storage: '1TB SSD NVMe',
+      ramType: ramType,
+      ramSpeed: ramSpeed,
+      ramUpgradeStatus: ramUpgradeStatus,
+      ramUpgradeLabel: ramUpgradeLabel,
+      storage: '1TB SSD NVMe M.2 Gen4',
       storageType: 'M.2 NVMe',
       storageUpgradeStatus: 'full',
       storageUpgradeLabel: '✅ +1 Slot M.2 Gen4 Livre',
@@ -1947,19 +2132,19 @@ function saveOcrParsedLaptop() {
     };
 
     laptops.unshift(newLaptop);
-    watchlist.push(newLaptop.id);
+    if (!watchlist.includes(newLaptop.id)) watchlist.push(newLaptop.id);
     saveData();
     render();
 
-    // Fecha o modal e limpa o formulário
+    // Fecha o modal e limpa
     const modal = document.getElementById('ocrModal');
     if (modal) modal.style.display = 'none';
     resetOcr();
 
-    // Notificação visual na barra de contagem de catálogo
+    // Notificação visual toast e contagem
     const catalogSummary = document.getElementById('catalogSummary');
     if (catalogSummary) {
-      catalogSummary.innerText = `✓ "${newLaptop.name}" adicionado com sucesso ao topo do Radar!`;
+      catalogSummary.innerText = `✓ "${newLaptop.name}" adicionado com sucesso ao Radar!`;
       catalogSummary.style.color = 'var(--accent)';
       setTimeout(() => {
         catalogSummary.style.color = '';
@@ -1967,15 +2152,99 @@ function saveOcrParsedLaptop() {
       }, 5000);
     }
 
-    // Alerta confirmação
-    alert(`✓ Sucesso! "${newLaptop.name}" foi salvo e já está aparecendo no topo do seu Radar!`);
+    showToastNotification(`✓ "${newLaptop.name}" salvo com sucesso no topo do Radar!`);
   } catch (err) {
     console.error('Erro ao salvar notebook do OCR:', err);
     alert('Erro ao salvar: ' + err.message);
+  } finally {
+    if (btn) btn.disabled = false;
+    if (statusEl) statusEl.style.display = 'none';
   }
 }
 
+// Abrir preenchimento manual diretamente caso o usuário não queira tirar print
+function openManualOcrForm() {
+  const formWrap = document.getElementById('ocrResultFormWrap');
+  const prevWrap = document.getElementById('ocrPreviewWrap');
+  const statusBox = document.getElementById('ocrStatusBox');
+  const statusText = document.getElementById('ocrStatusText');
+
+  if (prevWrap) prevWrap.style.display = 'block';
+  if (statusBox) statusBox.style.display = 'block';
+  if (statusText) statusText.innerText = '✍️ Digite os dados do notebook abaixo e clique em Confirmar:';
+  if (formWrap) formWrap.style.display = 'block';
+
+  // Pré-preencher com sugestão pronta para edição se estiver vazio
+  const nameInput = document.getElementById('ocrParsedName');
+  if (nameInput && !nameInput.value) nameInput.value = 'ASUS ROG Zephyrus G16 (2024)';
+  const gpuInput = document.getElementById('ocrParsedGpu');
+  if (gpuInput && !gpuInput.value) gpuInput.value = 'NVIDIA RTX 4070';
+  const cpuInput = document.getElementById('ocrParsedCpu');
+  if (cpuInput && !cpuInput.value) cpuInput.value = 'Intel Core Ultra 9 185H';
+  const ramInput = document.getElementById('ocrParsedRam');
+  if (ramInput && !ramInput.value) ramInput.value = '16GB LPDDR5X 7467MHz';
+  const ramStatusSelect = document.getElementById('ocrParsedRamStatus');
+  if (ramStatusSelect) ramStatusSelect.value = 'none'; // Zephyrus tem RAM soldada
+  const priceUsInput = document.getElementById('ocrParsedPriceUs');
+  if (priceUsInput && !priceUsInput.value) priceUsInput.value = '1499';
+  const priceBrInput = document.getElementById('ocrParsedPriceBr');
+  if (priceBrInput && !priceBrInput.value) priceBrInput.value = '14899';
+  const storeInput = document.getElementById('ocrParsedStore');
+  if (storeInput && !storeInput.value) storeInput.value = 'Best Buy';
+}
+
+// Alternar entre visualização de Cards Espaçosos e Tabela Comparativa Lado a Lado
+function switchViewMode(mode) {
+  currentViewMode = mode;
+  const btnCards = document.getElementById('btnViewCards');
+  const btnTable = document.getElementById('btnViewTable');
+
+  if (mode === 'cards') {
+    if (btnCards) btnCards.classList.add('active');
+    if (btnTable) btnTable.classList.remove('active');
+  } else {
+    if (btnTable) btnTable.classList.add('active');
+    if (btnCards) btnCards.classList.remove('active');
+  }
+  render();
+}
+
+// Notificação Toast não-bloqueante
+function showToastNotification(message) {
+  let toast = document.getElementById('appToastNotice');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'appToastNotice';
+    toast.style.position = 'fixed';
+    toast.style.bottom = '24px';
+    toast.style.right = '24px';
+    toast.style.background = 'linear-gradient(135deg, #0284c7, #10b981)';
+    toast.style.color = '#fff';
+    toast.style.padding = '14px 22px';
+    toast.style.borderRadius = '10px';
+    toast.style.fontWeight = '700';
+    toast.style.fontSize = '0.92rem';
+    toast.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
+    toast.style.zIndex = '9999';
+    toast.style.transition = 'all 0.3s ease';
+    toast.style.display = 'flex';
+    toast.style.alignItems = 'center';
+    toast.style.gap = '8px';
+    document.body.appendChild(toast);
+  }
+  toast.innerText = message;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateY(0)';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(15px)';
+  }, 4500);
+}
+
 window.saveOcrParsedLaptop = saveOcrParsedLaptop;
+window.openManualOcrForm = openManualOcrForm;
+window.switchViewMode = switchViewMode;
+window.showToastNotification = showToastNotification;
 
 // ==========================================
 // CENTRAL DE BUSCA DIRETA NAS LOJAS
