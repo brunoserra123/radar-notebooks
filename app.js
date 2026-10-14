@@ -1843,6 +1843,245 @@ function saveManualAuditSpecs(laptopId) {
   }
 }
 
+// Modal de Correção Rápida e Troca de Fotos na Página
+function openDirectEditModal(laptopId) {
+  const laptop = laptops.find(l => l.id === laptopId) || DEFAULT_LAPTOPS.find(l => l.id === laptopId);
+  if (!laptop) return;
+
+  const modal = document.getElementById('directEditModal');
+  const body = document.getElementById('directEditModalBody');
+  const title = document.getElementById('directEditModalTitle');
+  if (!modal || !body) return;
+
+  if (title) title.innerText = `✏️ Corrigir: ${laptop.name}`;
+
+  const currentImg = laptop.imageUrl || getLaptopImage(laptop);
+
+  body.innerHTML = `
+    <div class="direct-edit-layout">
+      <!-- 1. Seção de Foto -->
+      <div class="edit-img-section">
+        <div style="font-weight: 700; font-size: 0.92rem; margin-bottom: 0.6rem; color: #fff; display:flex; align-items:center; gap:6px;">
+          <span>📷 Foto do Notebook</span>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(Altere instantaneamente com 1 clique ou cole seu próprio link)</span>
+        </div>
+
+        <div class="edit-img-preview-container">
+          <div class="edit-img-preview-box">
+            <img id="editModalPreviewImg" src="${currentImg}" alt="Preview" onerror="this.src='images/asus_zephyrus_g16.jpg';">
+          </div>
+          <div style="flex: 1; min-width: 240px; display:flex; flex-direction:column; gap:8px;">
+            <div>
+              <label style="font-size:0.76rem; color:var(--text-muted); font-weight:700;">Cole o Link da Imagem (Google, Kabum, Amazon, etc.):</label>
+              <input type="text" id="editLaptopImageUrl" class="form-input" style="width:100%; margin-top:3px;" 
+                placeholder="https://exemplo.com/foto-notebook.jpg ou deixe em branco para o padrão" 
+                value="${laptop.imageUrl || ''}" 
+                oninput="updateEditImagePreview(this.value)">
+            </div>
+            <div>
+              <label style="font-size:0.76rem; color:var(--text-muted); font-weight:700;">Ou escolha uma foto salva no seu computador:</label>
+              <input type="file" id="editLaptopImageFile" accept="image/*" style="font-size:0.8rem; margin-top:3px; color:var(--text-muted);" onchange="handleEditLocalImage(event)">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <span style="font-size:0.76rem; font-weight:700; color:var(--accent);">⚡ Fotos Oficiais em 1 Clique (Catálogo Real):</span>
+          <div class="preset-img-chips">
+            <button type="button" class="preset-chip-btn" onclick="setEditPresetImage('images/asus_tuf_a15.jpg', this)">🟢 ASUS TUF A15</button>
+            <button type="button" class="preset-chip-btn" onclick="setEditPresetImage('images/asus_zephyrus_g16.jpg', this)">🔵 ASUS Zephyrus G16</button>
+            <button type="button" class="preset-chip-btn" onclick="setEditPresetImage('images/dell_g16_7630.jpg', this)">🟣 Dell G16 7630 / G15</button>
+            <button type="button" class="preset-chip-btn" onclick="setEditPresetImage('images/lenovo_legion_slim_5.jpg', this)">⚪ Lenovo Legion Slim 5</button>
+            <button type="button" class="preset-chip-btn" onclick="setEditPresetImage('images/lenovo_legion_pro_5i.jpg', this)">🔷 Lenovo Legion Pro 5i</button>
+            <button type="button" class="preset-chip-btn" onclick="setEditPresetImage('images/acer_helios_neo_16.jpg', this)">🔶 Acer Helios Neo 16</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Grade de Especificações & Preços -->
+      <div class="direct-edit-grid">
+        <div class="edit-field-group">
+          <label>Nome do Notebook:</label>
+          <input type="text" id="editLaptopName" value="${laptop.name || ''}">
+        </div>
+
+        <div class="edit-field-group">
+          <label>Código do Modelo (Ex: FA507UI, 7630, etc.):</label>
+          <input type="text" id="editLaptopModelCode" value="${laptop.modelCode || ''}">
+        </div>
+
+        <div class="edit-field-group">
+          <label>Placa de Vídeo (GPU):</label>
+          <input type="text" id="editLaptopGpu" value="${laptop.gpu || ''}">
+        </div>
+
+        <div class="edit-field-group">
+          <label>Potência TGP da GPU (Watts):</label>
+          <input type="text" id="editLaptopGpuTgp" value="${laptop.gpuTgp || '140W'}">
+        </div>
+
+        <div class="edit-field-group">
+          <label>Processador (CPU):</label>
+          <input type="text" id="editLaptopCpu" value="${laptop.cpu || ''}">
+        </div>
+
+        <div class="edit-field-group">
+          <label>Memória RAM (Texto):</label>
+          <input type="text" id="editLaptopRam" value="${laptop.ram || ''}">
+        </div>
+
+        <div class="edit-field-group">
+          <label>Possibilidade de Troca de Memória RAM:</label>
+          <select id="editLaptopRamUpgrade">
+            <option value="full" ${laptop.ramUpgradeStatus === 'full' ? 'selected' : ''}>✅ 2x Slots SODIMM (Aceita Upgrade Livre)</option>
+            <option value="none" ${laptop.ramUpgradeStatus === 'none' ? 'selected' : ''}>❌ Memória Soldada (Não aceita troca)</option>
+          </select>
+        </div>
+
+        <div class="edit-field-group">
+          <label>Armazenamento (SSD):</label>
+          <input type="text" id="editLaptopStorage" value="${laptop.storage || ''}">
+        </div>
+
+        <div class="edit-field-group">
+          <label>Preço Brasil (R$):</label>
+          <input type="number" id="editLaptopPriceBr" value="${laptop.priceBr || 0}">
+        </div>
+
+        <div class="edit-field-group">
+          <label>Preço EUA ($ USD):</label>
+          <input type="number" id="editLaptopPriceUs" value="${laptop.priceUs || 0}">
+        </div>
+
+        <div class="edit-field-group">
+          <label>Suporte a Carregador USB-C PD:</label>
+          <select id="editLaptopUsbC">
+            <option value="true" ${laptop.hasUsbCCharging ? 'selected' : ''}>⚡ Sim, suporta recarga por Type-C (65W a 140W)</option>
+            <option value="false" ${!laptop.hasUsbCCharging ? 'selected' : ''}>🔌 Não, apenas plugue redondo tradicional</option>
+          </select>
+        </div>
+
+        <div class="edit-field-group">
+          <label>Autonomia da Bateria (Horas em Uso Normal):</label>
+          <input type="number" step="0.5" id="editLaptopBatteryHours" value="${laptop.batteryHoursNormal || 4}">
+        </div>
+      </div>
+
+      <!-- 3. Botões de Ação -->
+      <div class="audit-actions-bar">
+        <button type="button" class="btn btn-secondary" onclick="closeDirectEditModal()">
+          Cancelar
+        </button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-secondary" onclick="resetLaptopToDefault('${laptop.id}')" style="font-size:0.8rem;">
+            🔄 Restaurar Padrão de Fábrica
+          </button>
+          <button type="button" class="btn btn-primary" onclick="saveDirectEdit('${laptop.id}')">
+            💾 Salvar Alterações na Página
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  modal.style.display = 'flex';
+}
+
+function closeDirectEditModal() {
+  const modal = document.getElementById('directEditModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function updateEditImagePreview(url) {
+  const img = document.getElementById('editModalPreviewImg');
+  if (img) {
+    img.src = (url && url.trim()) ? url.trim() : 'images/asus_zephyrus_g16.jpg';
+  }
+}
+
+function setEditPresetImage(imagePath, chipBtn) {
+  const input = document.getElementById('editLaptopImageUrl');
+  if (input) {
+    input.value = imagePath;
+    updateEditImagePreview(imagePath);
+  }
+  document.querySelectorAll('.preset-chip-btn').forEach(btn => btn.classList.remove('active'));
+  if (chipBtn) chipBtn.classList.add('active');
+}
+
+function handleEditLocalImage(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    const input = document.getElementById('editLaptopImageUrl');
+    if (input) input.value = dataUrl;
+    updateEditImagePreview(dataUrl);
+    showToastNotification('📷 Imagem carregada do seu computador!');
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveDirectEdit(laptopId) {
+  const idx = laptops.findIndex(l => l.id === laptopId);
+  if (idx === -1) {
+    alert('Notebook não encontrado para edição.');
+    return;
+  }
+
+  const name = document.getElementById('editLaptopName')?.value.trim();
+  const modelCode = document.getElementById('editLaptopModelCode')?.value.trim();
+  const gpu = document.getElementById('editLaptopGpu')?.value.trim();
+  const gpuTgp = document.getElementById('editLaptopGpuTgp')?.value.trim();
+  const cpu = document.getElementById('editLaptopCpu')?.value.trim();
+  const ram = document.getElementById('editLaptopRam')?.value.trim();
+  const ramUpgradeStatus = document.getElementById('editLaptopRamUpgrade')?.value;
+  const storage = document.getElementById('editLaptopStorage')?.value.trim();
+  const priceBr = parseFloat(document.getElementById('editLaptopPriceBr')?.value) || laptops[idx].priceBr;
+  const priceUs = parseFloat(document.getElementById('editLaptopPriceUs')?.value) || laptops[idx].priceUs;
+  const hasUsbCCharging = document.getElementById('editLaptopUsbC')?.value === 'true';
+  const batteryHours = parseFloat(document.getElementById('editLaptopBatteryHours')?.value) || 4;
+  const imageUrl = document.getElementById('editLaptopImageUrl')?.value.trim();
+
+  if (name) laptops[idx].name = name;
+  if (modelCode) laptops[idx].modelCode = modelCode;
+  if (gpu) laptops[idx].gpu = gpu;
+  if (gpuTgp) laptops[idx].gpuTgp = gpuTgp;
+  if (cpu) laptops[idx].cpu = cpu;
+  if (ram) laptops[idx].ram = ram;
+  if (ramUpgradeStatus) {
+    laptops[idx].ramUpgradeStatus = ramUpgradeStatus;
+    laptops[idx].ramUpgradeLabel = ramUpgradeStatus === 'none' ? '❌ Não Aceita Troca (Soldada)' : '✅ Aceita Troca (2x Slots SODIMM)';
+  }
+  if (storage) laptops[idx].storage = storage;
+  laptops[idx].priceBr = priceBr;
+  laptops[idx].priceUs = priceUs;
+  laptops[idx].hasUsbCCharging = hasUsbCCharging;
+  laptops[idx].batteryHoursNormal = batteryHours;
+  if (imageUrl !== undefined) {
+    laptops[idx].imageUrl = imageUrl;
+  }
+
+  saveData();
+  render();
+  closeDirectEditModal();
+  showToastNotification(`✅ ${laptops[idx].name}: Alterações salvas com sucesso!`);
+}
+
+function resetLaptopToDefault(laptopId) {
+  const def = DEFAULT_LAPTOPS.find(d => d.id === laptopId);
+  const idx = laptops.findIndex(l => l.id === laptopId);
+  if (def && idx !== -1) {
+    laptops[idx] = JSON.parse(JSON.stringify(def));
+    saveData();
+    render();
+    closeDirectEditModal();
+    showToastNotification(`🔄 ${def.name}: Restaurado para as especificações originais!`);
+  }
+}
+
 // Modal e Extração Inteligente por Link Direto
 function openLinkImportModal() {
   const modal = document.getElementById('linkImportModal');
@@ -2096,6 +2335,9 @@ function render() {
         <div class="card-image-hero">
           <img src="${getLaptopImage(laptop)}" alt="${laptop.name}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=700&q=80';">
           <div class="card-image-brand">${getBrandTag(laptop.name)}</div>
+          <button type="button" class="btn-card-quick-fix" onclick="openDirectEditModal('${laptop.id}')" title="Corrigir foto ou especificações na página">
+            ✏️ Corrigir Foto / Specs
+          </button>
           <div class="card-image-overlay-tgp">${laptop.gpu} • ${laptop.gpuTgp || '140W'}</div>
           ${(laptop.score >= 93 || (laptop.bestFor && (laptop.bestFor.includes('Sweetspot') || laptop.bestFor.includes('Melhor')))) ? `
             <div style="position:absolute; bottom:10px; left:12px; background:linear-gradient(135deg, #f59e0b, #d97706); color:#000; font-size:0.7rem; font-weight:800; padding:3px 9px; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,0.6); display:flex; align-items:center; gap:4px;">
@@ -2271,6 +2513,9 @@ function render() {
         <div class="card-actions">
           <button class="btn btn-robot" onclick="openSpecsAuditModal('${laptop.id}')" title="Robô GamerRadar: Conferir e Validar Especificações">
             🤖 Conferir Specs
+          </button>
+          <button class="btn btn-secondary" onclick="openDirectEditModal('${laptop.id}')" title="Corrigir foto, modelo ou preços">
+            ✏️ Corrigir
           </button>
           <button class="btn btn-primary" onclick="openDuelModal('${laptop.id}')" title="Colocar em duelo direto contra outro modelo">
             🥊 Duelo
