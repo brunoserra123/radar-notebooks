@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261013_v5">
+  <link rel="stylesheet" href="styles.css?v=20261013_v6">
   <link rel="icon" type="image/jpeg" href="icon.jpg">
   <link rel="apple-touch-icon" href="icon.jpg">
   <!-- Tesseract.js para leitura OCR de print de tela direto no navegador -->
@@ -18,17 +18,17 @@
   <header class="app-header">
     <div class="header-container">
       <div class="brand">
-        <div class="logo-icon">⚡</div>
+        <div class="logo-icon">âš¡</div>
         <div>
           <h1 class="logo-title">GamerRadar <span>BR vs EUA</span></h1>
-          <p class="logo-subtitle">Comparador Inteligente, Equivalência de Hardware & Vigia de Preços</p>
+          <p class="logo-subtitle">Comparador Inteligente, EquivalÃªncia de Hardware & Vigia de PreÃ§os</p>
         </div>
       </div>
 
       <!-- Currency & Tax Controls -->
       <div class="currency-bar">
         <div class="currency-item">
-          <span class="currency-label">Cotação Dólar:</span>
+          <span class="currency-label">CotaÃ§Ã£o DÃ³lar:</span>
           <div class="currency-input-wrap">
             <span>R$</span>
             <input type="number" id="usdRateInput" value="5.65" step="0.05" min="4.00" max="8.00">
@@ -38,7 +38,7 @@
           <span class="currency-label">Imposto EUA (Sales Tax):</span>
           <select id="salesTaxSelect">
             <option value="0">0% (Delaware / Tax Free / Online)</option>
-            <option value="0.065">6.5% (Flórida / Orlando / Miami)</option>
+            <option value="0.065">6.5% (FlÃ³rida / Orlando / Miami)</option>
             <option value="0.08875">8.87% (Nova York)</option>
           </select>
         </div>
@@ -46,12 +46,12 @@
           <span class="currency-label">Taxa / IOF:</span>
           <select id="importModeSelect">
             <option value="wise">1.1% IOF (Wise / Nomad)</option>
-            <option value="credit_card">4.38% IOF (Cartão de Crédito)</option>
-            <option value="direct">0% (Dólar em Espécie Direto)</option>
+            <option value="credit_card">4.38% IOF (CartÃ£o de CrÃ©dito)</option>
+            <option value="direct">0% (DÃ³lar em EspÃ©cie Direto)</option>
           </select>
         </div>
         <button class="btn btn-secondary" id="btnOpenSyncModal" title="Conectar ao Google Sheets / Apps Script">
-          ☁️ Google Sheets
+          â˜ï¸ Google Sheets
         </button>
       </div>
     </div>
@@ -62,11 +62,11 @@
     <section class="budget-spotlight">
       <div class="spotlight-card">
         <div class="spotlight-info">
-          <span class="badge badge-accent">🎯 Sua Faixa Selecionada</span>
-          <h2>Orçamento Foco: <strong>R$ 8.000 a R$ 8.900</strong></h2>
+          <span class="badge badge-accent">ðŸŽ¯ Sua Faixa Selecionada</span>
+          <h2>OrÃ§amento Foco: <strong>R$ 8.000 a R$ 8.900</strong></h2>
           <p>
-            Na faixa de R$ 8k - 8.9k, o objetivo é garantir <strong>RTX 4060 com TGP máximo (140W) e tela QHD 100% sRGB</strong> no Brasil,
-            ou buscar nos EUA um modelo com <strong>RTX 4070</strong> no mesmo preço final!
+            Na faixa de R$ 8k - 8.9k, o objetivo Ã© garantir <strong>RTX 4060 com TGP mÃ¡ximo (140W) e tela QHD 100% sRGB</strong> no Brasil,
+            ou buscar nos EUA um modelo com <strong>RTX 4070</strong> no mesmo preÃ§o final!
           </p>
         </div>
         <div class="spotlight-stats">
@@ -92,41 +92,41 @@
         <div class="store-search-header">
           <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
             <span class="badge badge-purple">Buscador Oficial</span>
-            <h3 style="font-size: 1.15rem; font-weight: 700;">🔍 Pesquisar Direto nas Lojas (EUA & Brasil)</h3>
+            <h3 style="font-size: 1.15rem; font-weight: 700;">ðŸ” Pesquisar Direto nas Lojas (EUA & Brasil)</h3>
           </div>
           <span style="font-size: 0.78rem; color: var(--accent);">
-            🛡️ Filtro Anti-Pegadinha Ativo: Exclui vendedores terceiros e foca só em estoque oficial
+            ðŸ›¡ï¸ Filtro Anti-Pegadinha Ativo: Exclui vendedores terceiros e foca sÃ³ em estoque oficial
           </span>
         </div>
 
         <!-- Barra de Busca Multiloja -->
         <div class="store-search-inputs">
           <div class="search-input-wrap">
-            <span style="font-size: 1rem; margin-right: 0.4rem;">🔎</span>
+            <span style="font-size: 1rem; margin-right: 0.4rem;">ðŸ”Ž</span>
             <input type="text" id="storeCustomQuery" placeholder="Digite o que procura (ex: RTX 4070, OLED, Zephyrus G16, Legion Pro 5i)...">
           </div>
           <select id="storeSelectTarget">
-            <option value="bestbuy">🇺🇸 Best Buy (Apenas Oficial Best Buy)</option>
-            <option value="microcenter">🇺🇸 Micro Center (Clearance & Promoções)</option>
-            <option value="bhphoto">🇺🇸 B&H Photo Video (DealZone)</option>
-            <option value="amazon_us">🇺🇸 Amazon EUA</option>
-            <option value="kabum">🇧🇷 Kabum (Brasil)</option>
-            <option value="all">🌐 Abrir Melhores Lojas Juntas</option>
+            <option value="bestbuy">ðŸ‡ºðŸ‡¸ Best Buy (Apenas Oficial Best Buy)</option>
+            <option value="microcenter">ðŸ‡ºðŸ‡¸ Micro Center (Clearance & PromoÃ§Ãµes)</option>
+            <option value="bhphoto">ðŸ‡ºðŸ‡¸ B&H Photo Video (DealZone)</option>
+            <option value="amazon_us">ðŸ‡ºðŸ‡¸ Amazon EUA</option>
+            <option value="kabum">ðŸ‡§ðŸ‡· Kabum (Brasil)</option>
+            <option value="all">ðŸŒ Abrir Melhores Lojas Juntas</option>
           </select>
-          <button class="btn btn-primary" id="btnExecuteStoreSearch">🚀 Buscar na Loja</button>
+          <button class="btn btn-primary" id="btnExecuteStoreSearch">ðŸš€ Buscar na Loja</button>
         </div>
 
-        <!-- Atalhos Rápidos Recomendados (1 Clique) -->
+        <!-- Atalhos RÃ¡pidos Recomendados (1 Clique) -->
         <div class="quick-store-shortcuts">
-          <span class="shortcuts-label">⚡ Atalhos Rápidos (Filtros já configurados):</span>
+          <span class="shortcuts-label">âš¡ Atalhos RÃ¡pidos (Filtros jÃ¡ configurados):</span>
           <div class="shortcuts-chips">
-            <button class="quick-chip" onclick="quickSearch('bestbuy_intel')">🔵 Best Buy: Só Intel Core i7 / i9</button>
-            <button class="quick-chip" onclick="quickSearch('bestbuy_rtx4070')">🔥 Best Buy: RTX 4070 até $1.450</button>
-            <button class="quick-chip" onclick="quickSearch('bestbuy_oled')">🌈 Best Buy: OLED Gamer</button>
-            <button class="quick-chip" onclick="quickSearch('bestbuy_openbox')">🏷️ Best Buy: Open-Box / Clearance</button>
-            <button class="quick-chip" onclick="quickSearch('microcenter_deals')">🏢 Micro Center: Gaming Deals</button>
-            <button class="quick-chip" onclick="quickSearch('bh_laptops')">📸 B&H: Deals</button>
-            <button class="quick-chip" onclick="quickSearch('kabum_rtx')">🇧🇷 Kabum: RTX 4060/4070 BR</button>
+            <button class="quick-chip" onclick="quickSearch('bestbuy_intel')">ðŸ”µ Best Buy: SÃ³ Intel Core i7 / i9</button>
+            <button class="quick-chip" onclick="quickSearch('bestbuy_rtx4070')">ðŸ”¥ Best Buy: RTX 4070 atÃ© $1.450</button>
+            <button class="quick-chip" onclick="quickSearch('bestbuy_oled')">ðŸŒˆ Best Buy: OLED Gamer</button>
+            <button class="quick-chip" onclick="quickSearch('bestbuy_openbox')">ðŸ·ï¸ Best Buy: Open-Box / Clearance</button>
+            <button class="quick-chip" onclick="quickSearch('microcenter_deals')">ðŸ¢ Micro Center: Gaming Deals</button>
+            <button class="quick-chip" onclick="quickSearch('bh_laptops')">ðŸ“¸ B&H: Deals</button>
+            <button class="quick-chip" onclick="quickSearch('kabum_rtx')">ðŸ‡§ðŸ‡· Kabum: RTX 4060/4070 BR</button>
           </div>
         </div>
       </div>
@@ -136,46 +136,46 @@
     <section class="controls-section">
       <div class="search-filter-bar">
         <div class="search-box">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon">ðŸ”</span>
           <input type="text" id="searchInput" placeholder="Buscar por modelo (ex: Legion, Predator, G16, RTX 4070, i7, i9)...">
         </div>
 
         <div class="filter-chips" id="filterChips">
           <button class="chip active" data-filter="all">Todos</button>
-          <button class="chip" data-filter="intel">🔵 Só Intel Core (Foco)</button>
-          <button class="chip" data-filter="amd">🔴 AMD Ryzen</button>
+          <button class="chip" data-filter="intel">ðŸ”µ SÃ³ Intel Core (Foco)</button>
+          <button class="chip" data-filter="amd">ðŸ”´ AMD Ryzen</button>
           <button class="chip" data-filter="budget">Na Faixa (R$ 8k - 8.9k)</button>
-          <button class="chip" data-filter="gpu_upgrade">🚀 Upgrade Grátis de GPU nos EUA</button>
+          <button class="chip" data-filter="gpu_upgrade">ðŸš€ Upgrade GrÃ¡tis de GPU nos EUA</button>
           <button class="chip" data-filter="rtx4070">Com RTX 4070</button>
           <button class="chip" data-filter="rtx4060">Com RTX 4060</button>
-          <button class="chip" data-filter="battery_long">🔋 Bateria Longa (6h+ Uso Normal)</button>
-          <button class="chip" data-filter="ram_upgrade">🔄 Aceita Upgrade de RAM (2x SODIMM)</button>
-          <button class="chip" data-filter="ram_soldered" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">🚫 Alerta: RAM Soldada (Não Troca)</button>
-          <button class="chip" data-filter="ddr5">⚡ RAM DDR5 (Mais Rápida)</button>
-          <button class="chip" data-filter="m2_extra">💾 Slot M.2 NVMe Extra Livre</button>
-          <button class="chip" data-filter="usbc_charging">🔌 Carrega por Type-C (USB-C PD)</button>
-          <button class="chip" data-filter="biometrics">🔐 Com Leitor de Digital / Facial</button>
-          <button class="chip" data-filter="rich_ports">⚡ Portas: USB-A + Type-C</button>
-          <button class="chip" data-filter="watchlist">⭐ Meus Monitorados</button>
+          <button class="chip" data-filter="battery_long">ðŸ”‹ Bateria Longa (6h+ Uso Normal)</button>
+          <button class="chip" data-filter="ram_upgrade">ðŸ”„ Aceita Upgrade de RAM (2x SODIMM)</button>
+          <button class="chip" data-filter="ram_soldered" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">ðŸš« Alerta: RAM Soldada (NÃ£o Troca)</button>
+          <button class="chip" data-filter="ddr5">âš¡ RAM DDR5 (Mais RÃ¡pida)</button>
+          <button class="chip" data-filter="m2_extra">ðŸ’¾ Slot M.2 NVMe Extra Livre</button>
+          <button class="chip" data-filter="usbc_charging">ðŸ”Œ Carrega por Type-C (USB-C PD)</button>
+          <button class="chip" data-filter="biometrics">ðŸ” Com Leitor de Digital / Facial</button>
+          <button class="chip" data-filter="rich_ports">âš¡ Portas: USB-A + Type-C</button>
+          <button class="chip" data-filter="watchlist">â­ Meus Monitorados</button>
         </div>
       </div>
 
       <div class="sort-bar">
         <span>Ordenar por:</span>
         <select id="sortSelect">
-          <option value="value_score">Melhor Custo-Benefício (Score)</option>
-          <option value="battery_desc">🔋 Maior Autonomia de Bateria (Uso Normal)</option>
-          <option value="ram_desc">🧠 Maior Memória RAM (32GB / 16GB)</option>
-          <option value="price_br_asc">Menor Preço no Brasil (R$)</option>
-          <option value="price_us_asc">Menor Preço nos EUA (US$)</option>
+          <option value="value_score">Melhor Custo-BenefÃ­cio (Score)</option>
+          <option value="battery_desc">ðŸ”‹ Maior Autonomia de Bateria (Uso Normal)</option>
+          <option value="ram_desc">ðŸ§  Maior MemÃ³ria RAM (32GB / 16GB)</option>
+          <option value="price_br_asc">Menor PreÃ§o no Brasil (R$)</option>
+          <option value="price_us_asc">Menor PreÃ§o nos EUA (US$)</option>
           <option value="diff_desc">Maior Economia trazendo dos EUA</option>
-          <option value="gpu_power">Potência da GPU (TGP / Tier)</option>
+          <option value="gpu_power">PotÃªncia da GPU (TGP / Tier)</option>
         </select>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border: none; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);">⚡ Guia: Placas, Bateria, RAM & SSD</button>
-          <button class="btn btn-screenshot" id="btnOpenOcrModal">📸 Puxar por Print</button>
-          <button class="btn btn-primary" id="btnOpenDuel">🥊 Duelo: Qual Vale Mais a Pena?</button>
-          <button class="btn btn-secondary" id="btnOpenAddModal">➕ Novo Modelo</button>
+          <button class="btn btn-warning" id="btnOpenGpuGuide" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; border: none; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);">âš¡ Guia: Placas, Bateria, RAM & SSD</button>
+          <button class="btn btn-screenshot" id="btnOpenOcrModal">ðŸ“¸ Puxar por Print</button>
+          <button class="btn btn-primary" id="btnOpenDuel">ðŸ¥Š Duelo: Qual Vale Mais a Pena?</button>
+          <button class="btn btn-secondary" id="btnOpenAddModal">âž• Novo Modelo</button>
         </div>
       </div>
     </section>
@@ -184,12 +184,12 @@
     <section class="catalog-section">
       <div class="section-header">
         <div>
-          <h2 class="section-title">Radar de Preços Brasil vs EUA</h2>
+          <h2 class="section-title">Radar de PreÃ§os Brasil vs EUA</h2>
           <span class="catalog-summary" id="catalogSummary">Exibindo 8 notebooks</span>
         </div>
         <div class="view-mode-toggle" id="viewModeToggle">
-          <button type="button" class="view-mode-btn active" id="btnViewCards" onclick="window.switchViewMode('cards')">🎴 Cards Espaçosos</button>
-          <button type="button" class="view-mode-btn" id="btnViewTable" onclick="window.switchViewMode('table')">📊 Tabela Comparativa Direta</button>
+          <button type="button" class="view-mode-btn active" id="btnViewCards" onclick="window.switchViewMode('cards')">ðŸŽ´ Cards EspaÃ§osos</button>
+          <button type="button" class="view-mode-btn" id="btnViewTable" onclick="window.switchViewMode('table')">ðŸ“Š Tabela Comparativa Direta</button>
         </div>
       </div>
 
@@ -209,7 +209,7 @@
             <span class="badge badge-purple">Motor de Similaridade</span>
             <h3 class="modal-title" id="comparatorTitle">Notebooks Parecidos & Concorrentes Diretos</h3>
           </div>
-          <button class="btn-close" id="btnCloseComparator">✕</button>
+          <button class="btn-close" id="btnCloseComparator">âœ•</button>
         </div>
         <div class="modal-body" id="comparatorBody">
           <!-- Dynamically populated -->
@@ -222,7 +222,7 @@
       <div class="modal-dialog">
         <div class="modal-header">
           <h3 class="modal-title">Cadastrar Notebook no Rastreador</h3>
-          <button class="btn-close" id="btnCloseAddModal">✕</button>
+          <button class="btn-close" id="btnCloseAddModal">âœ•</button>
         </div>
         <div class="modal-body">
           <form id="addLaptopForm" class="form-grid">
@@ -231,7 +231,7 @@
               <input type="text" id="lapName" required placeholder="Ex: Acer Predator Helios Neo 16 PHN16-72">
             </div>
             <div class="form-group">
-              <label for="lapGpu">Placa de Vídeo (GPU)</label>
+              <label for="lapGpu">Placa de VÃ­deo (GPU)</label>
               <select id="lapGpu" required>
                 <option value="RTX 4070">NVIDIA GeForce RTX 4070 (140W)</option>
                 <option value="RTX 4060">NVIDIA GeForce RTX 4060 (140W)</option>
@@ -244,7 +244,7 @@
               <input type="text" id="lapCpu" required placeholder="Ex: Intel i7-14700HX ou Ryzen 7 8845HS">
             </div>
             <div class="form-group">
-              <label for="lapRam">Memória RAM</label>
+              <label for="lapRam">MemÃ³ria RAM</label>
               <input type="text" id="lapRam" required placeholder="Ex: 16GB DDR5 5600MHz">
             </div>
             <div class="form-group">
@@ -252,11 +252,11 @@
               <input type="text" id="lapScreen" required placeholder="Ex: 16 QHD 165Hz 100% sRGB">
             </div>
             <div class="form-group">
-              <label for="lapPriceBr">Preço Médio Brasil (R$)</label>
+              <label for="lapPriceBr">PreÃ§o MÃ©dio Brasil (R$)</label>
               <input type="number" id="lapPriceBr" required placeholder="Ex: 8499" min="1000" step="50">
             </div>
             <div class="form-group">
-              <label for="lapPriceUs">Preço Médio EUA (US$)</label>
+              <label for="lapPriceUs">PreÃ§o MÃ©dio EUA (US$)</label>
               <input type="number" id="lapPriceUs" required placeholder="Ex: 1299" min="200" step="10">
             </div>
             <div class="form-group full-width">
@@ -281,10 +281,10 @@
       <div class="modal-dialog">
         <div class="modal-header">
           <div>
-            <span class="badge badge-cyan">Histórico & Alerta de Preço</span>
+            <span class="badge badge-cyan">HistÃ³rico & Alerta de PreÃ§o</span>
             <h3 class="modal-title" id="historyTitle">Monitoramento do Modelo</h3>
           </div>
-          <button class="btn-close" id="btnCloseHistory">✕</button>
+          <button class="btn-close" id="btnCloseHistory">âœ•</button>
         </div>
         <div class="modal-body" id="historyBody">
           <!-- Dynamic history points & alert setup -->
@@ -300,12 +300,12 @@
             <span class="badge badge-accent">Nuvem 100% Gratuita</span>
             <h3 class="modal-title">Sincronizar com Google Sheets / Apps Script</h3>
           </div>
-          <button class="btn-close" id="btnCloseSyncModal">✕</button>
+          <button class="btn-close" id="btnCloseSyncModal">âœ•</button>
         </div>
         <div class="modal-body">
           <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-            Integre seu site no <strong>GitHub Pages</strong> diretamente com uma <strong>Planilha Google</strong> através do <strong>Google Apps Script</strong>.
-            Assim, o Google vigia os preços na nuvem mesmo com o seu computador desligado!
+            Integre seu site no <strong>GitHub Pages</strong> diretamente com uma <strong>Planilha Google</strong> atravÃ©s do <strong>Google Apps Script</strong>.
+            Assim, o Google vigia os preÃ§os na nuvem mesmo com o seu computador desligado!
           </p>
           <div class="form-group" style="margin-bottom: 1rem;">
             <label for="gasApiUrl">URL do Web App do Google Apps Script:</label>
@@ -314,7 +314,7 @@
           </div>
           <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
             <button class="btn btn-secondary" id="btnTestFetchGAS">Testar & Carregar Dados</button>
-            <button class="btn btn-primary" id="btnSaveGAS">Salvar Conexão</button>
+            <button class="btn btn-primary" id="btnSaveGAS">Salvar ConexÃ£o</button>
           </div>
           <div id="gasStatusMessage" style="margin-top: 0.75rem; font-size: 0.82rem; display: none;"></div>
         </div>
@@ -326,20 +326,20 @@
       <div class="modal-dialog modal-large">
         <div class="modal-header">
           <div>
-            <span class="badge badge-purple">Inteligência de Decisão</span>
-            <h3 class="modal-title">🥊 Duelo Direto: Brasil vs EUA (Mesmo Preço, Quem Leva?)</h3>
+            <span class="badge badge-purple">InteligÃªncia de DecisÃ£o</span>
+            <h3 class="modal-title">ðŸ¥Š Duelo Direto: Brasil vs EUA (Mesmo PreÃ§o, Quem Leva?)</h3>
           </div>
-          <button class="btn-close" id="btnCloseDuelModal">✕</button>
+          <button class="btn-close" id="btnCloseDuelModal">âœ•</button>
         </div>
         <div class="modal-body">
           <div class="duel-selector-bar">
             <div class="duel-select-group">
-              <label for="duelSelectBr">🇧🇷 Escolha o Modelo de Referência do Brasil:</label>
+              <label for="duelSelectBr">ðŸ‡§ðŸ‡· Escolha o Modelo de ReferÃªncia do Brasil:</label>
               <select id="duelSelectBr"></select>
             </div>
             <div class="duel-vs-circle">VS</div>
             <div class="duel-select-group">
-              <label for="duelSelectUs">🇺🇸 Escolha o Modelo que seu Irmão Traz dos EUA:</label>
+              <label for="duelSelectUs">ðŸ‡ºðŸ‡¸ Escolha o Modelo que seu IrmÃ£o Traz dos EUA:</label>
               <select id="duelSelectUs"></select>
             </div>
           </div>
@@ -357,9 +357,9 @@
         <div class="modal-header">
           <div>
             <span class="badge badge-cyan">Leitor Inteligente de Imagem (OCR)</span>
-            <h3 class="modal-title">📸 Puxar Informações por Print de Tela</h3>
+            <h3 class="modal-title">ðŸ“¸ Puxar InformaÃ§Ãµes por Print de Tela</h3>
           </div>
-          <button class="btn-close" id="btnCloseOcrModal">✕</button>
+          <button class="btn-close" id="btnCloseOcrModal">âœ•</button>
         </div>
         <div class="modal-body">
           <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
@@ -367,13 +367,13 @@
           </p>
 
           <div class="ocr-dropzone" id="ocrDropzone">
-            <div class="ocr-dropzone-icon">📷</div>
+            <div class="ocr-dropzone-icon">ðŸ“·</div>
             <div style="font-weight: 700; margin-bottom: 0.2rem;">Arraste e solte o print aqui ou clique para selecionar</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Você também pode copiar a imagem e apertar <strong>Ctrl + V</strong> nesta tela</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">VocÃª tambÃ©m pode copiar a imagem e apertar <strong>Ctrl + V</strong> nesta tela</div>
             <input type="file" id="ocrFileInput" accept="image/*" style="display: none;">
             <div style="display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap;">
-              <button type="button" class="btn btn-secondary" onclick="document.getElementById('ocrFileInput').click()">📁 Escolher Arquivo de Imagem</button>
-              <button type="button" class="btn btn-secondary" id="btnManualOcrToggle" onclick="window.openManualOcrForm()">✍️ Digitar Manualmente sem Imagem</button>
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('ocrFileInput').click()">ðŸ“ Escolher Arquivo de Imagem</button>
+              <button type="button" class="btn btn-secondary" id="btnManualOcrToggle" onclick="window.openManualOcrForm()">âœï¸ Digitar Manualmente sem Imagem</button>
             </div>
           </div>
 
@@ -391,16 +391,16 @@
                   </div>
                 </div>
 
-                <!-- Formulário de Confirmação com Campos Extraídos -->
+                <!-- FormulÃ¡rio de ConfirmaÃ§Ã£o com Campos ExtraÃ­dos -->
                 <div id="ocrResultFormWrap" style="display: none;">
-                  <h4 style="font-size: 0.95rem; margin-bottom: 0.6rem; color: var(--accent);">✓ Informações Extraídas do Print:</h4>
+                  <h4 style="font-size: 0.95rem; margin-bottom: 0.6rem; color: var(--accent);">âœ“ InformaÃ§Ãµes ExtraÃ­das do Print:</h4>
                   <div class="form-grid">
                     <div class="form-group full-width">
                       <label>Nome do Modelo Identificado</label>
                       <input type="text" id="ocrParsedName">
                     </div>
                     <div class="form-group">
-                      <label>Placa de Vídeo (GPU)</label>
+                      <label>Placa de VÃ­deo (GPU)</label>
                       <input type="text" id="ocrParsedGpu">
                     </div>
                     <div class="form-group">
@@ -408,29 +408,29 @@
                       <input type="text" id="ocrParsedCpu">
                     </div>
                     <div class="form-group">
-                      <label>Memória RAM</label>
+                      <label>MemÃ³ria RAM</label>
                       <input type="text" id="ocrParsedRam">
                     </div>
                     <div class="form-group">
-                      <label for="ocrParsedRamStatus">RAM é Soldada ou Aceita Troca?</label>
+                      <label for="ocrParsedRamStatus">RAM Ã© Soldada ou Aceita Troca?</label>
                       <select id="ocrParsedRamStatus">
-                        <option value="full">✅ Aceita Troca (2x Slots SODIMM Removíveis)</option>
-                        <option value="none">❌ 100% Soldada na Placa (LPDDR5X - Não Troca)</option>
-                        <option value="partial">⚠️ Troca Parcial (1 Soldada + 1 Slot Livre)</option>
+                        <option value="full">âœ… Aceita Troca (2x Slots SODIMM RemovÃ­veis)</option>
+                        <option value="none">âŒ 100% Soldada na Placa (LPDDR5X - NÃ£o Troca)</option>
+                        <option value="partial">âš ï¸ Troca Parcial (1 Soldada + 1 Slot Livre)</option>
                       </select>
                     </div>
                     <div class="form-group">
-                      <label for="ocrParsedPriceUs">Preço em Dólar (US$) 🇺🇸</label>
+                      <label for="ocrParsedPriceUs">PreÃ§o em DÃ³lar (US$) ðŸ‡ºðŸ‡¸</label>
                       <input type="text" id="ocrParsedPriceUs" inputmode="decimal" placeholder="Ex: 1495.99">
-                      <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">Preço original na loja dos EUA</div>
+                      <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">PreÃ§o original na loja dos EUA</div>
                     </div>
                     <div class="form-group">
                       <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <label for="ocrParsedPriceBr">Preço no Brasil (R$) 🇧🇷</label>
-                        <button type="button" id="btnRecalcOcrBr" style="background: none; border: none; color: var(--accent); font-size: 0.72rem; cursor: pointer; text-decoration: underline; padding: 0;">↻ Recalcular Estimativa</button>
+                        <label for="ocrParsedPriceBr">PreÃ§o no Brasil (R$) ðŸ‡§ðŸ‡·</label>
+                        <button type="button" id="btnRecalcOcrBr" style="background: none; border: none; color: var(--accent); font-size: 0.72rem; cursor: pointer; text-decoration: underline; padding: 0;">â†» Recalcular Estimativa</button>
                       </div>
                       <input type="text" id="ocrParsedPriceBr" inputmode="numeric" placeholder="Ex: 14899">
-                      <div id="ocrPriceBrHelp" style="font-size: 0.72rem; color: var(--accent); margin-top: 3px;">⚡ Calculado automaticamente para o mercado brasileiro</div>
+                      <div id="ocrPriceBrHelp" style="font-size: 0.72rem; color: var(--accent); margin-top: 3px;">âš¡ Calculado automaticamente para o mercado brasileiro</div>
                     </div>
                     <div class="form-group">
                       <label for="ocrParsedStore">Loja / Origem</label>
@@ -441,7 +441,7 @@
                   <div style="display: flex; gap: 0.75rem; justify-content: flex-end; align-items: center; margin-top: 1rem;">
                     <span id="ocrSaveStatusText" style="font-size: 0.82rem; font-weight: 700; color: var(--accent); display: none;"></span>
                     <button type="button" class="btn btn-secondary" onclick="resetOcr()">Descartar</button>
-                    <button type="button" class="btn btn-primary" id="btnSaveOcrLaptop" onclick="window.saveOcrParsedLaptop()">✓ Confirmar e Salvar no Radar</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveOcrLaptop" onclick="window.saveOcrParsedLaptop()">âœ“ Confirmar e Salvar no Radar</button>
                   </div>
                 </div>
               </div>
@@ -449,31 +449,31 @@
           </div>
         </div>
       </div>
-    <!-- Modal Comparativo de Placas de Vídeo, Bateria & Tipo de Carregador -->
+    <!-- Modal Comparativo de Placas de VÃ­deo, Bateria & Tipo de Carregador -->
     <div class="modal-backdrop" id="gpuGuideModal" style="display: none;">
       <div class="modal-dialog modal-large">
         <div class="modal-header">
           <div>
-            <span class="badge badge-warning">Guia Prático do Comprador</span>
-            <h3 class="modal-title">⚡ Guia Completo: Placas, Bateria, RAM & Armazenamento</h3>
+            <span class="badge badge-warning">Guia PrÃ¡tico do Comprador</span>
+            <h3 class="modal-title">âš¡ Guia Completo: Placas, Bateria, RAM & Armazenamento</h3>
           </div>
-          <button class="btn-close" id="btnCloseGpuGuideModal">✕</button>
+          <button class="btn-close" id="btnCloseGpuGuideModal">âœ•</button>
         </div>
         <div class="modal-body">
-          <!-- Abas de Navegação -->
+          <!-- Abas de NavegaÃ§Ã£o -->
           <div class="guide-tabs" id="guideTabsNav">
-            <button class="guide-tab-btn active" data-tab="interactive">⚔️ Comparador Interativo de Placas</button>
-            <button class="guide-tab-btn" data-tab="battery">🔋 Autonomia Real da Bateria</button>
-            <button class="guide-tab-btn" data-tab="ramstorage">💾 RAM (DDR5/Troca) & SSD/SATA</button>
-            <button class="guide-tab-btn" data-tab="usbc">🔌 Carregador Type-C vs Pino Tradicional</button>
-            <button class="guide-tab-btn" data-tab="nextgen">🔮 Próxima Geração (RTX Série 50)</button>
+            <button class="guide-tab-btn active" data-tab="interactive">âš”ï¸ Comparador Interativo de Placas</button>
+            <button class="guide-tab-btn" data-tab="battery">ðŸ”‹ Autonomia Real da Bateria</button>
+            <button class="guide-tab-btn" data-tab="ramstorage">ðŸ’¾ RAM (DDR5/Troca) & SSD/SATA</button>
+            <button class="guide-tab-btn" data-tab="usbc">ðŸ”Œ Carregador Type-C vs Pino Tradicional</button>
+            <button class="guide-tab-btn" data-tab="nextgen">ðŸ”® PrÃ³xima GeraÃ§Ã£o (RTX SÃ©rie 50)</button>
           </div>
 
           <!-- Aba 1: Comparador Interativo -->
           <div class="guide-tab-pane active" id="paneInteractive">
             <div class="duel-selector-bar" style="margin-bottom: 1.25rem;">
               <div class="duel-select-group">
-                <label for="guideGpuA">🎮 Placa Base (Origem):</label>
+                <label for="guideGpuA">ðŸŽ® Placa Base (Origem):</label>
                 <select id="guideGpuA">
                   <option value="rtx4050">NVIDIA RTX 4050 (6GB GDDR6)</option>
                   <option value="rtx4060" selected>NVIDIA RTX 4060 (8GB GDDR6)</option>
@@ -483,13 +483,13 @@
               </div>
               <div class="duel-vs-circle">VS</div>
               <div class="duel-select-group">
-                <label for="guideGpuB">🔥 Placa Alvo (Comparar):</label>
+                <label for="guideGpuB">ðŸ”¥ Placa Alvo (Comparar):</label>
                 <select id="guideGpuB">
                   <option value="rtx4050">NVIDIA RTX 4050 (6GB GDDR6)</option>
                   <option value="rtx4060">NVIDIA RTX 4060 (8GB GDDR6)</option>
                   <option value="rtx4070" selected>NVIDIA RTX 4070 (8GB GDDR6)</option>
                   <option value="rtx4080">NVIDIA RTX 4080 (12GB GDDR6X)</option>
-                  <option value="rtx50series">RTX Série 50 (Blackwell - Nova Geração)</option>
+                  <option value="rtx50series">RTX SÃ©rie 50 (Blackwell - Nova GeraÃ§Ã£o)</option>
                 </select>
               </div>
             </div>
@@ -503,47 +503,47 @@
           <div class="guide-tab-pane" id="paneBattery" style="display: none;">
             <div class="battery-guide-box">
               <div class="battery-truth-alert">
-                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">⚡</div>
+                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">âš¡</div>
                 <div>
-                  <strong>A Realidade Sem Enrolação:</strong> Nenhum notebook gamer do mundo foi projetado para jogar sem tomada!
-                  Ao jogar na bateria, o sistema reduz os watts da placa de 140W para ~35W (para a bateria não estufar), <strong>derrubando o FPS em até 50%</strong>. A bateria dura no máximo <strong>1h a 1h20 jogando</strong>.
+                  <strong>A Realidade Sem EnrolaÃ§Ã£o:</strong> Nenhum notebook gamer do mundo foi projetado para jogar sem tomada!
+                  Ao jogar na bateria, o sistema reduz os watts da placa de 140W para ~35W (para a bateria nÃ£o estufar), <strong>derrubando o FPS em atÃ© 50%</strong>. A bateria dura no mÃ¡ximo <strong>1h a 1h20 jogando</strong>.
                 </div>
               </div>
 
               <h4 style="margin: 1.25rem 0 0.75rem 0; font-size: 1rem; color: var(--accent);">
-                💻 Autonomia Real em Uso Comum (Trabalho, Faculdade, YouTube com brilho médio):
+                ðŸ’» Autonomia Real em Uso Comum (Trabalho, Faculdade, YouTube com brilho mÃ©dio):
               </h4>
               <div class="battery-cards-grid">
                 <div class="battery-card">
                   <div class="battery-card-badge intel">Intel Core HX (i7-14700HX / i7-13650HX)</div>
                   <div class="battery-card-hours">3h00 a 4h30</div>
-                  <p class="battery-card-desc">Foco 100% em potência bruta. Possui 20 núcleos de alto desempenho que consomem energia contínua mesmo no Windows.</p>
+                  <p class="battery-card-desc">Foco 100% em potÃªncia bruta. Possui 20 nÃºcleos de alto desempenho que consomem energia contÃ­nua mesmo no Windows.</p>
                   <div class="battery-card-tag">Ex: Acer Predator Neo 16, Dell G16 7630</div>
                 </div>
 
                 <div class="battery-card highlight">
                   <div class="battery-card-badge ultra">Intel Core Ultra (Meteor Lake Ultra 7 155H)</div>
                   <div class="battery-card-hours">7h00 a 9h00</div>
-                  <p class="battery-card-desc">Possui ilha de baixo consumo (Low Power Island) e NPU integrada. Desliga os núcleos pesados ao navegar e ver vídeos.</p>
+                  <p class="battery-card-desc">Possui ilha de baixo consumo (Low Power Island) e NPU integrada. Desliga os nÃºcleos pesados ao navegar e ver vÃ­deos.</p>
                   <div class="battery-card-tag">Ex: ASUS ROG Zephyrus G16 (2024)</div>
                 </div>
 
                 <div class="battery-card">
-                  <div class="battery-card-badge amd">AMD Ryzen Série HS (Ryzen 7 7840HS / 8845HS)</div>
+                  <div class="battery-card-badge amd">AMD Ryzen SÃ©rie HS (Ryzen 7 7840HS / 8845HS)</div>
                   <div class="battery-card-hours">7h00 a 8h30</div>
-                  <p class="battery-card-desc">Construído em 4nm TSMC de extrema eficiência térmica. Excelente para quem precisa usar na aula sem levar carregador.</p>
+                  <p class="battery-card-desc">ConstruÃ­do em 4nm TSMC de extrema eficiÃªncia tÃ©rmica. Excelente para quem precisa usar na aula sem levar carregador.</p>
                   <div class="battery-card-tag">Ex: Lenovo Legion Slim 5, ASUS TUF A15</div>
                 </div>
               </div>
 
               <div class="battery-tips-list" style="margin-top: 1.25rem;">
                 <div class="tip-item">
-                  <strong>💡 O Segredo do MUX Switch / Advanced Optimus:</strong>
+                  <strong>ðŸ’¡ O Segredo do MUX Switch / Advanced Optimus:</strong>
                   Quando estiver fora de casa, selecione o modo "Eco" ou "iGPU Only" no software do notebook (Lenovo Vantage, Armoury Crate ou PredatorSense). Isso desliga a placa Nvidia por completo, dobrando a autonomia da bateria!
                 </div>
                 <div class="tip-item">
-                  <strong>✈️ Limite de Bateria em Avião (99.9Wh):</strong>
-                  Pela regulamentação da ANAC (Brasil) e FAA (EUA), baterias acima de 100Wh são proibidas em bagagem de mão de voos. Modelos como Zephyrus G16, TUF A15 e Helios Neo trazem <strong>90Wh</strong>, o maior tamanho permitido para viagem internacional do seu irmão!
+                  <strong>âœˆï¸ Limite de Bateria em AviÃ£o (99.9Wh):</strong>
+                  Pela regulamentaÃ§Ã£o da ANAC (Brasil) e FAA (EUA), baterias acima de 100Wh sÃ£o proibidas em bagagem de mÃ£o de voos. Modelos como Zephyrus G16, TUF A15 e Helios Neo trazem <strong>90Wh</strong>, o maior tamanho permitido para viagem internacional do seu irmÃ£o!
                 </div>
               </div>
             </div>
@@ -555,62 +555,62 @@
               <div class="usbc-comparison-cards">
                 <div class="usbc-card good">
                   <div class="usbc-card-header">
-                    <span class="badge badge-accent">⚡ Praticidade Total</span>
+                    <span class="badge badge-accent">âš¡ Praticidade Total</span>
                     <h4>Notebook com Carregamento USB-C PD (Power Delivery)</h4>
                   </div>
                   <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
                     Modelos como <strong>Lenovo Legion Slim 5 (140W)</strong>, <strong>Legion Pro 5i (140W)</strong>, <strong>ASUS ROG Zephyrus G16 (100W)</strong> e <strong>ASUS TUF A15 (100W)</strong> aceitam recarga diretamente pela porta USB-C!
                   </p>
                   <ul class="pros-cons-list">
-                    <li>✓ <strong>Você não precisa levar o tijolo na mochila:</strong> basta colocar um carregador de celular GaN compacto de 65W ou 100W para trabalhar ou estudar fora.</li>
-                    <li>✓ Usa o mesmo cabo do celular Android / Galaxy Fold 6!</li>
-                    <li>✓ Perfeito para cafeterias, reuniões, viagens e aeroportos.</li>
-                    <li>⚠️ Para jogar em potência máxima com TGP 140W, ainda usa a fonte principal em casa.</li>
+                    <li>âœ“ <strong>VocÃª nÃ£o precisa levar o tijolo na mochila:</strong> basta colocar um carregador de celular GaN compacto de 65W ou 100W para trabalhar ou estudar fora.</li>
+                    <li>âœ“ Usa o mesmo cabo do celular Android / Galaxy Fold 6!</li>
+                    <li>âœ“ Perfeito para cafeterias, reuniÃµes, viagens e aeroportos.</li>
+                    <li>âš ï¸ Para jogar em potÃªncia mÃ¡xima com TGP 140W, ainda usa a fonte principal em casa.</li>
                   </ul>
                 </div>
 
                 <div class="usbc-card alert">
                   <div class="usbc-card-header">
-                    <span class="badge badge-purple">🔌 Apenas Plugue Tradicional</span>
+                    <span class="badge badge-purple">ðŸ”Œ Apenas Plugue Tradicional</span>
                     <h4>Notebook Sem Recarga por Type-C (Pino Redondo)</h4>
                   </div>
                   <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
-                    Modelos como a <strong>linha Dell G15 e Dell G16</strong> possuem portas USB-C, porém elas servem apenas para transmissão de dados e saída de vídeo. <strong>NÃO recarregam o notebook!</strong>
+                    Modelos como a <strong>linha Dell G15 e Dell G16</strong> possuem portas USB-C, porÃ©m elas servem apenas para transmissÃ£o de dados e saÃ­da de vÃ­deo. <strong>NÃƒO recarregam o notebook!</strong>
                   </p>
                   <ul class="pros-cons-list">
-                    <li>⚠️ <strong>Obrigado a carregar a fonte pesada de 240W/330W</strong> (mais de 1 kg na mochila) mesmo se for apenas responder e-mails ou assistir aula.</li>
-                    <li>⚠️ Se esquecer a fonte original em casa, o notebook fica sem bateria e não aceita nenhum carregador de tomada portátil.</li>
+                    <li>âš ï¸ <strong>Obrigado a carregar a fonte pesada de 240W/330W</strong> (mais de 1 kg na mochila) mesmo se for apenas responder e-mails ou assistir aula.</li>
+                    <li>âš ï¸ Se esquecer a fonte original em casa, o notebook fica sem bateria e nÃ£o aceita nenhum carregador de tomada portÃ¡til.</li>
                   </ul>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Aba 4: Próxima Geração (RTX Série 50) -->
+          <!-- Aba 4: PrÃ³xima GeraÃ§Ã£o (RTX SÃ©rie 50) -->
           <div class="guide-tab-pane" id="paneNextGen" style="display: none;">
             <div class="nextgen-guide-box">
               <div style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
-                <h4 style="color: #c084fc; font-size: 1.1rem; margin-bottom: 0.5rem;">🔮 Vale a Pena Esperar a Próxima Geração (RTX Série 50 Blackwell)?</h4>
+                <h4 style="color: #c084fc; font-size: 1.1rem; margin-bottom: 0.5rem;">ðŸ”® Vale a Pena Esperar a PrÃ³xima GeraÃ§Ã£o (RTX SÃ©rie 50 Blackwell)?</h4>
                 <p style="font-size: 0.88rem; color: var(--text-main); line-height: 1.5;">
-                  A resposta sincera para o seu orçamento de <strong>R$ 8.000 a R$ 8.900</strong> é: <strong>NÃO VALE A PENA ESPERAR!</strong> Veja por que:
+                  A resposta sincera para o seu orÃ§amento de <strong>R$ 8.000 a R$ 8.900</strong> Ã©: <strong>NÃƒO VALE A PENA ESPERAR!</strong> Veja por que:
                 </p>
               </div>
 
               <div class="nextgen-reasons-grid">
                 <div class="reason-card">
-                  <div class="reason-icon">💸</div>
-                  <h5>1. Ágio de Lançamento Brutal</h5>
-                  <p>Notebooks de nova geração chegam nos EUA custando de $1.600 a $2.200 (bem acima do seu teto de $1.400). Levam de 6 a 9 meses até entrarem nas primeiras promoções.</p>
+                  <div class="reason-icon">ðŸ’¸</div>
+                  <h5>1. Ãgio de LanÃ§amento Brutal</h5>
+                  <p>Notebooks de nova geraÃ§Ã£o chegam nos EUA custando de $1.600 a $2.200 (bem acima do seu teto de $1.400). Levam de 6 a 9 meses atÃ© entrarem nas primeiras promoÃ§Ãµes.</p>
                 </div>
                 <div class="reason-card">
-                  <div class="reason-icon">🏷️</div>
-                  <h5>2. Sweetspot Histórico da Série 40</h5>
-                  <p>Agora é exatamente o momento onde a Série 40 (RTX 4060 por $999 e RTX 4070 por $1.199-$1.299) atinge seu menor preço histórico nos EUA para queima de estoque.</p>
+                  <div class="reason-icon">ðŸ·ï¸</div>
+                  <h5>2. Sweetspot HistÃ³rico da SÃ©rie 40</h5>
+                  <p>Agora Ã© exatamente o momento onde a SÃ©rie 40 (RTX 4060 por $999 e RTX 4070 por $1.199-$1.299) atinge seu menor preÃ§o histÃ³rico nos EUA para queima de estoque.</p>
                 </div>
                 <div class="reason-card">
-                  <div class="reason-icon">🚀</div>
+                  <div class="reason-icon">ðŸš€</div>
                   <h5>3. DLSS 3 + Frame Generation</h5>
-                  <p>A arquitetura Ada Lovelace da RTX 40 já possui gerador de quadros por IA (Frame Gen) e suporte a Ray Tracing de 3ª geração. Uma RTX 4070 roda qualquer lançamento no Ultra pelos próximos 4 anos com folga.</p>
+                  <p>A arquitetura Ada Lovelace da RTX 40 jÃ¡ possui gerador de quadros por IA (Frame Gen) e suporte a Ray Tracing de 3Âª geraÃ§Ã£o. Uma RTX 4070 roda qualquer lanÃ§amento no Ultra pelos prÃ³ximos 4 anos com folga.</p>
                 </div>
               </div>
             </div>
@@ -620,26 +620,26 @@
           <div class="guide-tab-pane" id="paneRamStorage" style="display: none;">
             <div class="ram-storage-guide-box">
               <div class="guide-alert-box">
-                <h4 style="color: var(--accent); margin-bottom: 0.4rem;">🧠 Legenda de Troca & Upgrades (RAM & Armazenamento):</h4>
+                <h4 style="color: var(--accent); margin-bottom: 0.4rem;">ðŸ§  Legenda de Troca & Upgrades (RAM & Armazenamento):</h4>
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.85rem;">
-                  <span><strong style="color: #34d399;">✅ Verde (Troca Total):</strong> 2x Slots SODIMM Removíveis (até 64GB) ou Slot M.2 Extra Livre</span>
-                  <span><strong style="color: #fbbf24;">⚠️ Amarelo (Parcial):</strong> 1 Slot Livre + Memória Soldada, ou Slot M.2 2230 menor</span>
-                  <span><strong style="color: #f87171;">❌ Vermelho (Sem Troca):</strong> 100% Soldada na Placa-Mãe (Não aceita upgrade)</span>
+                  <span><strong style="color: #34d399;">âœ… Verde (Troca Total):</strong> 2x Slots SODIMM RemovÃ­veis (atÃ© 64GB) ou Slot M.2 Extra Livre</span>
+                  <span><strong style="color: #fbbf24;">âš ï¸ Amarelo (Parcial):</strong> 1 Slot Livre + MemÃ³ria Soldada, ou Slot M.2 2230 menor</span>
+                  <span><strong style="color: #f87171;">âŒ Vermelho (Sem Troca):</strong> 100% Soldada na Placa-MÃ£e (NÃ£o aceita upgrade)</span>
                 </div>
               </div>
 
               <h4 style="font-size: 1.05rem; color: var(--text-main); margin-top: 0.5rem;">
-                ⚡ 1. Tecnologias de Memória RAM: Qual a diferença?
+                âš¡ 1. Tecnologias de MemÃ³ria RAM: Qual a diferenÃ§a?
               </h4>
               <div class="ram-comparison-grid">
                 <div class="ram-tech-card highlight">
-                  <span class="ram-tech-badge ddr5">DDR5 (Padrão Gamer Atual)</span>
+                  <span class="ram-tech-badge ddr5">DDR5 (PadrÃ£o Gamer Atual)</span>
                   <div class="ram-speed-label">4800 a 5600 MHz</div>
                   <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
-                    Padrão de alta velocidade com dois subcanais de 32 bits independentes por pente. Entrega até <strong>+50% de largura de banda</strong> para o processador comparado ao DDR4, mantendo os FPS mínimos mais estáveis.
+                    PadrÃ£o de alta velocidade com dois subcanais de 32 bits independentes por pente. Entrega atÃ© <strong>+50% de largura de banda</strong> para o processador comparado ao DDR4, mantendo os FPS mÃ­nimos mais estÃ¡veis.
                   </p>
                   <div style="font-size: 0.75rem; color: var(--accent); margin-top: auto; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 6px;">
-                    ✅ <strong>Vantagem:</strong> Usa pentes SODIMM removíveis (fácil upgrade até 64GB).
+                    âœ… <strong>Vantagem:</strong> Usa pentes SODIMM removÃ­veis (fÃ¡cil upgrade atÃ© 64GB).
                   </div>
                 </div>
 
@@ -647,61 +647,61 @@
                   <span class="ram-tech-badge lpddr5x">LPDDR5X (Ultrafinos / Estilo Mac)</span>
                   <div class="ram-speed-label">7467 MHz</div>
                   <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
-                    Velocidade absurda e baixo consumo elétrico, porém <strong>vem 100% SOLDADA na placa-mãe</strong>. Não existem slots físicos!
+                    Velocidade absurda e baixo consumo elÃ©trico, porÃ©m <strong>vem 100% SOLDADA na placa-mÃ£e</strong>. NÃ£o existem slots fÃ­sicos!
                   </p>
                   <div style="font-size: 0.75rem; color: #fbbf24; margin-top: auto; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 6px;">
-                    ❌ <strong>Atenção:</strong> Se comprar com 16GB, vai morrer com 16GB. Não aceita troca! (Ex: Zephyrus G16).
+                    âŒ <strong>AtenÃ§Ã£o:</strong> Se comprar com 16GB, vai morrer com 16GB. NÃ£o aceita troca! (Ex: Zephyrus G16).
                   </div>
                 </div>
 
                 <div class="ram-tech-card">
-                  <span class="ram-tech-badge ddr4">DDR4 (Geração Passada)</span>
+                  <span class="ram-tech-badge ddr4">DDR4 (GeraÃ§Ã£o Passada)</span>
                   <div class="ram-speed-label">3200 MHz</div>
                   <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
-                    Tecnologia de gerações anteriores (2020-2023). Mais barata, mas com menor largura de banda. Praticamente extinta em notebooks gamer modernos de R$ 8.000+.
+                    Tecnologia de geraÃ§Ãµes anteriores (2020-2023). Mais barata, mas com menor largura de banda. Praticamente extinta em notebooks gamer modernos de R$ 8.000+.
                   </p>
                   <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: auto; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 6px;">
-                    ⚠️ Evite em compras novas acima de R$ 7.000.
+                    âš ï¸ Evite em compras novas acima de R$ 7.000.
                   </div>
                 </div>
               </div>
 
               <h4 style="font-size: 1.05rem; color: var(--text-main); margin-top: 0.5rem;">
-                💾 2. Armazenamento: O que aconteceu com o HD SATA 2.5" e M.2 NVMe?
+                ðŸ’¾ 2. Armazenamento: O que aconteceu com o HD SATA 2.5" e M.2 NVMe?
               </h4>
               <div class="storage-comparison-cards">
                 <div class="storage-card good">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="badge badge-accent">✅ Padrão Moderno</span>
+                    <span class="badge badge-accent">âœ… PadrÃ£o Moderno</span>
                     <strong style="font-size:0.95rem;">2x Slots M.2 NVMe PCIe 4.0</strong>
                   </div>
                   <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.4;">
                     Todos os notebooks gamer atuais adotam <strong>dois slots M.2 NVMe</strong>.
                   </p>
                   <ul class="pros-cons-list">
-                    <li>✓ <strong>Velocidades brutais:</strong> 5.000 a 7.500 MB/s (14x mais rápido que qualquer SSD SATA).</li>
-                    <li>✓ <strong>Slot livre para 2º SSD:</strong> Você pode espetar um segundo SSD M.2 (1TB ou 2TB) a qualquer momento sem remover o original com o Windows!</li>
-                    <li>✓ Compacto no chassi: permite espaço para baterias maiores de 80Wh a 90Wh.</li>
+                    <li>âœ“ <strong>Velocidades brutais:</strong> 5.000 a 7.500 MB/s (14x mais rÃ¡pido que qualquer SSD SATA).</li>
+                    <li>âœ“ <strong>Slot livre para 2Âº SSD:</strong> VocÃª pode espetar um segundo SSD M.2 (1TB ou 2TB) a qualquer momento sem remover o original com o Windows!</li>
+                    <li>âœ“ Compacto no chassi: permite espaÃ§o para baterias maiores de 80Wh a 90Wh.</li>
                   </ul>
                 </div>
 
                 <div class="storage-card legacy">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="badge badge-purple">⚠️ Descontinuado</span>
+                    <span class="badge badge-purple">âš ï¸ Descontinuado</span>
                     <strong style="font-size:0.95rem;">Baia para HD / SSD SATA 2.5"</strong>
                   </div>
                   <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.4;">
                     Praticamente <strong>nenhum notebook gamer moderno possui baia interna SATA de 2.5"</strong>.
                   </p>
                   <ul class="pros-cons-list">
-                    <li>❌ Espaço foi eliminado para caber baterias maiores e câmaras de vapor com tubos de cobre duplos.</li>
-                    <li>💡 <strong>Como usar meu HD antigo?</strong> Compre um case externo USB 3.0 (R$ 35) e ligue via USB como HD externo!</li>
+                    <li>âŒ EspaÃ§o foi eliminado para caber baterias maiores e cÃ¢maras de vapor com tubos de cobre duplos.</li>
+                    <li>ðŸ’¡ <strong>Como usar meu HD antigo?</strong> Compre um case externo USB 3.0 (R$ 35) e ligue via USB como HD externo!</li>
                   </ul>
                 </div>
               </div>
 
               <h4 style="font-size: 1.05rem; color: var(--text-main); margin-top: 0.5rem;">
-                📋 Matriz de Upgrades dos Notebooks Monitorados:
+                ðŸ“‹ Matriz de Upgrades dos Notebooks Monitorados:
               </h4>
               <table class="upgrade-matrix-table">
                 <thead>
@@ -716,59 +716,59 @@
                 <tbody>
                   <tr>
                     <td><strong>Acer Predator Helios Neo 16</strong></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM até 64GB)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… Aceita Troca (2x SODIMM atÃ© 64GB)</span></td>
                     <td>DDR5 5600MHz</td>
-                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399;">âœ… 2x M.2 (1 Livre)</span></td>
                     <td>~5.0h</td>
                   </tr>
                   <tr>
                     <td><strong>Lenovo Legion Slim 5</strong></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM até 64GB)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… Aceita Troca (2x SODIMM atÃ© 64GB)</span></td>
                     <td>DDR5 5600MHz</td>
-                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ ~7.5h (Top)</span></td>
+                    <td><span style="color:#34d399;">âœ… 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… ~7.5h (Top)</span></td>
                   </tr>
                   <tr>
                     <td><strong>ASUS TUF Gaming A15</strong></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM até 64GB)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… Aceita Troca (2x SODIMM atÃ© 64GB)</span></td>
                     <td>DDR5 5600MHz</td>
-                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ ~8.0h (Top)</span></td>
+                    <td><span style="color:#34d399;">âœ… 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… ~8.0h (Top)</span></td>
                   </tr>
                   <tr>
                     <td><strong>Lenovo Legion Pro 5i</strong></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM - Já vem 32GB)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… Aceita Troca (2x SODIMM - JÃ¡ vem 32GB)</span></td>
                     <td>DDR5 5600MHz</td>
-                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399;">âœ… 2x M.2 (1 Livre)</span></td>
                     <td>~4.5h</td>
                   </tr>
                   <tr>
                     <td><strong>Acer Nitro 16</strong></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… Aceita Troca (2x SODIMM)</span></td>
                     <td>DDR5 4800MHz</td>
-                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ ~6.0h</span></td>
+                    <td><span style="color:#34d399;">âœ… 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… ~6.0h</span></td>
                   </tr>
                   <tr>
                     <td><strong>Dell G16 7630</strong></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… Aceita Troca (2x SODIMM)</span></td>
                     <td>DDR5 4800MHz</td>
-                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399;">âœ… 2x M.2 (1 Livre)</span></td>
                     <td>~4.0h</td>
                   </tr>
                   <tr>
                     <td><strong>Dell G15 5530</strong></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ Aceita Troca (2x SODIMM)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… Aceita Troca (2x SODIMM)</span></td>
                     <td>DDR5 4800MHz</td>
-                    <td><span style="color:#fbbf24; font-weight:700;">⚠️ 2x M.2 (2º slot precisa suporte Dell)</span></td>
+                    <td><span style="color:#fbbf24; font-weight:700;">âš ï¸ 2x M.2 (2Âº slot precisa suporte Dell)</span></td>
                     <td>~3.5h</td>
                   </tr>
                   <tr>
                     <td><strong>ASUS ROG Zephyrus G16</strong></td>
-                    <td><span style="color:#f87171; font-weight:700;">❌ Não Aceita Troca (100% Soldada)</span></td>
+                    <td><span style="color:#f87171; font-weight:700;">âŒ NÃ£o Aceita Troca (100% Soldada)</span></td>
                     <td>LPDDR5X 7467MHz</td>
-                    <td><span style="color:#34d399;">✅ 2x M.2 (1 Livre)</span></td>
-                    <td><span style="color:#34d399; font-weight:700;">✅ ~8.5h (Top)</span></td>
+                    <td><span style="color:#34d399;">âœ… 2x M.2 (1 Livre)</span></td>
+                    <td><span style="color:#34d399; font-weight:700;">âœ… ~8.5h (Top)</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -783,11 +783,11 @@
 
   <footer class="app-footer">
     <div class="footer-container">
-      <p>⚡ <strong>GamerRadar</strong> - Calculadora de paridade de compra, paridade técnica e rastreador de preços.</p>
-      <p class="footer-tip">Dica técnica: Sempre confira o <strong>TGP (Watts)</strong> da GPU. Uma RTX 4060 de 140W supera uma RTX 4070 limitada a 75W/100W!</p>
+      <p>âš¡ <strong>GamerRadar</strong> - Calculadora de paridade de compra, paridade tÃ©cnica e rastreador de preÃ§os.</p>
+      <p class="footer-tip">Dica tÃ©cnica: Sempre confira o <strong>TGP (Watts)</strong> da GPU. Uma RTX 4060 de 140W supera uma RTX 4070 limitada a 75W/100W!</p>
     </div>
   </footer>
 
-  <script src="app.js?v=20261013_v5"></script>
+  <script src="app.js?v=20261013_v6"></script>
 </body>
 </html>

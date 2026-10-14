@@ -360,6 +360,7 @@ let currentSort = 'value_score';
 let usdRate = 5.65;
 let salesTaxRate = 0.0; // 0% (Delaware / online), 6.5% (Flórida), 8.87% (NY)
 let importMode = 'wise'; // 'wise' (1.1%), 'credit_card' (4.38%), 'direct' (0%)
+var currentViewMode = 'cards'; // 'cards' ou 'table'
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
