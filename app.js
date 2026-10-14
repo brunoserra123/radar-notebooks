@@ -1213,36 +1213,58 @@ function getBrandTag(name = '') {
   return 'NOTEBOOK GAMER';
 }
 
-// Imagens de alta definição dedicadas para cada modelo
+// Imagens de alta definição dedicadas para cada modelo (sem confundir marcas)
 function getLaptopImage(laptop) {
   if (laptop && laptop.imageUrl) return laptop.imageUrl;
   const n = (laptop && laptop.name ? laptop.name : '').toLowerCase();
   const id = (laptop && laptop.id ? laptop.id : '').toLowerCase();
 
-  if (id.includes('helios') || n.includes('helios') || n.includes('predator')) {
-    return 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=700&q=80';
-  }
-  if (id.includes('g16') || n.includes('g16')) {
-    return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=700&q=80';
-  }
-  if (id.includes('slim-5') || n.includes('slim 5') || n.includes('slim-5')) {
-    return 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=700&q=80';
-  }
-  if (id.includes('tuf') || n.includes('tuf') || n.includes('a15')) {
-    return 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=700&q=80';
-  }
-  if (id.includes('pro-5i') || n.includes('pro 5') || n.includes('pro-5')) {
-    return 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=700&q=80';
-  }
-  if (id.includes('nitro') || n.includes('nitro 16')) {
-    return 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=700&q=80';
-  }
+  // 1. ASUS ROG Zephyrus G16 (Ultrabook Gamer Alumínio Fino - PRIORIDADE para não pegar 'g16' da Dell)
   if (id.includes('zephyrus') || n.includes('zephyrus')) {
     return 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=700&q=80';
   }
-  if (id.includes('g15') || n.includes('g15')) {
+
+  // 2. ASUS ROG Strix
+  if (id.includes('strix') || n.includes('strix')) {
+    return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80';
+  }
+
+  // 3. ASUS TUF Gaming (A15 / F15)
+  if (id.includes('tuf') || n.includes('tuf')) {
+    return 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=700&q=80';
+  }
+
+  // 4. Dell G16 (Agora específico apenas para a linha DELL G16!)
+  if ((id.includes('dell') && (id.includes('g16') || id.includes('7630'))) || (n.includes('dell') && n.includes('g16')) || id === 'dell-g16-7630') {
+    return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=700&q=80';
+  }
+
+  // 5. Dell G15
+  if ((id.includes('dell') && id.includes('g15')) || (n.includes('dell') && n.includes('g15')) || id === 'dell-g15-5530') {
     return 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=700&q=80';
   }
+
+  // 6. Lenovo Legion Pro 5i
+  if (id.includes('pro-5') || n.includes('pro 5') || id.includes('legion-pro')) {
+    return 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=700&q=80';
+  }
+
+  // 7. Lenovo Legion Slim 5
+  if (id.includes('slim') || n.includes('slim 5') || id.includes('legion')) {
+    return 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=700&q=80';
+  }
+
+  // 8. Acer Predator Helios Neo 16
+  if (id.includes('helios') || n.includes('helios') || n.includes('predator')) {
+    return 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=700&q=80';
+  }
+
+  // 9. Acer Nitro 16
+  if (id.includes('nitro') || n.includes('nitro')) {
+    return 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=700&q=80';
+  }
+
+  // 10. Fallbacks por marca geral
   if (n.includes('lenovo')) {
     return 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=700&q=80';
   }
