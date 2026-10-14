@@ -1213,68 +1213,66 @@ function getBrandTag(name = '') {
   return 'NOTEBOOK GAMER';
 }
 
-// Imagens de alta definição dedicadas para cada modelo (sem confundir marcas)
+// Imagens de alta definição 100% autênticas e locais para cada modelo (sem imagens erradas de terceiros)
 function getLaptopImage(laptop) {
   if (laptop && laptop.imageUrl) return laptop.imageUrl;
   const n = (laptop && laptop.name ? laptop.name : '').toLowerCase();
   const id = (laptop && laptop.id ? laptop.id : '').toLowerCase();
 
-  // 1. ASUS ROG Zephyrus G16 (Ultrabook Gamer Alumínio Fino - PRIORIDADE para não pegar 'g16' da Dell)
+  // 1. ASUS ROG Zephyrus G16 (Autêntico Zephyrus Alumínio com logo ROG)
   if (id.includes('zephyrus') || n.includes('zephyrus')) {
-    return 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=700&q=80';
+    return 'images/asus_zephyrus_g16.jpg';
   }
 
-  // 2. ASUS ROG Strix
-  if (id.includes('strix') || n.includes('strix')) {
-    return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80';
+  // 2. ASUS TUF Gaming (A15 / F15)
+  if (id.includes('tuf') || n.includes('tuf') || n.includes('a15')) {
+    return 'images/asus_tuf_a15.jpg';
   }
 
-  // 3. ASUS TUF Gaming (A15 / F15)
-  if (id.includes('tuf') || n.includes('tuf')) {
-    return 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=700&q=80';
-  }
-
-  // 4. Dell G16 (Agora específico apenas para a linha DELL G16!)
+  // 3. Dell G16 (Autêntico Dell G16 7630 com exaustor angular e logo G)
   if ((id.includes('dell') && (id.includes('g16') || id.includes('7630'))) || (n.includes('dell') && n.includes('g16')) || id === 'dell-g16-7630') {
-    return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=700&q=80';
+    return 'images/dell_g16_7630.jpg';
   }
 
-  // 5. Dell G15
+  // 4. Dell G15
   if ((id.includes('dell') && id.includes('g15')) || (n.includes('dell') && n.includes('g15')) || id === 'dell-g15-5530') {
-    return 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=700&q=80';
+    return 'images/dell_g16_7630.jpg';
   }
 
-  // 6. Lenovo Legion Pro 5i
+  // 5. Lenovo Legion Pro 5i (Autêntico Legion com logo azul na tampa)
   if (id.includes('pro-5') || n.includes('pro 5') || id.includes('legion-pro')) {
-    return 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=700&q=80';
+    return 'images/lenovo_legion_pro_5i.jpg';
   }
 
-  // 7. Lenovo Legion Slim 5
+  // 6. Lenovo Legion Slim 5 (Autêntico Legion Slim cinza storm)
   if (id.includes('slim') || n.includes('slim 5') || id.includes('legion')) {
-    return 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=700&q=80';
+    return 'images/lenovo_legion_slim_5.jpg';
   }
 
-  // 8. Acer Predator Helios Neo 16
+  // 7. Acer Predator Helios Neo 16 (Autêntico Helios com logo ciano Predator e gravação a laser)
   if (id.includes('helios') || n.includes('helios') || n.includes('predator')) {
-    return 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=700&q=80';
+    return 'images/acer_helios_neo_16.jpg';
   }
 
-  // 9. Acer Nitro 16
+  // 8. Acer Nitro 16
   if (id.includes('nitro') || n.includes('nitro')) {
-    return 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=700&q=80';
+    return 'images/acer_helios_neo_16.jpg';
   }
 
-  // 10. Fallbacks por marca geral
-  if (n.includes('lenovo')) {
-    return 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=700&q=80';
+  // Fallbacks por marca geral
+  if (n.includes('asus') || n.includes('rog')) {
+    return 'images/asus_zephyrus_g16.jpg';
   }
-  if (n.includes('asus')) {
-    return 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=700&q=80';
+  if (n.includes('lenovo')) {
+    return 'images/lenovo_legion_slim_5.jpg';
   }
   if (n.includes('dell')) {
-    return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=700&q=80';
+    return 'images/dell_g16_7630.jpg';
   }
-  return 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=700&q=80';
+  if (n.includes('acer')) {
+    return 'images/acer_helios_neo_16.jpg';
+  }
+  return 'images/asus_zephyrus_g16.jpg';
 }
 
 // Modal e Extração Inteligente por Link Direto
