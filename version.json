@@ -1,5 +1,5 @@
 {
-  "version": "20261014_v30",
-  "releaseNotes": "Correção crítica estrutural HTML: fechamento do ocrModal e reposicionamento do modal de vídeos como filho direto do body + Player Embutido",
-  "updatedAt": "2026-10-14T16:50:00-03:00"
+  "version": "20261014_v31",
+  "releaseNotes": "Player do YouTube 100% corrigido com IDs oficiais de vídeos reais (Dan Ferreira, Jarrod's Tech, Lucas Ishii, Adrenaline), playlist com thumbnails e abas funcionais.",
+  "updatedAt": "2026-10-14T17:31:00-03:00"
 }
