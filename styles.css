@@ -2141,10 +2141,21 @@ select {
 }
 
 /* Robô IA: Botão de Conferir Especificações & Auditoria */
+@keyframes robotGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(56, 189, 248, 0.4), inset 0 0 4px rgba(56, 189, 248, 0.2);
+    border-color: rgba(56, 189, 248, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.85), inset 0 0 8px rgba(56, 189, 248, 0.5);
+    border-color: #38bdf8;
+  }
+}
+
 .btn-robot-verify {
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(168, 85, 247, 0.22));
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(168, 85, 247, 0.28));
   color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.4);
+  border: 1px solid rgba(56, 189, 248, 0.5);
   font-size: 0.72rem;
   font-weight: 700;
   padding: 3px 8px;
@@ -2155,28 +2166,62 @@ select {
   gap: 4px;
   transition: all 0.2s ease;
   white-space: nowrap;
+  animation: robotGlowPulse 2.2s infinite ease-in-out;
 }
 
 .btn-robot-verify:hover {
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(168, 85, 247, 0.4));
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.4), rgba(168, 85, 247, 0.5));
   color: #ffffff;
   border-color: #38bdf8;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 4px 18px rgba(56, 189, 248, 0.5);
 }
 
 .btn-robot {
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(139, 92, 246, 0.2));
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(139, 92, 246, 0.25));
   color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  border: 1px solid rgba(56, 189, 248, 0.4);
   font-weight: 700;
+  cursor: pointer;
+  animation: robotGlowPulse 2.8s infinite ease-in-out;
 }
 
 .btn-robot:hover {
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(139, 92, 246, 0.35));
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(139, 92, 246, 0.4));
   color: #ffffff;
   border-color: #38bdf8;
-  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.4);
+}
+
+#specsAuditModal {
+  z-index: 99999 !important;
+}
+
+#specsAuditModal .modal-dialog {
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.25), 0 20px 40px rgba(0, 0, 0, 0.8);
+  animation: auditPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes auditPop {
+  from { transform: scale(0.93); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.audit-scanner-line {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #38bdf8, #10b981, transparent);
+  animation: scannerAnim 2s linear infinite;
+  margin-bottom: 1.25rem;
+  border-radius: 99px;
+  box-shadow: 0 0 10px #38bdf8;
+}
+
+@keyframes scannerAnim {
+  0% { transform: translateX(-60%); opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { transform: translateX(60%); opacity: 0.3; }
 }
 
 /* Modal de Auditoria do Robô IA */

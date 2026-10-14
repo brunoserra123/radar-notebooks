@@ -1556,7 +1556,16 @@ function openSpecsAuditModal(laptopId) {
 
   const portsInfo = countPorts(officialPorts);
 
+  // Garante isolamento fechando outros modais
+  document.querySelectorAll('.modal-backdrop').forEach(m => {
+    if (m.id !== 'specsAuditModal') m.style.display = 'none';
+  });
+
+  // Sinal visual imediato
+  showToastNotification(`🤖 Robô GamerRadar: Auditando ${laptop.name}...`);
+
   body.innerHTML = `
+    <div class="audit-scanner-line"></div>
     <div class="audit-header-hero">
       <img src="${getLaptopImage(laptop)}" alt="${laptop.name}" class="audit-hero-thumb">
       <div>
