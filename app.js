@@ -2301,6 +2301,42 @@ function getLaptopWeight(laptop) {
   return { kg: '2.40', lbs: '5.29' };
 }
 
+// Retorna a badge de veredito da GPU: Verde (Pode comprar) ou Atenção (Pensa bem)
+function getGpuVerdictBadge(laptop) {
+  const gpu = ((laptop && laptop.gpu) ? laptop.gpu : '').toLowerCase();
+  const tgp = ((laptop && laptop.gpuTgp) ? laptop.gpuTgp : '').toLowerCase();
+
+  // 1. Apenas Placa Integrada (SEM placa dedicada NVIDIA) -> Vermelho
+  if (gpu.includes('iris') || gpu.includes('uhd') || (gpu.includes('arc') && !gpu.includes('a770') && !gpu.includes('a730')) || (gpu.includes('radeon') && !gpu.includes('rx'))) {
+    return `<span class="badge" style="background:rgba(239, 68, 68, 0.22); color:#f87171; border:1px solid rgba(239, 68, 68, 0.55); font-size:0.72rem; padding:3px 8px; font-weight:800; border-radius:4px; white-space:nowrap;">🚫 Cuidado (Pensa bem - Sem Placa Gamer)</span>`;
+  }
+
+  // 2. RTX 4070 / RTX 4080 / RTX 4090 (Top de linha com 140W) -> Verde
+  if (gpu.includes('4070') || gpu.includes('4080') || gpu.includes('4090')) {
+    return `<span class="badge" style="background:rgba(16, 185, 129, 0.22); color:#34d399; border:1px solid rgba(16, 185, 129, 0.55); font-size:0.72rem; padding:3px 8px; font-weight:800; border-radius:4px; white-space:nowrap;">🟢 Placa Certa (Pode comprar)</span>`;
+  }
+
+  // 3. RTX 4060 com TGP 140W -> Verde
+  if (gpu.includes('4060')) {
+    if (tgp.includes('45w') || tgp.includes('65w') || tgp.includes('75w')) {
+      return `<span class="badge" style="background:rgba(245, 158, 11, 0.22); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.55); font-size:0.72rem; padding:3px 8px; font-weight:800; border-radius:4px; white-space:nowrap;">⚠️ Atenção (Pensa bem - TGP Capado)</span>`;
+    }
+    return `<span class="badge" style="background:rgba(16, 185, 129, 0.22); color:#34d399; border:1px solid rgba(16, 185, 129, 0.55); font-size:0.72rem; padding:3px 8px; font-weight:800; border-radius:4px; white-space:nowrap;">🟢 Placa Certa (Pode comprar)</span>`;
+  }
+
+  // 4. RTX 4050 -> Amarelo (Apenas 6GB VRAM, sofre em lançamentos)
+  if (gpu.includes('4050')) {
+    return `<span class="badge" style="background:rgba(245, 158, 11, 0.22); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.55); font-size:0.72rem; padding:3px 8px; font-weight:800; border-radius:4px; white-space:nowrap;">⚠️ Atenção (Pensa bem - Apenas 6GB VRAM)</span>`;
+  }
+
+  // 5. RTX 3050 ou anterior
+  if (gpu.includes('3050') || gpu.includes('1650') || gpu.includes('2050')) {
+    return `<span class="badge" style="background:rgba(239, 68, 68, 0.22); color:#f87171; border:1px solid rgba(239, 68, 68, 0.55); font-size:0.72rem; padding:3px 8px; font-weight:800; border-radius:4px; white-space:nowrap;">🚫 Atenção (Pensa bem - Placa Antiga)</span>`;
+  }
+
+  return `<span class="badge" style="background:rgba(56, 189, 248, 0.18); color:#38bdf8; border:1px solid rgba(56, 189, 248, 0.45); font-size:0.72rem; padding:3px 8px; font-weight:800; border-radius:4px; white-space:nowrap;">🎮 Placa Gamer</span>`;
+}
+
 // Renderização Principal do Grid
 function render() {
   const grid = document.getElementById('notebookGrid');
@@ -2477,13 +2513,19 @@ function render() {
     if (hasSuperiorGpuInUsa) {
       decisionBadge = `
         <div class="badge badge-recommend-usa" style="width:100%; text-align:center; padding:7px 10px; font-size:0.78rem; font-weight:700;">
-          🚀 VALE MUITO NOS EUA: Leva ${laptop.gpu} pelo preço de 4060 no Brasil!
+          🚀 VALE MUITO NOS EUA (Pode comprar): Leva ${laptop.gpu} pelo preço de 4060 no Brasil!
         </div>
       `;
     } else if (hasGreatDealInBr) {
       decisionBadge = `
         <div class="badge badge-recommend-br" style="width:100%; text-align:center; padding:7px 10px; font-size:0.78rem; font-weight:700;">
-          🛡️ VALE A PENA NO BRASIL: Mesma placa + Garantia nacional de 1 ano e Teclado ABNT2
+          🛡️ VALE A PENA NO BRASIL (Pode comprar): Mesma placa + Garantia nacional de 1 ano e Teclado ABNT2
+        </div>
+      `;
+    } else if (laptop.gpu && (laptop.gpu.includes('4050') || laptop.gpu.includes('Iris') || laptop.gpu.includes('UHD') || laptop.gpu.includes('Integrada'))) {
+      decisionBadge = `
+        <div class="badge" style="width:100%; text-align:center; padding:7px 10px; font-size:0.78rem; font-weight:800; background:rgba(245, 158, 11, 0.18); color:#fbbf24; border:1px solid rgba(245, 158, 11, 0.45);">
+          ⚠️ ATENÇÃO (Pensa bem): Modelo com placa mais fraca/limitada para jogos pesados
         </div>
       `;
     }
@@ -2522,7 +2564,10 @@ function render() {
         <div class="specs-block">
           <div class="specs-hardware-grid">
             <div class="spec-item">
-              <span class="spec-label">🎮 Placa de Vídeo (Dedicada vs Integrada)</span>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:4px;">
+                <span class="spec-label" style="margin:0;">🎮 Placa de Vídeo</span>
+                ${getGpuVerdictBadge(laptop)}
+              </div>
               <span class="spec-value spec-gpu-tgp">
                 <div>
                   <span class="badge badge-accent" style="font-size:0.68rem; padding:1px 6px;">⚡ DEDICADA (dGPU)</span>
@@ -2768,6 +2813,7 @@ function renderTable(filteredLaptops) {
               <td>
                 <div style="font-weight:700; color:#38bdf8;">${laptop.gpu}</div>
                 <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">${laptop.gpuTgp}</div>
+                <div style="margin-top:4px;">${getGpuVerdictBadge(laptop)}</div>
               </td>
               <td>
                 <div style="font-size:0.84rem; font-weight:600;">${laptop.cpu.split('(')[0].trim()}</div>
